@@ -1,0 +1,1011 @@
+import { useEffect, useState } from "react";
+import { Table, Dropdown } from "react-bootstrap";
+import Header from "../components/header";
+import Asidebar from "../components/asidebar";
+import Form from "react-bootstrap/Form";
+import axios from "axios";
+import CryptoJS from "crypto-js";
+
+export default function Profiledetails() {
+  const [loginDetails, setloginDetails] = useState({
+    current_password: "",
+    new_password: "",
+    new_password_confirm: "",
+    verification_code: "",
+  });
+  // Password validation
+  const [passwordValidation, setpasswordValidation] = useState({
+    length: false,
+    lowercase: false,
+    uppercase: false,
+    number: false,
+    special: false,
+  });
+
+  const [formdata, setformdata] = useState({
+    email: "",
+    phone: "",
+    first_name: "",
+    last_name: "",
+    gender: "",
+    "inline-radio-1": "",
+    "inline-radio-2": "",
+  });
+  // console.log(formdata);
+
+  const [editCancel, setEditCancel] = useState(false);
+  const [numbereditCancel, setNumberEditCancel] = useState(false);
+  const [formedit, setFormEdit] = useState(false);
+  const [editform, setEditForm] = useState(false);
+  //password rules
+  const [showRules, setshowRules] = useState(false);
+
+  const editForm = (item) => {
+    setEditForm(!editform);
+  };
+
+  const [table, setTable] = useState([
+    { id: 1, isShown: false },
+    { id: 2, isShown: false },
+    { id: 3, isShown: false },
+    { id: 4, isShown: false },
+  ]);
+  const [tableDelete, setTableDelete] = useState(false);
+  async function handleClickOpen() {
+    setTableDelete((tableDelete) => !tableDelete);
+  }
+  let toggleClassOpen = tableDelete ? " show" : "";
+
+  const [btnState, setBtnState] = useState(false);
+
+  let toggleClassCheck = btnState ? " show" : "";
+
+  const [formShow, setFormShow] = useState(false);
+  function handleClickForm() {
+    setFormShow((formShow) => !btnState);
+  }
+  let toggleClassForm = btnState ? " show-form" : "";
+
+  const handleFormData = (e) => {
+    // console.log(e.target.checked);
+    if (e.target.id == "inline-radio-1") {
+      setformdata({
+        ...formdata,
+        "inline-radio-1": "on",
+        "inline-radio-2": "off",
+        gender: "male",
+      });
+    } else if (e.target.id == "inline-radio-2") {
+      setformdata({
+        ...formdata,
+        "inline-radio-1": "off",
+        "inline-radio-2": "on",
+        gender: "female",
+      });
+    } else {
+      setformdata({
+        ...formdata,
+        [e.target.id]: e.target.value,
+      });
+    }
+  };
+
+  // console.log(formdata, "formdata");
+
+  const mouseEnterFn = (show) => {
+    setTable((cate) =>
+      cate.map((item, index) => {
+        if (item.id === show.id) {
+          return { ...item, isShown: true };
+        } else {
+          return item;
+        }
+      })
+    );
+  };
+
+  const mouseLeaveFn = (show) => {
+    setTable((cate) =>
+      cate.map((item, index) => {
+        if (item.id === show.id) {
+          return { ...item, isShown: false };
+        } else {
+          return item;
+        }
+      })
+    );
+  };
+
+  const phoneNumberSaveButton = () => {
+    setNumberEditCancel(!numbereditCancel);
+  };
+
+  async function handleClick(e) {
+    e.preventDefault();
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}v1/password/resset`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          email: user.email,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        alert("Error");
+      } else {
+        alert("otp sent to your email");
+        setBtnState((btnState) => !btnState);
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Error");
+    }
+  }
+
+  // Resend code button
+  async function resendCodeBtn(e) {
+    e.preventDefault();
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}v1/password/resset`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          email: user.email,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        alert("Error");
+      } else {
+        alert("otp sent to your email");
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Error");
+    }
+  }
+
+  const nameSaveButton = async () => {
+    try {
+      const token = localStorage.getItem("janz_medical_login_token");
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}v1/customer/profile`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        data: {
+          first_name: formdata.first_name,
+          last_name: formdata.last_name,
+          gender: formdata.gender,
+          phone: formdata.phone,
+        },
+      });
+      // console.log(response, "response");
+      if (response.status == "200") {
+        localStorage.setItem(
+          "janz_medical_user",
+          JSON.stringify(response?.data?.user)
+        );
+        alert("Profile updated successfully");
+      } else {
+        alert("Error");
+        console.log(error);
+      }
+    } catch (error) {
+      alert("Error");
+      console.log(error);
+    }
+    setEditCancel(!editCancel);
+  };
+  const checkDisbledCreateAccountBtn = async () => {
+    const isValid = Object.values(passwordValidation).every(
+      (val) => val === true
+    );
+    console.log(isValid, "IS VALID");
+    return isValid;
+  };
+  // Login details onchnage
+  const loginDetailsChangeFn = (e) => {
+    if (e.target.id === "new_password") {
+      let value = e.target.value;
+      setpasswordValidation({
+        length: value.length >= 8,
+        lowercase: /[a-z]/.test(value),
+        uppercase: /[A-Z]/.test(value),
+        number: /\d/.test(value),
+        special: /[!@#\$%^&*?_~]/.test(value),
+      });
+    }
+    setloginDetails({ ...loginDetails, [e.target.id]: e.target.value });
+  };
+  // console.log(loginDetails, "LOGIN DETAILS");
+  // console.log(passwordValidation, "PASSWORD VALIDATION");
+  const resetPasswordLoginBtn = async (e) => {
+    e.preventDefault();
+    if (
+      loginDetails.current_password === "" ||
+      loginDetails.new_password === "" ||
+      loginDetails.new_password_confirm === ""
+    ) {
+      return;
+    }
+    if (loginDetails.current_password === loginDetails.new_password) {
+      alert("Password is same as current password");
+      return;
+    }
+    if (loginDetails.new_password !== loginDetails.new_password_confirm) {
+      alert("Password not matched");
+      return;
+    }
+    let isValid = checkDisbledCreateAccountBtn();
+    if (!isValid) {
+      alert("Password must follow all rules as specified");
+      return;
+    }
+    try {
+      var CryptoJSAesJson = {
+        stringify: function (cipherParams) {
+          var j = { ct: cipherParams.ciphertext.toString(CryptoJS.enc.Base64) };
+          if (cipherParams.iv) j.iv = cipherParams.iv.toString();
+          if (cipherParams.salt) j.s = cipherParams.salt.toString();
+          return JSON.stringify(j);
+        },
+      };
+      const key = "JAnz23M4o6m";
+      let encryptedCurrent_Password = CryptoJS.AES.encrypt(
+        JSON.stringify(loginDetails.current_password),
+        key,
+        {
+          format: CryptoJSAesJson,
+        }
+      ).toString();
+      let encryptedNew_Password = CryptoJS.AES.encrypt(
+        JSON.stringify(loginDetails.new_password),
+        key,
+        {
+          format: CryptoJSAesJson,
+        }
+      ).toString();
+
+      encryptedCurrent_Password = JSON.parse(encryptedCurrent_Password);
+      encryptedNew_Password = JSON.parse(encryptedNew_Password);
+      const token = localStorage.getItem("janz_medical_login_token");
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}v1/customer/password/change`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: "Bearer " + token,
+        },
+        data: {
+          current_password: {
+            ct: encryptedCurrent_Password.ct,
+            iv: encryptedCurrent_Password.iv,
+            s: encryptedCurrent_Password.s,
+          },
+          new_password: {
+            ct: encryptedNew_Password.ct,
+            iv: encryptedNew_Password.iv,
+            s: encryptedNew_Password.s,
+          },
+          verify_code: loginDetails.verification_code,
+        },
+      });
+      // console.log(response, "result");
+      if (response.data.status != false) {
+        setBtnState((btnState) => !btnState);
+      } else {
+        alert("Error");
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Error");
+    }
+  };
+
+  // Use effect
+  useEffect(() => {
+    let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+    // console.log(user);
+    setformdata({
+      ...formdata,
+      first_name: user?.customer_first_name ? user?.customer_first_name : "",
+      last_name: user?.customer_last_name ? user?.customer_last_name : "",
+      gender: user?.gender ? user?.gender : "",
+      phone: user?.phone ? user?.phone : "",
+      email: user?.email ? user?.email : "",
+      "inline-radio-1": user?.gender
+        ? user?.gender.toLowerCase() == "male"
+          ? "on"
+          : "off"
+        : "off",
+      "inline-radio-2": user?.gender
+        ? user?.gender.toLowerCase() == "female"
+          ? "on"
+          : "off"
+        : "off",
+    });
+  }, []);
+
+  return (
+    <>
+      <Header></Header>
+      <Asidebar></Asidebar>
+      <div className="wrapper">
+        <div className="row">
+          <div className="col text-center py-4">
+            <h2>Profile Details</h2>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-sm-12 col-md-10 col-lg-8">
+            <div className="row">
+              <div className="col-auto">
+                <h5 className="small-heading">Profile Details</h5>
+              </div>
+              <div className="col-auto ms-auto">
+                {editCancel ? (
+                  <button
+                    className="border-btn"
+                    onClick={() => setEditCancel(!editCancel)}
+                  >
+                    Cancel
+                  </button>
+                ) : (
+                  <button
+                    className="border-btn"
+                    onClick={() => setEditCancel(!editCancel)}
+                  >
+                    Edit
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="row pb-4">
+              <div className="col-sm-6">
+                <label htmlFor="first_name" className="form-label">
+                  First Name
+                </label>
+                <input
+                  type="text"
+                  value={formdata.first_name}
+                  disabled={!editCancel}
+                  onChange={handleFormData}
+                  className="form-control"
+                  id="first_name"
+                />
+              </div>
+              <div className="col-sm-6">
+                <label htmlFor="last_name" className="form-label">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  value={formdata.last_name}
+                  disabled={!editCancel}
+                  onChange={handleFormData}
+                  className="form-control"
+                  id="last_name"
+                />
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="col-sm-6">
+                <div className="mb-4">
+                  <label htmlFor="inputGender">Your Gender</label>
+                  <Form>
+                    {["radio"].map((type) => (
+                      <div key={`inline-${type}`} className="mb-3">
+                        <Form.Check
+                          inline
+                          label="Male"
+                          name="group1"
+                          type={type}
+                          id={`inline-${type}-1`}
+                          disabled={!editCancel}
+                          onChange={handleFormData}
+                          checked={
+                            formdata["inline-radio-1"] == "on" ? true : false
+                          }
+                          // value={gender}
+                        />
+                        <Form.Check
+                          inline
+                          label="Female"
+                          name="group1"
+                          type={type}
+                          id={`inline-${type}-2`}
+                          disabled={!editCancel}
+                          onChange={handleFormData}
+                          checked={
+                            formdata["inline-radio-2"] == "on" ? true : false
+                          }
+                        />
+                      </div>
+                    ))}
+                  </Form>
+                </div>
+                <div className="mb-4">
+                  <label className="form-label">Phone Number</label>
+                  <input
+                    type="number"
+                    value={formdata.phone}
+                    disabled={!editCancel}
+                    onChange={handleFormData}
+                    className="form-control"
+                    id="phone"
+                  />
+                </div>
+                {editCancel && (
+                  <div className="pb-3">
+                    <button
+                      typeof="button"
+                      className="button button-default"
+                      onClick={() => setEditCancel(!editCancel)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      typeof="button"
+                      className="button button-blue px-3 mx-4"
+                      onClick={nameSaveButton}
+                    >
+                      Save
+                    </button>
+                  </div>
+                )}
+                <div className="mb-4">
+                  <label className="form-label">Email address (username)</label>
+                  <input
+                    type="email"
+                    value={formdata.email}
+                    onChange={handleFormData}
+                    className="form-control"
+                    id="email"
+                    disabled
+                  />
+                </div>
+                <div className="mb-4">
+                  <button className="border-btn my-2" onClick={handleClick}>
+                    Reset Password
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <h5 className="small-heading py-3">My addresses</h5>
+        {editform && (
+          <div className="edit-form-box">
+            <h6>Edit address</h6>
+            <div className="row">
+              <div className="col-md-6">
+                <Form>
+                  {["radio"].map((type) => (
+                    <div key={`inline-${type}`} className="mb-3">
+                      <Form.Check
+                        inline
+                        label="Primary"
+                        name="primary"
+                        type={type}
+                        id={`inline-${type}-3`}
+                      />
+                    </div>
+                  ))}
+                  <div className="mb-3">
+                    <label htmlFor="exampleInputName" className="form-label">
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      value="Janz Corp"
+                      className="form-control"
+                      id="exampleInputName"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="exampleInputAddress" className="form-label">
+                      Address 01
+                    </label>
+                    <input
+                      type="text"
+                      value="abc 011"
+                      className="form-control"
+                      id="exampleInputAddress"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="exampleInputAddress" className="form-label">
+                      Address 02
+                    </label>
+                    <input
+                      type="text"
+                      value="abrrc22 01221"
+                      className="form-control"
+                      id="exampleInputAddress"
+                    />
+                  </div>
+                  <div className="mb-3 d-flex justify-content-between">
+                    <span>Do you use APO/FPO Address?</span>
+                    {["radio"].map((type) => (
+                      <div key={`inline-${type}`} className="mb-3">
+                        <Form.Check
+                          inline
+                          label="Yes"
+                          name="group4"
+                          type={type}
+                          id={`inline-${type}-4`}
+                          onClick={() => setFormEdit(!formedit)}
+                        />
+                        <Form.Check
+                          inline
+                          label="No"
+                          name="group4"
+                          type={type}
+                          id={`inline-${type}-5`}
+                          onClick={() => setFormEdit(!formedit)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  {formedit ? (
+                    <div className="yes-btn-show">
+                      <div className="mb-3 d-flex justify-content-between">
+                        <span>Address Type</span>
+                        {["radio"].map((type) => (
+                          <div key={`inline-${type}`} className="mb-3">
+                            <Form.Check
+                              inline
+                              label="APO"
+                              name="group5"
+                              type={type}
+                              id={`inline-${type}-4`}
+                            />
+                            <Form.Check
+                              inline
+                              label="FPO"
+                              name="group5"
+                              type={type}
+                              id={`inline-${type}-5`}
+                            />
+                            <Form.Check
+                              inline
+                              label="DPO"
+                              name="group5"
+                              type={type}
+                              id={`inline-${type}-6`}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mb-3">
+                        <label htmlFor="exampleInputBox" className="form-label">
+                          Unit/Box #
+                        </label>
+                        <input
+                          type="text"
+                          value="CMR 414 Box 1416"
+                          className="form-control"
+                          id="exampleInputBox"
+                        />
+                      </div>
+                      <div className="mb-3 form-group">
+                        <label for="exampleFormControlSelect1">State</label>
+                        <select
+                          className="form-control"
+                          id="exampleFormControlSelect1"
+                        >
+                          <option>AE</option>
+                          <option>USA</option>
+                        </select>
+                      </div>
+                      <div className="mb-3">
+                        <label
+                          htmlFor="exampleInputCountry"
+                          className="form-label"
+                        >
+                          Country
+                        </label>
+                        <input
+                          type="text"
+                          value="Italy"
+                          className="form-control"
+                          id="exampleInputCountry"
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label
+                          htmlFor="exampleInputZipcode"
+                          className="form-label"
+                        >
+                          ZIP Code
+                        </label>
+                        <input
+                          type="text"
+                          value="00233"
+                          className="form-control"
+                          id="exampleInputZipcode"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="no-btn-show">
+                      <div className="mb-3">
+                        <label
+                          htmlFor="exampleInputCity"
+                          className="form-label"
+                        >
+                          City
+                        </label>
+                        <input
+                          type="text"
+                          value="New York"
+                          className="form-control"
+                          id="exampleInputCity"
+                        />
+                      </div>
+                      <div className="mb-3 form-group">
+                        <label for="exampleFormControlSelect1">State</label>
+                        <select
+                          className="form-control"
+                          id="exampleFormControlSelect1"
+                        >
+                          <option>New York</option>
+                          <option>United State</option>
+                          <option>India</option>
+                          <option>Nepal</option>
+                        </select>
+                      </div>
+                      <div className="mb-3">
+                        <label
+                          htmlFor="exampleInputCountry"
+                          className="form-label"
+                        >
+                          Country
+                        </label>
+                        <input
+                          type="text"
+                          value="abc"
+                          className="form-control"
+                          id="exampleInputCountry"
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label
+                          htmlFor="exampleInputZipcode"
+                          className="form-label"
+                        >
+                          ZIP Code
+                        </label>
+                        <input
+                          type="text"
+                          value="00033"
+                          className="form-control"
+                          id="exampleInputZipcode"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <div className="d-flex justify-content-between ms-0">
+                    <button
+                      className="button button-default same-btn delete ml-10"
+                      onClick={() => setEditForm(!editform)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className="button button-blue same-btn mr-10"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </Form>
+              </div>
+            </div>
+          </div>
+        )}
+        <div className="row">
+          <div className="col-md-12">
+            <div className="address-tbl1 card border-0">
+              {/* <div className="card-header bg-white border-0 p-3">
+                <h6>Primary</h6>
+              </div> */}
+              <div className="card-body pt-0">
+                {
+                  <Table responsive>
+                    <colgroup>
+                      <col width="35%" />
+                      <col />
+                      <col width="56" />
+                    </colgroup>
+                    <tbody>
+                      {table.map((item, index) => (
+                        <tr key={index}>
+                          <td>
+                            <strong style={{ textDecoration: "underline" }}>
+                              Primary
+                            </strong>
+                            <br />
+                            Janz corp
+                          </td>
+                          <td>Address 1, address 2 , City, state, Zip code</td>
+                          <td>
+                            <Dropdown className="dots-dropdown">
+                              <Dropdown.Toggle
+                                as="button"
+                                className="btn"
+                                id="dropdown-basic"
+                              >
+                                <svg className="icon">
+                                  <use href="#icon_threedot"></use>
+                                </svg>
+                              </Dropdown.Toggle>
+                              <Dropdown.Menu className="shadow mmw-96px dropdown-menu-end">
+                                <Dropdown.Item
+                                  as="button"
+                                  className="border-bottom"
+                                  onClick={() => editForm(item)}
+                                >
+                                  Edit
+                                </Dropdown.Item>
+                                <Dropdown.Item
+                                  as="button"
+                                  onClick={handleClickOpen}
+                                >
+                                  Delete
+                                </Dropdown.Item>
+                              </Dropdown.Menu>
+                            </Dropdown>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="w-100 py-4">
+          <button
+            typeof="button"
+            className="button button-blue w-100 p-3 fs-20"
+          >
+            <span className="plus-icon">
+              <svg className="icon">
+                <use href="#icon_btnadd"></use>
+              </svg>
+            </span>
+            Add New Address
+          </button>
+        </div>
+
+        <div className={`modal ${toggleClassCheck}`}>
+          <div className="popup-body">
+            <form className="d-flex">
+              <div className="reset-box-blue">
+                <h5>Reset Password</h5>
+                <h6>Your new password must:</h6>
+                <ul>
+                  <li>Be atleast 8 character length</li>
+                  <li>Not be same as your current password</li>
+                </ul>
+              </div>
+              <div className="reset-box-white">
+                <div className="pop-close d-flex text-white">
+                  <div className="w-100 align-self-center text-center mx-auto">
+                    <strong>Reset Password</strong>
+                  </div>
+                  <button
+                    className="pop-btn ms-auto"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setBtnState((btnState) => !btnState);
+                      setshowRules(false);
+                    }}
+                  >
+                    <span>
+                      <svg className="icon m-icon">
+                        <use href="#icon_close-btn"></use>
+                      </svg>
+                    </span>
+                  </button>
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="exampleInputPws1" className="form-label">
+                    Current Password
+                  </label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    id="current_password"
+                    // autoComplete="current-password"
+                    value={loginDetails.current_password}
+                    onChange={loginDetailsChangeFn}
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="exampleInputPws2" className="form-label">
+                    New Password
+                  </label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    id="new_password"
+                    // autoComplete="current-password"
+                    value={loginDetails.new_password}
+                    onChange={loginDetailsChangeFn}
+                    onFocus={() => setshowRules(true)}
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="exampleInputPws3" className="form-label">
+                    Confirm Password
+                  </label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    id="new_password_confirm"
+                    // autoComplete="current-password"
+                    value={loginDetails.new_password_confirm}
+                    onChange={(e) =>
+                      setloginDetails({
+                        ...loginDetails,
+                        new_password_confirm: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                {showRules && (
+                  <div className="mb-2">
+                    <div className="reset-tick-box">
+                      <span>
+                        <svg className="icon">
+                          {passwordValidation.length == true ? (
+                            <use href="#icon_green-tick"></use>
+                          ) : (
+                            <use href="#icon_wrong-tick"></use>
+                          )}
+                        </svg>
+                      </span>
+                      <span>Atleast 8 character</span>
+                    </div>
+                    <div className="reset-tick-box">
+                      <span>
+                        <svg className="icon">
+                          {passwordValidation.lowercase == true ? (
+                            <use href="#icon_green-tick"></use>
+                          ) : (
+                            <use href="#icon_wrong-tick"></use>
+                          )}
+                        </svg>
+                      </span>
+                      <span>Atleast One Lower case</span>
+                    </div>
+                    <div className="reset-tick-box">
+                      <span>
+                        <svg className="icon">
+                          {passwordValidation.uppercase == true ? (
+                            <use href="#icon_green-tick"></use>
+                          ) : (
+                            <use href="#icon_wrong-tick"></use>
+                          )}
+                        </svg>
+                      </span>
+                      <span>Atleast One Upper case</span>
+                    </div>
+                    <div className="reset-tick-box">
+                      <span>
+                        <svg className="icon">
+                          {passwordValidation.number == true ? (
+                            <use href="#icon_green-tick"></use>
+                          ) : (
+                            <use href="#icon_wrong-tick"></use>
+                          )}
+                        </svg>
+                      </span>
+                      <span>Atleast One Number</span>
+                    </div>
+                    <div className="reset-tick-box">
+                      <span>
+                        <svg className="icon">
+                          {passwordValidation.special == true ? (
+                            <use href="#icon_green-tick"></use>
+                          ) : (
+                            <use href="#icon_wrong-tick"></use>
+                          )}
+                        </svg>
+                      </span>
+                      <span>
+                        Atleast One Special Character (! @ # $ % ^ & % * ? _ ~)
+                      </span>
+                    </div>
+                  </div>
+                )}
+                <div className="mb-3">
+                  <label htmlFor="exampleInputEmail" className="form-label">
+                    Verification Code
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="Enter code sent to your email"
+                    className="form-control"
+                    id="verification_code"
+                    value={loginDetails.verification_code}
+                    onChange={(e) =>
+                      setloginDetails({
+                        ...loginDetails,
+                        verification_code: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="reset-btn">
+                  <button typeof="button" onClick={resendCodeBtn}>
+                    Resend Code
+                  </button>
+                </div>
+                <div className="reset-btn-box">
+                  <button
+                    typeof="button"
+                    className="button button-blue"
+                    onClick={resetPasswordLoginBtn}
+                  >
+                    Reset Password
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div className={`modal ${toggleClassOpen}`}>
+          <div className="popup-body-delete">
+            <div className="pop-delete-box">
+              <div className="delete-pop-icon py-20">
+                <div className="pop-icon">
+                  <svg className="icon">
+                    <use href="#icon_popdelete"></use>
+                  </svg>
+                </div>
+              </div>
+              <h1 className="small-heading d-flex justify-content-center">
+                Delete this record?
+              </h1>
+              <p className="gray py-20 d-flex justify-content-center">
+                Do you want to really delete this records?
+              </p>
+              <div className="d-flex justify-content-center pb-20">
+                <button
+                  type="button"
+                  className="button button-blue same-btn mr-10"
+                  onClick={handleClickOpen}
+                >
+                  Cancel
+                </button>
+                <button className="button button-default same-btn delete ml-10">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}

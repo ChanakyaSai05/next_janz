@@ -1,0 +1,1038 @@
+import Head from "next/head";
+import Image from "next/image";
+import Slider from "react-slick";
+import { Inter } from "@next/font/google";
+import styles from "../styles/Home.module.css";
+import { Container, Nav, Tab, Col, Row, Dropdown } from "react-bootstrap";
+import Headerlanding from "../components/headerlanding";
+import Footer from "../components/footer";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import categoryHero from "../public/images/category-hero.svg";
+import category1 from "../public/images/category1.svg";
+import category2 from "../public/images/category2.svg";
+import category3 from "../public/images/category3.svg";
+import category4 from "../public/images/category4.svg";
+import category5 from "../public/images/category5.svg";
+import category6 from "../public/images/category6.svg";
+import category7 from "../public/images/category7.svg";
+import category8 from "../public/images/category8.svg";
+import cardImg1 from "../public/images/card-img1.svg";
+import cardImg2 from "../public/images/card-img2.svg";
+import cardImg3 from "../public/images/card-img3.svg";
+import cardImg4 from "../public/images/card-img4.svg";
+import Link from "next/link";
+
+const inter = Inter({ subsets: ["latin"] });
+
+export default function Category() {
+  const hero = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+  };
+
+  let settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 4,
+    slidesToScroll: 1,
+    initialSlide: 0,
+    autoplay: true,
+    autoplaySpeed: 2000,
+    pauseOnHover: true,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 3,
+          infinite: true,
+          dots: true,
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          initialSlide: 1,
+        },
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
+  };
+  return (
+    <>
+      <Headerlanding></Headerlanding>
+      <div className="slider-box-category">
+        <Slider {...hero}>
+          <div className="slider-content">
+            <Image
+              width={4320}
+              height={1890}
+              src={categoryHero}
+              className="carousel-img opacity-50"
+              alt="..."
+            />
+            <Container className="h-100">
+              <div className="row h-100 d-flex align-items-center">
+                <div className="col-md-6 col-sm-12 text-white">
+                  <h1>Maternity Care </h1>
+                  <p>
+                    We carry a wide range of maternity care products, so you
+                    have one less thing to worry about as your family grows.
+                    From breast pumps, refill bags and accessories, we have you
+                    covered.
+                  </p>
+                </div>
+              </div>
+            </Container>
+          </div>
+          <div className="slider-content">
+            <Image
+              width={4320}
+              height={1890}
+              src={categoryHero}
+              className="carousel-img opacity-50"
+              alt="..."
+            />
+            <Container className="h-100">
+              <div className="row h-100 d-flex align-items-center">
+                <div className="col-md-6 col-sm-12 text-white">
+                  <h1>Maternity Care </h1>
+                  <p>
+                    We carry a wide range of maternity care products, so you
+                    have one less thing to worry about as your family grows.
+                    From breast pumps, refill bags and accessories, we have you
+                    covered.
+                  </p>
+                </div>
+              </div>
+            </Container>
+          </div>
+          <div className="slider-content">
+            <Image
+              width={4320}
+              height={1890}
+              src={categoryHero}
+              className="carousel-img opacity-50"
+              alt="..."
+            />
+            <Container className="h-100">
+              <div className="row h-100 d-flex align-items-center">
+                <div className="col-md-6 col-sm-12 text-white">
+                  <h1>Maternity Care </h1>
+                  <p>
+                    We carry a wide range of maternity care products, so you
+                    have one less thing to worry about as your family grows.
+                    From breast pumps, refill bags and accessories, we have you
+                    covered.
+                  </p>
+                </div>
+              </div>
+            </Container>
+          </div>
+          <div className="slider-content">
+            <Image
+              width={4320}
+              height={1890}
+              src={categoryHero}
+              className="carousel-img opacity-50"
+              alt="..."
+            />
+            <Container className="h-100">
+              <div className="row h-100 d-flex align-items-center">
+                <div className="col-md-6 col-sm-12 text-white">
+                  <h1>Maternity Care </h1>
+                  <p>
+                    We carry a wide range of maternity care products, so you
+                    have one less thing to worry about as your family grows.
+                    From breast pumps, refill bags and accessories, we have you
+                    covered.
+                  </p>
+                </div>
+              </div>
+            </Container>
+          </div>
+        </Slider>
+      </div>
+
+      <div className="">
+        <Container>
+          <div className="row">
+            <div className="col-12 py-4">
+              <p>Home&#62;Maternity Care</p>
+              <p>
+                <strong>JANZ Medical Supply</strong> is dedicated to helping
+                mothers during each step of their motherhood journey. Our
+                knowledgeable staff can help you select the perfect breast pump;
+                whether it be a convenience-oriented portable style, or one with
+                higher suction capabilities for more intensive needs. Best yet –
+                most insurance providers cover these products and accessories up
+                to 100%, meaning no money out of pocket when obtaining them!
+                Equip yourself with everything necessary while on your
+                pregnancy, postnatal, and postpartum journeys – JANZ has got you
+                covered.
+              </p>
+              <p>
+                <strong>
+                  We provide our military members and families with breast pumps
+                  and refills at no cost. We direct bill insurance so you
+                  don&apos;t have to. We currently accept Tricare, Aetna, VA and
+                  AFSPA plans.
+                </strong>
+              </p>
+            </div>
+          </div>
+        </Container>
+      </div>
+
+      <div className="medical-supplier">
+        <div className="container py-5">
+          <div className="row row-cols-1 row-cols-md-4">
+            <div className="col my-2">
+              <div className="card-box">
+                <Image width={296} height={300} src={category1} alt="..." />
+                <h5>Maternity Care</h5>
+                <Link href={"/sub_category"}>
+                  <button type="button">Show more</button>
+                </Link>
+              </div>
+            </div>
+            <div className="col my-2">
+              <div className="card-box">
+                <Image width={296} height={300} src={category2} alt="..." />
+                <h5>Respiratory Care</h5>
+                <button type="button">Show more</button>
+              </div>
+            </div>
+            <div className="col my-2">
+              <div className="card-box">
+                <Image width={296} height={300} src={category3} alt="..." />
+                <h5>Diabetic Care</h5>
+                <button type="button">Show more</button>
+              </div>
+            </div>
+            <div className="col my-2">
+              <div className="card-box">
+                <Image width={296} height={296} src={category4} alt="..." />
+                <h5>Mobility</h5>
+                <button type="button">Show more</button>
+              </div>
+            </div>
+            <div className="col my-2">
+              <div className="card-box">
+                <Image width={296} height={300} src={category5} alt="..." />
+                <h5>Daily Aids</h5>
+                <button type="button">Show more</button>
+              </div>
+            </div>
+            <div className="col my-2">
+              <div className="card-box">
+                <Image width={296} height={300} src={category6} alt="..." />
+                <h5>Health Devices</h5>
+                <button type="button">Show more</button>
+              </div>
+            </div>
+            <div className="col my-2">
+              <div className="card-box">
+                <Image width={296} height={300} src={category7} alt="..." />
+                <h5>Physical Therapy</h5>
+                <button type="button">Show more</button>
+              </div>
+            </div>
+            <div className="col my-2">
+              <div className="card-box">
+                <Image width={296} height={296} src={category8} alt="..." />
+                <h5>Support Bands and Braces</h5>
+                <button type="button">Show more</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Slider 1*/}
+      <div className="category-slider-box">
+        <div className="container py-5">
+          <div className="row pb-5">
+            <div className="col-12 line-heading text-center">
+              <h3>Featured Breast Pumps</h3>
+            </div>
+          </div>
+          <div className="row">
+            <div className="12">
+              <Slider {...settings}>
+                <div className="card">
+                  <div className="card-bodys">
+                    <div className="d-flex justify-content-between">
+                      <div className="like-down-box">
+                        <svg className="icon">
+                          <use href="#icon_like-dull"></use>
+                        </svg>
+                      </div>
+                      <div className="download-box">
+                        <svg className="icon">
+                          <use href="#icon_loader-dull"></use>
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="d-flex my-2 py-2 justify-content-center">
+                      <div className="card-img">
+                        <Image
+                          width={180}
+                          height={180}
+                          src={cardImg1}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                    <p className="card-text">5 OZ Breast Milk Bottle Set</p>
+                    <span className="badge text-bg-primary p-2 px-3 me-2">
+                      4.2 &#9733;
+                    </span>
+                    <span>(166)</span>
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="card-bodys">
+                    <div className="d-flex justify-content-between">
+                      <div className="like-down-box">
+                        <svg className="icon">
+                          <use href="#icon_like"></use>
+                        </svg>
+                      </div>
+                      <div className="download-box">
+                        <svg className="icon">
+                          <use href="#icon_loader"></use>
+                        </svg>
+                        <span>1</span>
+                      </div>
+                    </div>
+                    <div className="d-flex my-2 py-2 justify-content-center">
+                      <div className="card-img">
+                        <Image
+                          width={159}
+                          height={160}
+                          src={cardImg2}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                    <p className="card-text">
+                      Spectra S1 Plus Electric Breast Pump Dual Voltage
+                    </p>
+                    <span className="badge text-bg-primary p-2 px-3 me-2">
+                      4.1 &#9733;
+                    </span>
+                    <span>(176)</span>
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="card-bodys">
+                    <div className="d-flex justify-content-between">
+                      <div className="like-down-box">
+                        <svg className="icon">
+                          <use href="#icon_like-dull"></use>
+                        </svg>
+                      </div>
+                      <div className="download-box">
+                        <svg className="icon">
+                          <use href="#icon_loader-dull"></use>
+                        </svg>
+                        {/* <span>1</span> */}
+                      </div>
+                    </div>
+                    <div className="d-flex my-2 py-2 justify-content-center">
+                      <div className="card-img">
+                        <Image
+                          width={180}
+                          height={180}
+                          src={cardImg3}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                    <p className="card-text">Lansinoh Resupply Kit</p>
+                    <span className="badge text-bg-primary p-2 px-3 me-2">
+                      4.4 &#9733;
+                    </span>
+                    <span>(200)</span>
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="card-bodys">
+                    <div className="d-flex justify-content-between">
+                      <div className="like-down-box">
+                        <svg className="icon">
+                          <use href="#icon_like-dull"></use>
+                        </svg>
+                      </div>
+                      <div className="download-box">
+                        <svg className="icon">
+                          <use href="#icon_loader-dull"></use>
+                        </svg>
+                        {/* <span>1</span> */}
+                      </div>
+                    </div>
+                    <div className="d-flex my-2 py-2 justify-content-center">
+                      <div className="card-img">
+                        <Image
+                          width={125}
+                          height={160}
+                          src={cardImg4}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                    <p className="card-text">Bambo Nature Love Balm</p>
+                    <span className="badge text-bg-primary p-2 px-3 me-2">
+                      4.0 &#9733;
+                    </span>
+                    <span>(123)</span>
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="card-bodys">
+                    <div className="d-flex justify-content-between">
+                      <div className="like-down-box">
+                        <svg className="icon">
+                          <use href="#icon_like"></use>
+                        </svg>
+                      </div>
+                      <div className="download-box">
+                        <svg className="icon">
+                          <use href="#icon_loader"></use>
+                        </svg>
+                        <span>1</span>
+                      </div>
+                    </div>
+                    <div className="d-flex my-2 py-2 justify-content-center">
+                      <div className="card-img">
+                        <Image
+                          width={159}
+                          height={160}
+                          src={cardImg4}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                    <p className="card-text">
+                      Spectra S1 Plus Electric Breast Pump Dual Voltage
+                    </p>
+                    <span className="badge text-bg-primary p-2 px-3 me-2">
+                      4.1 &#9733;
+                    </span>
+                    <span>(176)</span>
+                  </div>
+                </div>
+              </Slider>
+            </div>
+          </div>
+        </div>
+
+        <div className="container py-5">
+          <div className="row pb-5">
+            <div className="col-12 line-heading text-center">
+              <h3>Featured JANZ Mom Products</h3>
+            </div>
+          </div>
+          <div className="row">
+            <div className="12">
+              <Slider {...settings}>
+                <div className="card">
+                  <div className="card-bodys">
+                    <div className="d-flex justify-content-between">
+                      <div className="like-down-box">
+                        <svg className="icon">
+                          <use href="#icon_like-dull"></use>
+                        </svg>
+                      </div>
+                      <div className="download-box">
+                        <svg className="icon">
+                          <use href="#icon_loader-dull"></use>
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="d-flex my-2 py-2 justify-content-center">
+                      <div className="card-img">
+                        <Image
+                          width={180}
+                          height={180}
+                          src={cardImg1}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                    <p className="card-text">5 OZ Breast Milk Bottle Set</p>
+                    <span className="badge text-bg-primary p-2 px-3 me-2">
+                      4.2 &#9733;
+                    </span>
+                    <span>(166)</span>
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="card-bodys">
+                    <div className="d-flex justify-content-between">
+                      <div className="like-down-box">
+                        <svg className="icon">
+                          <use href="#icon_like"></use>
+                        </svg>
+                      </div>
+                      <div className="download-box">
+                        <svg className="icon">
+                          <use href="#icon_loader"></use>
+                        </svg>
+                        <span>1</span>
+                      </div>
+                    </div>
+                    <div className="d-flex my-2 py-2 justify-content-center">
+                      <div className="card-img">
+                        <Image
+                          width={159}
+                          height={160}
+                          src={cardImg2}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                    <p className="card-text">
+                      Spectra S1 Plus Electric Breast Pump Dual Voltage
+                    </p>
+                    <span className="badge text-bg-primary p-2 px-3 me-2">
+                      4.1 &#9733;
+                    </span>
+                    <span>(176)</span>
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="card-bodys">
+                    <div className="d-flex justify-content-between">
+                      <div className="like-down-box">
+                        <svg className="icon">
+                          <use href="#icon_like-dull"></use>
+                        </svg>
+                      </div>
+                      <div className="download-box">
+                        <svg className="icon">
+                          <use href="#icon_loader-dull"></use>
+                        </svg>
+                        {/* <span>1</span> */}
+                      </div>
+                    </div>
+                    <div className="d-flex my-2 py-2 justify-content-center">
+                      <div className="card-img">
+                        <Image
+                          width={180}
+                          height={180}
+                          src={cardImg3}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                    <p className="card-text">Lansinoh Resupply Kit</p>
+                    <span className="badge text-bg-primary p-2 px-3 me-2">
+                      4.4 &#9733;
+                    </span>
+                    <span>(200)</span>
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="card-bodys">
+                    <div className="d-flex justify-content-between">
+                      <div className="like-down-box">
+                        <svg className="icon">
+                          <use href="#icon_like-dull"></use>
+                        </svg>
+                      </div>
+                      <div className="download-box">
+                        <svg className="icon">
+                          <use href="#icon_loader-dull"></use>
+                        </svg>
+                        {/* <span>1</span> */}
+                      </div>
+                    </div>
+                    <div className="d-flex my-2 py-2 justify-content-center">
+                      <div className="card-img">
+                        <Image
+                          width={125}
+                          height={160}
+                          src={cardImg4}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                    <p className="card-text">Bambo Nature Love Balm</p>
+                    <span className="badge text-bg-primary p-2 px-3 me-2">
+                      4.0 &#9733;
+                    </span>
+                    <span>(123)</span>
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="card-bodys">
+                    <div className="d-flex justify-content-between">
+                      <div className="like-down-box">
+                        <svg className="icon">
+                          <use href="#icon_like"></use>
+                        </svg>
+                      </div>
+                      <div className="download-box">
+                        <svg className="icon">
+                          <use href="#icon_loader"></use>
+                        </svg>
+                        <span>1</span>
+                      </div>
+                    </div>
+                    <div className="d-flex my-2 py-2 justify-content-center">
+                      <div className="card-img">
+                        <Image
+                          width={159}
+                          height={160}
+                          src={cardImg2}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                    <p className="card-text">
+                      Spectra S1 Plus Electric Breast Pump Dual Voltage
+                    </p>
+                    <span className="badge text-bg-primary p-2 px-3 me-2">
+                      4.1 &#9733;
+                    </span>
+                    <span>(176)</span>
+                  </div>
+                </div>
+              </Slider>
+            </div>
+          </div>
+        </div>
+
+        <div className="container py-5">
+          <div className="row pb-5">
+            <div className="col-12 line-heading text-center">
+              <h3>Featured JANZ Baby Products</h3>
+            </div>
+          </div>
+          <div className="row">
+            <div className="12">
+              <Slider {...settings}>
+                <div className="card">
+                  <div className="card-bodys">
+                    <div className="d-flex justify-content-between">
+                      <div className="like-down-box">
+                        <svg className="icon">
+                          <use href="#icon_like-dull"></use>
+                        </svg>
+                      </div>
+                      <div className="download-box">
+                        <svg className="icon">
+                          <use href="#icon_loader-dull"></use>
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="d-flex my-2 py-2 justify-content-center">
+                      <div className="card-img">
+                        <Image
+                          width={180}
+                          height={180}
+                          src={cardImg1}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                    <p className="card-text">5 OZ Breast Milk Bottle Set</p>
+                    <span className="badge text-bg-primary p-2 px-3 me-2">
+                      4.2 &#9733;
+                    </span>
+                    <span>(166)</span>
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="card-bodys">
+                    <div className="d-flex justify-content-between">
+                      <div className="like-down-box">
+                        <svg className="icon">
+                          <use href="#icon_like"></use>
+                        </svg>
+                      </div>
+                      <div className="download-box">
+                        <svg className="icon">
+                          <use href="#icon_loader"></use>
+                        </svg>
+                        <span>1</span>
+                      </div>
+                    </div>
+                    <div className="d-flex my-2 py-2 justify-content-center">
+                      <div className="card-img">
+                        <Image
+                          width={159}
+                          height={160}
+                          src={cardImg2}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                    <p className="card-text">
+                      Spectra S1 Plus Electric Breast Pump Dual Voltage
+                    </p>
+                    <span className="badge text-bg-primary p-2 px-3 me-2">
+                      4.1 &#9733;
+                    </span>
+                    <span>(176)</span>
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="card-bodys">
+                    <div className="d-flex justify-content-between">
+                      <div className="like-down-box">
+                        <svg className="icon">
+                          <use href="#icon_like-dull"></use>
+                        </svg>
+                      </div>
+                      <div className="download-box">
+                        <svg className="icon">
+                          <use href="#icon_loader-dull"></use>
+                        </svg>
+                        {/* <span>1</span> */}
+                      </div>
+                    </div>
+                    <div className="d-flex my-2 py-2 justify-content-center">
+                      <div className="card-img">
+                        <Image
+                          width={180}
+                          height={180}
+                          src={cardImg3}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                    <p className="card-text">Lansinoh Resupply Kit</p>
+                    <span className="badge text-bg-primary p-2 px-3 me-2">
+                      4.4 &#9733;
+                    </span>
+                    <span>(200)</span>
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="card-bodys">
+                    <div className="d-flex justify-content-between">
+                      <div className="like-down-box">
+                        <svg className="icon">
+                          <use href="#icon_like-dull"></use>
+                        </svg>
+                      </div>
+                      <div className="download-box">
+                        <svg className="icon">
+                          <use href="#icon_loader-dull"></use>
+                        </svg>
+                        {/* <span>1</span> */}
+                      </div>
+                    </div>
+                    <div className="d-flex my-2 py-2 justify-content-center">
+                      <div className="card-img">
+                        <Image
+                          width={125}
+                          height={160}
+                          src={cardImg4}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                    <p className="card-text">Bambo Nature Love Balm</p>
+                    <span className="badge text-bg-primary p-2 px-3 me-2">
+                      4.0 &#9733;
+                    </span>
+                    <span>(123)</span>
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="card-bodys">
+                    <div className="d-flex justify-content-between">
+                      <div className="like-down-box">
+                        <svg className="icon">
+                          <use href="#icon_like"></use>
+                        </svg>
+                      </div>
+                      <div className="download-box">
+                        <svg className="icon">
+                          <use href="#icon_loader"></use>
+                        </svg>
+                        <span>1</span>
+                      </div>
+                    </div>
+                    <div className="d-flex my-2 py-2 justify-content-center">
+                      <div className="card-img">
+                        <Image
+                          width={159}
+                          height={160}
+                          src={cardImg2}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                    <p className="card-text">
+                      Spectra S1 Plus Electric Breast Pump Dual Voltage
+                    </p>
+                    <span className="badge text-bg-primary p-2 px-3 me-2">
+                      4.1 &#9733;
+                    </span>
+                    <span>(176)</span>
+                  </div>
+                </div>
+              </Slider>
+            </div>
+          </div>
+        </div>
+
+        <div className="container py-5">
+          <div className="row pb-5">
+            <div className="col-12 line-heading text-center">
+              <h3>Featured Breast Milk Bag</h3>
+            </div>
+          </div>
+          <div className="row">
+            <div className="12">
+              <Slider {...settings}>
+                <div className="card">
+                  <div className="card-bodys">
+                    <div className="d-flex justify-content-between">
+                      <div className="like-down-box">
+                        <svg className="icon">
+                          <use href="#icon_like-dull"></use>
+                        </svg>
+                      </div>
+                      <div className="download-box">
+                        <svg className="icon">
+                          <use href="#icon_loader-dull"></use>
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="d-flex my-2 py-2 justify-content-center">
+                      <div className="card-img">
+                        <Image
+                          width={180}
+                          height={180}
+                          src={cardImg1}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                    <p className="card-text">5 OZ Breast Milk Bottle Set</p>
+                    <span className="badge text-bg-primary p-2 px-3 me-2">
+                      4.2 &#9733;
+                    </span>
+                    <span>(166)</span>
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="card-bodys">
+                    <div className="d-flex justify-content-between">
+                      <div className="like-down-box">
+                        <svg className="icon">
+                          <use href="#icon_like"></use>
+                        </svg>
+                      </div>
+                      <div className="download-box">
+                        <svg className="icon">
+                          <use href="#icon_loader"></use>
+                        </svg>
+                        <span>1</span>
+                      </div>
+                    </div>
+                    <div className="d-flex my-2 py-2 justify-content-center">
+                      <div className="card-img">
+                        <Image
+                          width={159}
+                          height={160}
+                          src={cardImg2}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                    <p className="card-text">
+                      Spectra S1 Plus Electric Breast Pump Dual Voltage
+                    </p>
+                    <span className="badge text-bg-primary p-2 px-3 me-2">
+                      4.1 &#9733;
+                    </span>
+                    <span>(176)</span>
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="card-bodys">
+                    <div className="d-flex justify-content-between">
+                      <div className="like-down-box">
+                        <svg className="icon">
+                          <use href="#icon_like-dull"></use>
+                        </svg>
+                      </div>
+                      <div className="download-box">
+                        <svg className="icon">
+                          <use href="#icon_loader-dull"></use>
+                        </svg>
+                        {/* <span>1</span> */}
+                      </div>
+                    </div>
+                    <div className="d-flex my-2 py-2 justify-content-center">
+                      <div className="card-img">
+                        <Image
+                          width={180}
+                          height={180}
+                          src={cardImg3}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                    <p className="card-text">Lansinoh Resupply Kit</p>
+                    <span className="badge text-bg-primary p-2 px-3 me-2">
+                      4.4 &#9733;
+                    </span>
+                    <span>(200)</span>
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="card-bodys">
+                    <div className="d-flex justify-content-between">
+                      <div className="like-down-box">
+                        <svg className="icon">
+                          <use href="#icon_like-dull"></use>
+                        </svg>
+                      </div>
+                      <div className="download-box">
+                        <svg className="icon">
+                          <use href="#icon_loader-dull"></use>
+                        </svg>
+                        {/* <span>1</span> */}
+                      </div>
+                    </div>
+                    <div className="d-flex my-2 py-2 justify-content-center">
+                      <div className="card-img">
+                        <Image
+                          width={125}
+                          height={160}
+                          src={cardImg4}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                    <p className="card-text">Bambo Nature Love Balm</p>
+                    <span className="badge text-bg-primary p-2 px-3 me-2">
+                      4.0 &#9733;
+                    </span>
+                    <span>(123)</span>
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="card-bodys">
+                    <div className="d-flex justify-content-between">
+                      <div className="like-down-box">
+                        <svg className="icon">
+                          <use href="#icon_like"></use>
+                        </svg>
+                      </div>
+                      <div className="download-box">
+                        <svg className="icon">
+                          <use href="#icon_loader"></use>
+                        </svg>
+                        <span>1</span>
+                      </div>
+                    </div>
+                    <div className="d-flex my-2 py-2 justify-content-center">
+                      <div className="card-img">
+                        <Image
+                          width={159}
+                          height={160}
+                          src={cardImg2}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                    <p className="card-text">
+                      Spectra S1 Plus Electric Breast Pump Dual Voltage
+                    </p>
+                    <span className="badge text-bg-primary p-2 px-3 me-2">
+                      4.1 &#9733;
+                    </span>
+                    <span>(176)</span>
+                  </div>
+                </div>
+              </Slider>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Slider End */}
+
+      <div className="order-step-box">
+        <div className="container py-5">
+          <div className="row pb-5">
+            <div className="col-12 line-heading text-center">
+              <h3>How JANZ Medical Can Help You</h3>
+              <p className="large-para">
+                Order your medical products in 3 easy steps{" "}
+              </p>
+            </div>
+          </div>
+          <div className="row row-cols-1 row-cols-md-3">
+            <div className="col py-2 text-center">
+              <div className="d-flex justify-content-center">
+                <div className="icon-box">
+                  <svg className="icon">
+                    <use href="#icon_choose-product"></use>
+                  </svg>
+                </div>
+              </div>
+              <h5 className="py-2">Choose a product</h5>
+              <p>
+                Register, browse and choose the product you would like to order
+              </p>
+            </div>
+            <div className="col py-2 text-center">
+              <div className="d-flex justify-content-center">
+                <div className="icon-box">
+                  <svg className="icon">
+                    <use href="#icon_checkout"></use>
+                  </svg>
+                </div>
+              </div>
+              <h5 className="py-2">Checkout</h5>
+              <p>
+                We will need your insurance information and RX. We will check
+                eligibility to get your item covered to lower or eliminate
+                out-of-pocket expenses.
+              </p>
+            </div>
+            <div className="col py-2 text-center">
+              <div className="d-flex justify-content-center">
+                <div className="icon-box">
+                  <svg className="icon">
+                    <use href="#icon_shipped"></use>
+                  </svg>
+                </div>
+              </div>
+              <h5 className="py-2">Shipped</h5>
+              <p>
+                We ship directly to you, APO/FPO or In Store Pickup. We file the
+                paperwork on your behalf and alert you when you are eligible for
+                resupplies.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <Footer></Footer>
+    </>
+  );
+}
