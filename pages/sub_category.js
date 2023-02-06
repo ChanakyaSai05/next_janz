@@ -20,11 +20,13 @@ import cardImg1 from "../public/images/card-img1.svg";
 import cardImg2 from "../public/images/card-img2.svg";
 import cardImg3 from "../public/images/card-img3.svg";
 import cardImg4 from "../public/images/card-img4.svg";
+import { useRouter } from "next/router";
 // import video from "../public/images/video.svg";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Subcategory() {
+  const router = useRouter();
   const hero = {
     dots: true,
     infinite: true,
@@ -236,7 +238,12 @@ export default function Subcategory() {
               <div className="card-box">
                 <Image width={296} height={300} src={subCateg1} alt="..." />
                 <h5>Double Electric Pump</h5>
-                <button type="button">Show more</button>
+                <button
+                  type="button"
+                  onClick={() => router.push("/category_filter")}
+                >
+                  Show more
+                </button>
               </div>
             </div>
             <div className="col my-2">

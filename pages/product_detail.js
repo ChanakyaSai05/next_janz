@@ -19,10 +19,12 @@ import fullmask2 from "../public/images/fullmask2.svg";
 import fullmask3 from "../public/images/fullmask3.svg";
 import fullmask4 from "../public/images/fullmask4.svg";
 import checkImg from "../public/images/check-img.svg";
+import { useRouter } from "next/router";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Productdetail() {
+  const router = useRouter();
   let settings = {
     dots: true,
     infinite: true,
@@ -1660,7 +1662,12 @@ export default function Productdetail() {
                               alt=""
                             />
                           </div>
-                          <button type="button" className="w-100 my-3">
+                          <button
+                            type="button"
+                            className="w-100 my-3"
+                            onClick={() => router.push("/product")}
+                            data-bs-dismiss="modal"
+                          >
                             Add to Cart
                           </button>
                         </div>

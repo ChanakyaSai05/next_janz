@@ -401,6 +401,10 @@ header {
   width: 60%;
 }
 
+.w-85 {
+  width: 85%;
+}
+
 .reset-box-blue {
   background-color: #1A8CD1;
   border-radius: 18px 0px 0px 18px;
@@ -865,7 +869,7 @@ aside {
 
 .show {
   .dropdown-toggle {
-    background-color: white;
+    background: white;
     color: #1A8CD1 !important;
   }
 }
@@ -957,8 +961,10 @@ aside {
   }
 }
 
-.dropdown-toggle::after {
-  display: none;
+.landing-header {
+  .dropdown-toggle::after {
+    display: none;
+  }
 }
 
 .carousel-control-prev {
@@ -1242,21 +1248,6 @@ aside {
       color: #2A2A2A;
     }
   }
-  .like-down-box,
-  .download-box {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #F0F0F0;
-    border-radius: 20px;
-    cursor: pointer;
-    z-index: 2;
-    .icon {
-      font-size: 22px;
-    }
-  }
   .download-box {
     position: relative;
     span {
@@ -1282,6 +1273,24 @@ aside {
       height: 100%;
       object-fit: cover;
     }
+  }
+}
+
+.like-down-box,
+.download-box {
+  min-width: 40px;
+  max-width: 40px;
+  min-height: 40px;
+  max-height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #F0F0F0;
+  border-radius: 20px;
+  cursor: pointer;
+  z-index: 2;
+  .icon {
+    font-size: 22px;
   }
 }
 
@@ -2122,6 +2131,39 @@ footer {
       }
     }
   }
+  .incart-box {
+    .accordion-button::after {
+      display: block !important;
+    }
+    h4 {
+      pointer-events: all !important;
+    }
+    .collapse {
+      display: block;
+      transition: none !important;
+      &.collapsing {
+        transition: none !important;
+        height: auto;
+      }
+      &.show {
+        display: none;
+      }
+    }
+  }
+  .filter-box {
+    display: none;
+  }
+  .filter-show {
+    .dropdown-toggle {
+      color: #0b5ed7 !important;
+    }
+    .filter-box {
+      display: block;
+      height: 70vh;
+      overflow: hidden;
+      overflow-y: auto;
+    }
+  }
 }
 
 .btn-green {
@@ -2336,6 +2378,38 @@ footer {
   }
 }
 
+.title-img {
+  background: #FFFFFF;
+  width: 150px;
+  height: 150px;
+  min-width: 150px;
+  min-height: 150px;
+  max-height: 150px;
+  max-width: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.incart-box {
+  background: #FFFFFF;
+  border: 1px solid #E9E9E9;
+  padding: 20px;
+  h4 {
+    pointer-events: none;
+  }
+  a {
+    text-decoration: none;
+    p {
+      color: #2A2A2A;
+      font-weight: 600;
+    }
+  }
+  .accordion-button::after {
+    display: none;
+  }
+}
+
 
 /*=============================================*/
 
@@ -2400,9 +2474,6 @@ footer {
       font-weight: 400;
       font-size: 16px;
     }
-  }
-  .w-75 {
-    width: 100% !important;
   }
   .nav-btn {
     display: none;

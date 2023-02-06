@@ -1340,12 +1340,7 @@ export default function Checkout() {
                   <p className="fw-bold">Front Side</p>
                   <div className="upload-box position-relative p-4">
                     <label className="drag-box input-file p-3">
-                      <Image
-                        width={40}
-                        height={30}
-                        src="/images/uploader.png"
-                        alt="..."
-                      />
+                      <Image width={40} height={30} src={uploader} alt="..." />
                       <input
                         type="file"
                         accept="image/*"
@@ -1381,12 +1376,7 @@ export default function Checkout() {
                   <p className="fw-bold">Back Side</p>
                   <div className="upload-box position-relative p-4">
                     <label className="drag-box input-file p-3">
-                      <Image
-                        width={40}
-                        height={30}
-                        src="/images/uploader.png"
-                        alt="..."
-                      />
+                      <Image width={40} height={30} src={uploader} alt="..." />
                       <input
                         type="file"
                         accept="image/*"

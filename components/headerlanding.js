@@ -102,7 +102,7 @@ export default function Headerlanding() {
   const handleModalClose = (id) => {
     setShowModal({ ...showModal, [id]: false });
   };
-  console.log(showModal, "SHOW MODAL");
+  // console.log(showModal, "SHOW MODAL");
 
   const closeRefLoginModal = useRef();
   // After typing email and reset button otp model has to open
@@ -483,7 +483,9 @@ export default function Headerlanding() {
                           <svg className="icon text-secondary">
                             <use href="#icon_cart"></use>
                           </svg>
-                          <span className="text-secondary">Cart</span>
+                          <span className="text-secondary d-none d-lg-block">
+                            Cart
+                          </span>
                         </div>
                       </Link>
                     </div>
@@ -503,17 +505,17 @@ export default function Headerlanding() {
               >
                 <Dropdown
                   className="has-megamenu"
-                  id="toggle-1"
-                  onMouseEnter={() => handleModalOpen("toggle-1")}
-                  onMouseLeave={() => handleModalClose("toggle-1")}
-                  onToggle={() => handleModalOpen("toggle-1")}
+                  // id="toggle-1"
+                  // onMouseEnter={() => handleModalOpen("toggle-1")}
+                  // onMouseLeave={() => handleModalClose("toggle-1")}
+                  // onToggle={() => handleModalOpen("toggle-1")}
                 >
-                  <Dropdown
+                  <Dropdown.Toggle
                     id="dropdown-basic"
                     className="text-white m-0 dropdown-btn"
                   >
                     Products
-                  </Dropdown>
+                  </Dropdown.Toggle>
                   <Dropdown.Menu
                     className="megamenu p-3 rounded-0 border-white"
                     show={showModal["toggle-1"]}
@@ -590,16 +592,16 @@ export default function Headerlanding() {
                   </Dropdown.Menu>
                 </Dropdown>
                 <Dropdown
-                  id="toggle-2"
-                  onMouseEnter={() => handleModalOpen("toggle-2")}
-                  onMouseLeave={() => handleModalClose("toggle-2")}
+                // id="toggle-2"
+                // onMouseEnter={() => handleModalOpen("toggle-2")}
+                // onMouseLeave={() => handleModalClose("toggle-2")}
                 >
-                  <Dropdown
+                  <Dropdown.Toggle
                     id="dropdown-basic"
                     className="text-white m-0 dropdown-btn"
                   >
                     Brands
-                  </Dropdown>
+                  </Dropdown.Toggle>
 
                   <Dropdown.Menu
                     className="brand-btn"
@@ -619,16 +621,16 @@ export default function Headerlanding() {
                   </Dropdown.Menu>
                 </Dropdown>
                 <Dropdown
-                  id="toggle-3"
-                  onMouseEnter={() => handleModalOpen("toggle-3")}
-                  onMouseLeave={() => handleModalClose("toggle-3")}
+                // id="toggle-3"
+                // onMouseEnter={() => handleModalOpen("toggle-3")}
+                // onMouseLeave={() => handleModalClose("toggle-3")}
                 >
-                  <Dropdown
+                  <Dropdown.Toggle
                     id="dropdown-basic"
                     className="text-white m-0 dropdown-btn"
                   >
                     Insurances
-                  </Dropdown>
+                  </Dropdown.Toggle>
                   <Dropdown.Menu
                     className="head-list"
                     show={showModal["toggle-3"]}
@@ -643,16 +645,16 @@ export default function Headerlanding() {
                   </Dropdown.Menu>
                 </Dropdown>
                 <Dropdown
-                  id="toggle-4"
-                  onMouseEnter={() => handleModalOpen("toggle-4")}
-                  onMouseLeave={() => handleModalClose("toggle-4")}
+                // id="toggle-4"
+                // onMouseEnter={() => handleModalOpen("toggle-4")}
+                // onMouseLeave={() => handleModalClose("toggle-4")}
                 >
-                  <Dropdown
+                  <Dropdown.Toggle
                     id="dropdown-basic"
                     className="text-white m-0 dropdown-btn"
                   >
                     Services
-                  </Dropdown>
+                  </Dropdown.Toggle>
                   <Dropdown.Menu
                     className="list-w"
                     show={showModal["toggle-4"]}
@@ -664,16 +666,16 @@ export default function Headerlanding() {
                   </Dropdown.Menu>
                 </Dropdown>
                 <Dropdown
-                  id="toggle-5"
-                  onMouseEnter={() => handleModalOpen("toggle-5")}
-                  onMouseLeave={() => handleModalClose("toggle-5")}
+                // id="toggle-5"
+                // onMouseEnter={() => handleModalOpen("toggle-5")}
+                // onMouseLeave={() => handleModalClose("toggle-5")}
                 >
-                  <Dropdown
+                  <Dropdown.Toggle
                     id="dropdown-basic"
                     className="text-white m-0 dropdown-btn"
                   >
                     Resources
-                  </Dropdown>
+                  </Dropdown.Toggle>
                   <Dropdown.Menu
                     className="resources-btn"
                     show={showModal["toggle-5"]}
@@ -703,16 +705,16 @@ export default function Headerlanding() {
                 </Dropdown>
                 <Dropdown
                   className="about-btn-box"
-                  id="toggle-6"
-                  onMouseEnter={() => handleModalOpen("toggle-6")}
-                  onMouseLeave={() => handleModalClose("toggle-6")}
+                  // id="toggle-6"
+                  // onMouseEnter={() => handleModalOpen("toggle-6")}
+                  // onMouseLeave={() => handleModalClose("toggle-6")}
                 >
-                  <Dropdown
+                  <Dropdown.Toggle
                     id="dropdown-basic"
                     className="text-white m-0 dropdown-btn"
                   >
                     About Us
-                  </Dropdown>
+                  </Dropdown.Toggle>
                   <Dropdown.Menu
                     className="about-btn"
                     show={showModal["toggle-6"]}
