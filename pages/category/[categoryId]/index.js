@@ -2,30 +2,35 @@ import Head from "next/head";
 import Image from "next/image";
 import Slider from "react-slick";
 import { Inter } from "@next/font/google";
-import styles from "../styles/Home.module.css";
+// import styles from "../styles/Home.module.css";
 import { Container, Nav, Tab, Col, Row, Dropdown } from "react-bootstrap";
-import Headerlanding from "../components/headerlanding";
-import Footer from "../components/footer";
+import Headerlanding from "../../../components/headerlanding";
+import Footer from "../../../components/footer";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import categoryHero from "../public/images/category-hero.svg";
-import category1 from "../public/images/category1.svg";
-import category2 from "../public/images/category2.svg";
-import category3 from "../public/images/category3.svg";
-import category4 from "../public/images/category4.svg";
-import category5 from "../public/images/category5.svg";
-import category6 from "../public/images/category6.svg";
-import category7 from "../public/images/category7.svg";
-import category8 from "../public/images/category8.svg";
-import cardImg1 from "../public/images/card-img1.svg";
-import cardImg2 from "../public/images/card-img2.svg";
-import cardImg3 from "../public/images/card-img3.svg";
-import cardImg4 from "../public/images/card-img4.svg";
+import categoryHero from "../../../public/images/category-hero.svg";
+import category1 from "../../../public/images/category1.svg";
+import category2 from "../../../public/images/category2.svg";
+import category3 from "../../../public/images/category3.svg";
+import category4 from "../../../public/images/category4.svg";
+import category5 from "../../../public/images/category5.svg";
+import category6 from "../../../public/images/category6.svg";
+import category7 from "../../../public/images/category7.svg";
+import category8 from "../../../public/images/category8.svg";
+import cardImg1 from "../../../public/images/card-img1.svg";
+import cardImg2 from "../../../public/images/card-img2.svg";
+import cardImg3 from "../../../public/images/card-img3.svg";
+import cardImg4 from "../../../public/images/card-img4.svg";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Category() {
+  const router = useRouter();
+  const params = router.query;
+  console.log(params, "params");
+  const { categoryId } = params;
   const hero = {
     dots: true,
     infinite: true,
@@ -170,8 +175,21 @@ export default function Category() {
       <div className="">
         <Container>
           <div className="row">
+            <div className="col-12 pt-3 pb-2">
+              <nav className="breadcrumb-wrap" aria-label="breadcrumb">
+                <ol className="breadcrumb">
+                  <li className="breadcrumb-item">
+                    <a href="#">Home</a>
+                  </li>
+                  <li className="breadcrumb-item active" aria-current="page">
+                    {categoryId}
+                  </li>
+                </ol>
+              </nav>
+            </div>
+          </div>
+          <div className="row">
             <div className="col-12 py-4">
-              <p>Home&#62;Maternity Care</p>
               <p>
                 <strong>JANZ Medical Supply</strong> is dedicated to helping
                 mothers during each step of their motherhood journey. Our
@@ -203,8 +221,8 @@ export default function Category() {
             <div className="col my-2">
               <div className="card-box">
                 <Image width={296} height={300} src={category1} alt="..." />
-                <h5>Maternity Care</h5>
-                <Link href={"/sub_category"}>
+                <h5>Maternity Care 22</h5>
+                <Link href={`/category/${categoryId}/sub_category`}>
                   <button type="button">Show more</button>
                 </Link>
               </div>

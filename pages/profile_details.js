@@ -5,6 +5,7 @@ import Asidebar from "../components/asidebar";
 import Form from "react-bootstrap/Form";
 import axios from "axios";
 import CryptoJS from "crypto-js";
+import { Country, State, City } from "country-state-city";
 
 export default function Profiledetails() {
   const [loginDetails, setloginDetails] = useState({
@@ -40,8 +41,53 @@ export default function Profiledetails() {
   //password rules
   const [showRules, setshowRules] = useState(false);
 
+  // us states
+  const [usStates, setusStates] = useState([]);
+  // profile details
+  const [profileDetails, setprofileDetails] = useState({
+    name: "",
+    address1: "",
+    address2: "",
+    apoFpo: "yes",
+    addressType: "",
+    city: "",
+    state: "",
+    country: "",
+    zipCode: "",
+    unitBox: "",
+    us_states: "",
+    address_id: "0",
+    primary: "",
+  });
+  // Address list
+  const [addressList, setaddressList] = useState([]);
+
+  const handleProfileDetails = (e) => {
+    setprofileDetails({ ...profileDetails, [e.target.id]: e.target.value });
+  };
+  console.log(profileDetails, "PROFILE DETAILS type address no");
+
   const editForm = (item) => {
-    setEditForm(!editform);
+    setprofileDetails({
+      ...profileDetails,
+      address_id: item?.address_id,
+      address1: item?.address1 ? item?.address1 : "",
+      address2: item?.address2 ? item?.address2 : "",
+      addressType: item?.address_type ? item?.address_type : "",
+      city: item?.city ? item?.city : "",
+      name: item?.contact_name ? item?.contact_name : "",
+      country: item?.country ? item?.country : "",
+      phone: item?.phone ? item?.phone : "",
+      state: item?.state ? item?.state : "",
+      unitBox: item?.unit_box ? item?.unit_box : "",
+      zipCode: item?.zip_code ? item?.zip_code : "",
+      primary: item?.address_default === "1" ? "on" : "",
+      apoFpo:
+        item?.state === "AE" || item?.state === "AP" || item?.state === "AA"
+          ? "no"
+          : "yes",
+    });
+    setEditForm(true);
   };
 
   const [table, setTable] = useState([
@@ -120,12 +166,98 @@ export default function Profiledetails() {
     setNumberEditCancel(!numbereditCancel);
   };
 
+  //
+  const addressSaveButton = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const token = localStorage.getItem("janz_medical_login_token");
+
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/address/update`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        data: {
+          address_id: parseInt(profileDetails.address_id),
+          address_default: profileDetails.primary === "on" ? 1 : 0,
+          contact_name: profileDetails.name,
+          address1: profileDetails.address1,
+          address2: profileDetails.address2,
+          address_type: profileDetails.addressType,
+          unit_box: profileDetails.unitBox,
+          state: profileDetails.state,
+          country: profileDetails.country,
+          city: profileDetails.city,
+          zip_code: profileDetails.zipCode,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        alert("Error");
+      } else {
+        // console.log(response.data);
+        setEditForm(false);
+        setprofileDetails({
+          name: "",
+          address1: "",
+          address2: "",
+          apoFpo: "yes",
+          addressType: "",
+          city: "",
+          state: "",
+          country: "",
+          zipCode: "",
+          unitBox: "",
+          us_states: "",
+          address_id: "0",
+          primary: "",
+        });
+        getAddressList();
+        // alert("Success");
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Error");
+    }
+  };
+  //get address list
+  const getAddressList = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const token = localStorage.getItem("janz_medical_login_token");
+
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/address`,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        alert("Error");
+      } else {
+        console.log(response.data);
+        setaddressList(response.data.address);
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Error");
+    }
+  };
+
   async function handleClick(e) {
     e.preventDefault();
     try {
       let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+
       const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}v1/password/resset`,
+        url: `${process.env.NEXT_PUBLIC_URL}password/resset`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -154,7 +286,7 @@ export default function Profiledetails() {
     try {
       let user = JSON.parse(localStorage.getItem("janz_medical_user"));
       const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}v1/password/resset`,
+        url: `${process.env.NEXT_PUBLIC_URL}password/resset`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -180,7 +312,7 @@ export default function Profiledetails() {
     try {
       const token = localStorage.getItem("janz_medical_login_token");
       const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}v1/customer/profile`,
+        url: `${process.env.NEXT_PUBLIC_URL}customer/profile`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -284,7 +416,7 @@ export default function Profiledetails() {
       encryptedNew_Password = JSON.parse(encryptedNew_Password);
       const token = localStorage.getItem("janz_medical_login_token");
       const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}v1/customer/password/change`,
+        url: `${process.env.NEXT_PUBLIC_URL}customer/password/change`,
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -338,6 +470,11 @@ export default function Profiledetails() {
           : "off"
         : "off",
     });
+  }, []);
+  useEffect(() => {
+    let states = State.getStatesOfCountry("US");
+    setusStates(states);
+    getAddressList();
   }, []);
 
   return (
@@ -495,26 +632,32 @@ export default function Profiledetails() {
             <div className="row">
               <div className="col-md-6">
                 <Form>
-                  {["radio"].map((type) => (
-                    <div key={`inline-${type}`} className="mb-3">
-                      <Form.Check
-                        inline
-                        label="Primary"
-                        name="primary"
-                        type={type}
-                        id={`inline-${type}-3`}
-                      />
-                    </div>
-                  ))}
                   <div className="mb-3">
+                    <Form.Check
+                      inline
+                      label="Primary"
+                      name="primary"
+                      type="radio"
+                      id="primary"
+                      checked={profileDetails?.primary === "on"}
+                      onClick={() => {
+                        setprofileDetails({
+                          ...profileDetails,
+                          primary: profileDetails.primary === "on" ? "" : "on",
+                        });
+                      }}
+                    />
+                  </div>
+                  <div className="mb-3 w-100">
                     <label htmlFor="exampleInputName" className="form-label">
                       Name
                     </label>
                     <input
                       type="text"
-                      value="Janz Corp"
+                      value={profileDetails.name}
                       className="form-control"
-                      id="exampleInputName"
+                      id="name"
+                      onChange={handleProfileDetails}
                     />
                   </div>
                   <div className="mb-3">
@@ -523,9 +666,10 @@ export default function Profiledetails() {
                     </label>
                     <input
                       type="text"
-                      value="abc 011"
+                      value={profileDetails.address1}
                       className="form-control"
-                      id="exampleInputAddress"
+                      id="address1"
+                      onChange={handleProfileDetails}
                     />
                   </div>
                   <div className="mb-3">
@@ -534,13 +678,14 @@ export default function Profiledetails() {
                     </label>
                     <input
                       type="text"
-                      value="abrrc22 01221"
+                      value={profileDetails.address2}
                       className="form-control"
-                      id="exampleInputAddress"
+                      id="address2"
+                      onChange={handleProfileDetails}
                     />
                   </div>
                   <div className="mb-3 d-flex justify-content-between">
-                    <span>Do you use APO/FPO Address?</span>
+                    <span className="me-2">Do you use APO/FPO Address?</span>
                     {["radio"].map((type) => (
                       <div key={`inline-${type}`} className="mb-3">
                         <Form.Check
@@ -549,7 +694,15 @@ export default function Profiledetails() {
                           name="group4"
                           type={type}
                           id={`inline-${type}-4`}
-                          onClick={() => setFormEdit(!formedit)}
+                          onClick={() => {
+                            setprofileDetails({
+                              ...profileDetails,
+                              apoFpo: "yes",
+                              state: "",
+                              country: "",
+                            });
+                          }}
+                          checked={profileDetails.apoFpo === "yes"}
                         />
                         <Form.Check
                           inline
@@ -557,12 +710,20 @@ export default function Profiledetails() {
                           name="group4"
                           type={type}
                           id={`inline-${type}-5`}
-                          onClick={() => setFormEdit(!formedit)}
+                          onClick={() => {
+                            setprofileDetails({
+                              ...profileDetails,
+                              apoFpo: "no",
+                              state: "AE",
+                              unitBox: "",
+                            });
+                          }}
+                          checked={profileDetails.apoFpo === "no"}
                         />
                       </div>
                     ))}
                   </div>
-                  {formedit ? (
+                  {profileDetails.apoFpo === "no" ? (
                     <div className="yes-btn-show">
                       <div className="mb-3 d-flex justify-content-between">
                         <span>Address Type</span>
@@ -573,21 +734,42 @@ export default function Profiledetails() {
                               label="APO"
                               name="group5"
                               type={type}
-                              id={`inline-${type}-4`}
+                              id="addressType"
+                              onClick={() =>
+                                setprofileDetails({
+                                  ...profileDetails,
+                                  addressType: "APO",
+                                })
+                              }
+                              checked={profileDetails.addressType === "APO"}
                             />
                             <Form.Check
                               inline
                               label="FPO"
                               name="group5"
                               type={type}
-                              id={`inline-${type}-5`}
+                              id="addressType"
+                              onClick={() =>
+                                setprofileDetails({
+                                  ...profileDetails,
+                                  addressType: "FPO",
+                                })
+                              }
+                              checked={profileDetails.addressType === "FPO"}
                             />
                             <Form.Check
                               inline
                               label="DPO"
                               name="group5"
                               type={type}
-                              id={`inline-${type}-6`}
+                              id="addressType"
+                              onClick={() =>
+                                setprofileDetails({
+                                  ...profileDetails,
+                                  addressType: "DPO",
+                                })
+                              }
+                              checked={profileDetails.addressType === "DPO"}
                             />
                           </div>
                         ))}
@@ -598,19 +780,23 @@ export default function Profiledetails() {
                         </label>
                         <input
                           type="text"
-                          value="CMR 414 Box 1416"
+                          value={profileDetails.unitBox}
                           className="form-control"
-                          id="exampleInputBox"
+                          id="unitBox"
+                          onChange={handleProfileDetails}
                         />
                       </div>
                       <div className="mb-3 form-group">
                         <label for="exampleFormControlSelect1">State</label>
                         <select
                           className="form-control"
-                          id="exampleFormControlSelect1"
+                          id="state"
+                          value={profileDetails.state}
+                          onChange={handleProfileDetails}
                         >
-                          <option>AE</option>
-                          <option>USA</option>
+                          {["AE", "AP", "AA"].map((item, index) => (
+                            <option key={index}>{item}</option>
+                          ))}
                         </select>
                       </div>
                       <div className="mb-3">
@@ -622,9 +808,10 @@ export default function Profiledetails() {
                         </label>
                         <input
                           type="text"
-                          value="Italy"
+                          value={profileDetails.country}
                           className="form-control"
-                          id="exampleInputCountry"
+                          id="country"
+                          onChange={handleProfileDetails}
                         />
                       </div>
                       <div className="mb-3">
@@ -636,9 +823,10 @@ export default function Profiledetails() {
                         </label>
                         <input
                           type="text"
-                          value="00233"
+                          value={profileDetails.zipCode}
                           className="form-control"
-                          id="exampleInputZipcode"
+                          id="zipCode"
+                          onChange={handleProfileDetails}
                         />
                       </div>
                     </div>
@@ -653,37 +841,42 @@ export default function Profiledetails() {
                         </label>
                         <input
                           type="text"
-                          value="New York"
+                          value={profileDetails.city}
                           className="form-control"
-                          id="exampleInputCity"
+                          id="city"
+                          onChange={handleProfileDetails}
                         />
                       </div>
                       <div className="mb-3 form-group">
                         <label for="exampleFormControlSelect1">State</label>
                         <select
                           className="form-control"
-                          id="exampleFormControlSelect1"
+                          id="state"
+                          value={profileDetails.state}
+                          onChange={handleProfileDetails}
                         >
-                          <option>New York</option>
-                          <option>United State</option>
-                          <option>India</option>
-                          <option>Nepal</option>
+                          <option value="">Select state</option>
+                          {usStates?.map((item, index) => (
+                            <>
+                              <option value={item?.name}>{item?.name}</option>
+                            </>
+                          ))}
                         </select>
                       </div>
-                      <div className="mb-3">
-                        <label
-                          htmlFor="exampleInputCountry"
-                          className="form-label"
-                        >
-                          Country
-                        </label>
-                        <input
-                          type="text"
-                          value="abc"
-                          className="form-control"
-                          id="exampleInputCountry"
-                        />
-                      </div>
+                      {/* <div className="mb-3">
+                                      <label
+                                        htmlFor="exampleInputCountry"
+                                        className="form-label"
+                                      >
+                                        Country
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value="abc"
+                                        className="form-control"
+                                        id="exampleInputCountry"
+                                      />
+                                    </div> */}
                       <div className="mb-3">
                         <label
                           htmlFor="exampleInputZipcode"
@@ -693,9 +886,10 @@ export default function Profiledetails() {
                         </label>
                         <input
                           type="text"
-                          value="00033"
+                          value={profileDetails.zipCode}
                           className="form-control"
-                          id="exampleInputZipcode"
+                          id="zipCode"
+                          onChange={handleProfileDetails}
                         />
                       </div>
                     </div>
@@ -703,13 +897,37 @@ export default function Profiledetails() {
                   <div className="d-flex justify-content-between ms-0">
                     <button
                       className="button button-default same-btn delete ml-10"
-                      onClick={() => setEditForm(!editform)}
+                      onClick={() => {
+                        setEditForm(false);
+                        setprofileDetails({
+                          name: "",
+                          address1: "",
+                          address2: "",
+                          apoFpo: "yes",
+                          addressType: "",
+                          city: "",
+                          state: "",
+                          country: "",
+                          zipCode: "",
+                          unitBox: "",
+                          us_states: "",
+                          address_id: "0",
+                          primary: "",
+                        });
+                      }}
                     >
                       Cancel
                     </button>
                     <button
                       type="button"
                       className="button button-blue same-btn mr-10"
+                      onClick={() => {
+                        setprofileDetails({
+                          ...profileDetails,
+                          address_id: "0",
+                        });
+                        addressSaveButton();
+                      }}
                     >
                       Save
                     </button>
@@ -734,16 +952,21 @@ export default function Profiledetails() {
                       <col width="56" />
                     </colgroup>
                     <tbody>
-                      {table.map((item, index) => (
+                      {addressList?.map((item, index) => (
                         <tr key={index}>
                           <td>
-                            <strong style={{ textDecoration: "underline" }}>
-                              Primary
-                            </strong>
+                            {item?.address_default === "1" && (
+                              <strong style={{ textDecoration: "underline" }}>
+                                Primary
+                              </strong>
+                            )}
                             <br />
-                            Janz corp
+                            {item?.contact_name}
                           </td>
-                          <td>Address 1, address 2 , City, state, Zip code</td>
+                          <td>
+                            {item?.address1}, {item?.address2} , {item?.city},
+                            {item?.state}, {item?.zip_code}
+                          </td>
                           <td>
                             <Dropdown className="dots-dropdown">
                               <Dropdown.Toggle
@@ -785,6 +1008,7 @@ export default function Profiledetails() {
           <button
             typeof="button"
             className="button button-blue w-100 p-3 fs-20"
+            onClick={() => setEditForm(true)}
           >
             <span className="plus-icon">
               <svg className="icon">

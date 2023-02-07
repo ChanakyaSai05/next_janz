@@ -16,9 +16,7 @@ import UserContext from "../context/UserContext";
 
 export async function getServerSideProps({ params }) {
   // console.log("before axios call");
-  const res = await axios.get(
-    `http://backend.jms.janzcorp.com/v1/menu/content`
-  );
+  const res = await axios.get(`${process.env.NEXT_PUBLIC_URL}menu/content`);
   // console.log("after axios call");
   const data = res.data;
 
@@ -95,13 +93,17 @@ export default function Headerlanding() {
     "toggle-7": false,
   });
 
-  const handleModalOpen = (id) => {
-    setShowModal({ [id]: true });
+  const handleDropdownOpen = (id) => {
+    // setShowModal({ [id]: true });
+    // document.getElementById(id).classList.add('show');
+    document.getElementById(id).click();
+  };
+  const handleDropdownClose = (id) => {
+    // setShowModal({ ...showModal, [id]: false });
+    // document.getElementById(id).classList.remove('show');
+    document.getElementById(id).click();
   };
 
-  const handleModalClose = (id) => {
-    setShowModal({ ...showModal, [id]: false });
-  };
   // console.log(showModal, "SHOW MODAL");
 
   const closeRefLoginModal = useRef();
@@ -153,7 +155,7 @@ export default function Headerlanding() {
     if (isValid) {
       try {
         const response = await axios({
-          url: `${process.env.NEXT_PUBLIC_URL}v1/register`,
+          url: `${process.env.NEXT_PUBLIC_URL}register`,
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -209,7 +211,7 @@ export default function Headerlanding() {
       ).toString();
       encrypted = JSON.parse(encrypted);
       const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}v1/login`,
+        url: `${process.env.NEXT_PUBLIC_URL}login`,
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -259,7 +261,7 @@ export default function Headerlanding() {
   const resetPasswordBtn = async () => {
     try {
       const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}v1/password/resset`,
+        url: `${process.env.NEXT_PUBLIC_URL}password/resset`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -291,7 +293,7 @@ export default function Headerlanding() {
       // console.log(passwordStr, "PSTR");
 
       const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}v1/password/resset/verify`,
+        url: `${process.env.NEXT_PUBLIC_URL}password/resset/verify`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -346,7 +348,7 @@ export default function Headerlanding() {
       ).toString();
       encrypted = JSON.parse(encrypted);
       const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}v1/password/change`,
+        url: `${process.env.NEXT_PUBLIC_URL}password/change`,
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -414,9 +416,7 @@ export default function Headerlanding() {
   };
 
   async function fetchData() {
-    const res = await axios.get(
-      `http://backend.jms.janzcorp.com/v1/menu/content`
-    );
+    const res = await axios.get(`${process.env.NEXT_PUBLIC_URL}menu/content`);
     // setProductsData(res.data);
     if (res.data.status != false) {
       // console.log(res.data, "RES DATA");
@@ -505,13 +505,11 @@ export default function Headerlanding() {
               >
                 <Dropdown
                   className="has-megamenu"
-                  // id="toggle-1"
-                  // onMouseEnter={() => handleModalOpen("toggle-1")}
-                  // onMouseLeave={() => handleModalClose("toggle-1")}
-                  // onToggle={() => handleModalOpen("toggle-1")}
+                  onMouseLeave={() => handleDropdownClose("dropdown1")}
                 >
                   <Dropdown.Toggle
-                    id="dropdown-basic"
+                    id="dropdown1"
+                    onMouseEnter={() => handleDropdownOpen("dropdown1")}
                     className="text-white m-0 dropdown-btn"
                   >
                     Products
@@ -536,7 +534,9 @@ export default function Headerlanding() {
                                   <strong
                                     onClick={() => {
                                       if (index == 0) {
-                                        router.push("/sub_category");
+                                        router.push(
+                                          `/category/${item?.category_name}`
+                                        );
                                       }
                                     }}
                                   >
@@ -559,7 +559,15 @@ export default function Headerlanding() {
                                           className="col"
                                           key={child?.category_name}
                                         >
-                                          <h5 className="pb-2">
+                                          <h5
+                                            className="pb-2"
+                                            onClick={() => {
+                                              if (child_index == 0) {
+                                                router.push("/sub_category");
+                                              }
+                                            }}
+                                            style={{ cursor: "pointer" }}
+                                          >
                                             {child?.category_name}
                                           </h5>
                                           <ul>
@@ -591,20 +599,21 @@ export default function Headerlanding() {
                     </Tab.Container>
                   </Dropdown.Menu>
                 </Dropdown>
+
                 <Dropdown
-                // id="toggle-2"
-                // onMouseEnter={() => handleModalOpen("toggle-2")}
-                // onMouseLeave={() => handleModalClose("toggle-2")}
+                  className="pntr-none"
+                  onMouseLeave={() => handleDropdownClose("dropdown2")}
                 >
                   <Dropdown.Toggle
-                    id="dropdown-basic"
-                    className="text-white m-0 dropdown-btn"
+                    id="dropdown2"
+                    onMouseEnter={() => handleDropdownOpen("dropdown2")}
+                    className="text-white m-0 dropdown-btn pnt-none"
                   >
                     Brands
                   </Dropdown.Toggle>
 
                   <Dropdown.Menu
-                    className="brand-btn"
+                    className="brand-btn mt-0 border-0"
                     show={showModal["toggle-2"]}
                   >
                     <div className="container">
@@ -621,42 +630,40 @@ export default function Headerlanding() {
                   </Dropdown.Menu>
                 </Dropdown>
                 <Dropdown
-                // id="toggle-3"
-                // onMouseEnter={() => handleModalOpen("toggle-3")}
-                // onMouseLeave={() => handleModalClose("toggle-3")}
+                  className="pntr-none"
+                  onMouseLeave={() => handleDropdownClose("dropdown3")}
                 >
                   <Dropdown.Toggle
-                    id="dropdown-basic"
-                    className="text-white m-0 dropdown-btn"
+                    id="dropdown3"
+                    className="text-white m-0 dropdown-btn pnt-none"
+                    onMouseEnter={() => handleDropdownOpen("dropdown3")}
                   >
                     Insurances
                   </Dropdown.Toggle>
                   <Dropdown.Menu
-                    className="head-list"
+                    className="head-list mt-0 border-0"
                     show={showModal["toggle-3"]}
                   >
                     <ul>
-                      <li>Tricare</li>
-                      <li>Healthnet</li>
-                      <li>Atena</li>
-                      <li>Human</li>
-                      <li>Healthnet</li>
+                      {productsData?.insurance?.map((item, index) => (
+                        <li>{item?.insurance_name}</li>
+                      ))}
                     </ul>
                   </Dropdown.Menu>
                 </Dropdown>
                 <Dropdown
-                // id="toggle-4"
-                // onMouseEnter={() => handleModalOpen("toggle-4")}
-                // onMouseLeave={() => handleModalClose("toggle-4")}
+                  className="pntr-none"
+                  onMouseLeave={() => handleDropdownClose("dropdown4")}
                 >
                   <Dropdown.Toggle
-                    id="dropdown-basic"
-                    className="text-white m-0 dropdown-btn"
+                    id="dropdown4"
+                    className="text-white m-0 dropdown-btn pnt-none"
+                    onMouseEnter={() => handleDropdownOpen("dropdown4")}
                   >
                     Services
                   </Dropdown.Toggle>
                   <Dropdown.Menu
-                    className="list-w"
+                    className="list-w mt-0 border-0"
                     show={showModal["toggle-4"]}
                   >
                     <ul>
@@ -665,19 +672,20 @@ export default function Headerlanding() {
                     </ul>
                   </Dropdown.Menu>
                 </Dropdown>
+
                 <Dropdown
-                // id="toggle-5"
-                // onMouseEnter={() => handleModalOpen("toggle-5")}
-                // onMouseLeave={() => handleModalClose("toggle-5")}
+                  className="pntr-none"
+                  onMouseLeave={() => handleDropdownClose("dropdown5")}
                 >
                   <Dropdown.Toggle
-                    id="dropdown-basic"
-                    className="text-white m-0 dropdown-btn"
+                    id="dropdown5"
+                    className="text-white m-0 dropdown-btn pnt-none"
+                    onMouseEnter={() => handleDropdownOpen("dropdown5")}
                   >
                     Resources
                   </Dropdown.Toggle>
                   <Dropdown.Menu
-                    className="resources-btn"
+                    className="resources-btn mt-0 border-0"
                     show={showModal["toggle-5"]}
                   >
                     <div className="container">
@@ -704,71 +712,44 @@ export default function Headerlanding() {
                   </Dropdown.Menu>
                 </Dropdown>
                 <Dropdown
-                  className="about-btn-box"
-                  // id="toggle-6"
-                  // onMouseEnter={() => handleModalOpen("toggle-6")}
-                  // onMouseLeave={() => handleModalClose("toggle-6")}
+                  className="about-btn-box pntr-none"
+                  onMouseLeave={() => handleDropdownClose("toggle-6")}
                 >
                   <Dropdown.Toggle
-                    id="dropdown-basic"
-                    className="text-white m-0 dropdown-btn"
+                    id="toggle-6"
+                    className="text-white m-0 dropdown-btn pnt-none"
+                    onMouseEnter={() => handleDropdownOpen("toggle-6")}
                   >
                     About Us
                   </Dropdown.Toggle>
                   <Dropdown.Menu
-                    className="about-btn"
+                    className="about-btn mt-0 border-0 pnt-none"
                     show={showModal["toggle-6"]}
                   >
                     <div className="container">
-                      <div className="row row-cols-1 row-cols-md-3">
-                        <div className="col">
-                          <h5 className="pb-2">United States</h5>
-                          <ul>
-                            <li>AAFES Fort Leonard Wood</li>
-                            <li>Tinker Main Exchange</li>
-                            <li>MacDill Main Exchange</li>
-                            <li>Navy Exchange San Diego</li>
-                            <li>Fort Sam Houston</li>
-                            <li>Schofield Main Exchange</li>
-                            <li>Tripler Army Medical Center</li>
-                            <li>Navy Exchange Mall at Pearl Harbor</li>
-                            <li>Fort Sill</li>
-                            <li>Davis-Monthan AFB</li>
-                            <li>Portsmouth Navy Exchange Scott Center</li>
-                            <li>Camp Lejeune</li>
-                            <li>Travis AFB</li>
-                          </ul>
-                        </div>
-                        <div className="col">
-                          <h5 className="pb-2">Europe</h5>
-                          <ul>
-                            <li>RAF Lakenheath Exchange</li>
-                            <li>Ramstein Exchange</li>
-                            <li>StuttgartPanzer Main Exchange</li>
-                            <li>Spangdahlem Main Exchange</li>
-                            <li>Wiesbaden Exchange</li>
-                            <li>Grafenwoehr Exchange</li>
-                            <li>Naples NEX</li>
-                            <li>Navy Exchange Mall at Pearl Harbor</li>
-                            <li>Aviano Main Exchange</li>
-                          </ul>
-                          <h5 className="py-2">US Territories</h5>
-                          <ul>
-                            <li>Andersen AFB</li>
-                            <li>Navy Exchange Mall at Guam</li>
-                            <li>Fort Buchanan Exchange</li>
-                          </ul>
-                        </div>
-                        <div className="col">
-                          <h5 className="pb-2">Pacific RIM</h5>
-                          <ul>
-                            <li>AAFES Camp Humphreys</li>
-                            <li>Osan Main Exchange</li>
-                            <li>Yokota Main Exchange</li>
-                            <li>Misawa Main Exchange</li>
-                            <li>Kadena Main Exchange</li>
-                            <li>AAFES Camp Foster</li>
-                          </ul>
+                      <div className="row row-cols-1 row-cols-md-4">
+                        {productsData?.stores?.map((item, index) => (
+                          <div className="col">
+                            <h5 className="pb-2">{item?.continent_name}</h5>
+                            <ul>
+                              {item?.stores?.map((item, index) => {
+                                return (
+                                  <li style={{ fontSize: "17px" }}>
+                                    {item?.store_name}
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </div>
+                        ))}
+                        <div
+                          className="col"
+                          style={{
+                            position: "absolute",
+                            bottom: "50px",
+                            right: "0px",
+                          }}
+                        >
                           <button type="button" className="btn btn-primary">
                             Contact Us
                           </button>
@@ -779,7 +760,7 @@ export default function Headerlanding() {
                 </Dropdown>
                 <div className="career-btn">
                   <button type="button" className="text-white m-0 dropdown-btn">
-                    Carrers
+                    Careers
                   </button>
                 </div>
               </Nav>

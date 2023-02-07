@@ -16,10 +16,12 @@ import cardImg3 from "../public/images/card-img3.svg";
 import cardImg4 from "../public/images/card-img4.svg";
 import airminiImg from "../public/images/air-mini.svg";
 import fullmask2 from "../public/images/fullmask2.svg";
+import { useRouter } from "next/router";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Product() {
+  const router = useRouter();
   let settings = {
     dots: true,
     infinite: true,
@@ -75,7 +77,14 @@ export default function Product() {
           <div className="row pt-4">
             <div className="col-sm-12 col-lg-3 order-lg-1">
               <div className="incart-box">
-                <h4 className="accordion-button" data-bs-toggle="collapse" role="button" data-bs-target="#items">In Cart</h4>
+                <h4
+                  className="accordion-button"
+                  data-bs-toggle="collapse"
+                  role="button"
+                  data-bs-target="#items"
+                >
+                  In Cart
+                </h4>
                 <div className="collapse show" id="items">
                   <a href="#" className="d-block my-3">
                     <p>AirMini Autoset</p>
@@ -88,68 +97,83 @@ export default function Product() {
                   </a>
                   <a href="#" className="d-block my-3">
                     <p>AirTouch F20 Replacement Frame System</p>
-                    <Image
-                      width={160}
-                      height={120}
-                      src={fullmask2}
-                      alt="..."
-                    />
+                    <Image width={160} height={120} src={fullmask2} alt="..." />
                   </a>
-                  <button type="button" className="btn btn-primary w-100">Proceed to Cart</button>
+                  <button
+                    type="button"
+                    className="btn btn-primary w-100"
+                    onClick={() => router.push("/cart_items")}
+                  >
+                    Proceed to Cart
+                  </button>
                 </div>
               </div>
             </div>
             <div className="col-sm-12 col-lg-9">
-              <h4 className="py-4">Other Accessories bought with AirMini Autoset </h4>
+              <h4 className="py-4">
+                Other Accessories bought with AirMini Autoset{" "}
+              </h4>
               <div className="d-flex pb-5">
                 <div className="me-3 title-img card-shadow">
-                  <Image
-                    width={120}
-                    height={120}
-                    src={cardImg2}
-                    alt="..."
-                  />
+                  <Image width={120} height={120} src={cardImg2} alt="..." />
                 </div>
                 <div className="">
                   <h4 className="pb-2">Title 1</h4>
                   <p>
-                    The Spectra S1 Plus Electric Breast Pump is the perfect solution for any new mom who needs to pump their breastmilk. This award-winning, dual voltage pump was designed with convenience, comfort and efficiency in mind. Featuring an ultra
+                    The Spectra S1 Plus Electric Breast Pump is the perfect
+                    solution for any new mom who needs to pump their breastmilk.
+                    This award-winning, dual voltage pump was designed with
+                    convenience, comfort and efficiency in mind. Featuring an
+                    ultra
                   </p>
-                  <button type="button" className="btn btn-outline-primary px-3">Add to Cart</button>
+                  <button
+                    type="button"
+                    className="btn btn-outline-primary px-3"
+                  >
+                    Add to Cart
+                  </button>
                 </div>
               </div>
               <div className="d-flex pb-5">
                 <div className="me-3 title-img card-shadow">
-                  <Image
-                    width={120}
-                    height={120}
-                    src={cardImg2}
-                    alt="..."
-                  />
+                  <Image width={120} height={120} src={cardImg2} alt="..." />
                 </div>
                 <div className="">
                   <h4 className="pb-2">Title 1</h4>
                   <p>
-                    The Spectra S1 Plus Electric Breast Pump is the perfect solution for any new mom who needs to pump their breastmilk. This award-winning, dual voltage pump was designed with convenience, comfort and efficiency in mind. Featuring an ultra
+                    The Spectra S1 Plus Electric Breast Pump is the perfect
+                    solution for any new mom who needs to pump their breastmilk.
+                    This award-winning, dual voltage pump was designed with
+                    convenience, comfort and efficiency in mind. Featuring an
+                    ultra
                   </p>
-                  <button type="button" className="btn btn-outline-primary px-3">Add to Cart</button>
+                  <button
+                    type="button"
+                    className="btn btn-outline-primary px-3"
+                  >
+                    Add to Cart
+                  </button>
                 </div>
               </div>
               <div className="d-flex pb-5">
                 <div className="me-3 title-img card-shadow">
-                  <Image
-                    width={120}
-                    height={120}
-                    src={cardImg2}
-                    alt="..."
-                  />
+                  <Image width={120} height={120} src={cardImg2} alt="..." />
                 </div>
                 <div className="">
                   <h4 className="pb-2">Title 1</h4>
                   <p>
-                    The Spectra S1 Plus Electric Breast Pump is the perfect solution for any new mom who needs to pump their breastmilk. This award-winning, dual voltage pump was designed with convenience, comfort and efficiency in mind. Featuring an ultra
+                    The Spectra S1 Plus Electric Breast Pump is the perfect
+                    solution for any new mom who needs to pump their breastmilk.
+                    This award-winning, dual voltage pump was designed with
+                    convenience, comfort and efficiency in mind. Featuring an
+                    ultra
                   </p>
-                  <button type="button" className="btn btn-outline-primary px-3">Add to Cart</button>
+                  <button
+                    type="button"
+                    className="btn btn-outline-primary px-3"
+                  >
+                    Add to Cart
+                  </button>
                 </div>
               </div>
             </div>

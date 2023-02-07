@@ -13,6 +13,7 @@
         "@next/font": "13.1.1",
         "axios": "^1.2.5",
         "bootstrap": "^5.2.3",
+        "country-state-city": "^3.1.2",
         "crypto-js": "^4.1.1",
         "eslint": "8.31.0",
         "eslint-config-next": "13.1.1",
@@ -24,6 +25,7 @@
         "react-signature-pad": "^0.0.6",
         "react-slick": "^0.29.0",
         "sharp": "^0.31.3",
-        "slick-carousel": "^1.8.1"
+        "slick-carousel": "^1.8.1",
+        "usa-states": "^0.0.6"
     }
 }

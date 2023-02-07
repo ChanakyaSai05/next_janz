@@ -3,22 +3,22 @@ import Head from "next/head";
 import Image from "next/image";
 import Slider from "react-slick";
 import { Inter } from "@next/font/google";
-import styles from "../styles/Home.module.css";
+// import styles from "../styles/Home.module.css";
 import { Container, Nav, Tab, Col, Row, Dropdown } from "react-bootstrap";
-import Headerlanding from "../components/headerlanding";
-import Footer from "../components/footer";
+import Headerlanding from "../../../../../../components/headerlanding";
+import Footer from "../../../../../../components/footer";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import product from "../public/images/product.svg";
-import cardImg1 from "../public/images/card-img1.svg";
-import cardImg2 from "../public/images/card-img2.svg";
-import cardImg3 from "../public/images/card-img3.svg";
-import cardImg4 from "../public/images/card-img4.svg";
-import fullmask1 from "../public/images/fullmask1.svg";
-import fullmask2 from "../public/images/fullmask2.svg";
-import fullmask3 from "../public/images/fullmask3.svg";
-import fullmask4 from "../public/images/fullmask4.svg";
-import checkImg from "../public/images/check-img.svg";
+import product from "../../../../../../public/images/product.svg";
+import cardImg1 from "../../../../../../public/images/card-img1.svg";
+import cardImg2 from "../../../../../../public/images/card-img2.svg";
+import cardImg3 from "../../../../../../public/images/card-img3.svg";
+import cardImg4 from "../../../../../../public/images/card-img4.svg";
+import fullmask1 from "../../../../../../public/images/fullmask1.svg";
+import fullmask2 from "../../../../../../public/images/fullmask2.svg";
+import fullmask3 from "../../../../../../public/images/fullmask3.svg";
+import fullmask4 from "../../../../../../public/images/fullmask4.svg";
+import checkImg from "../../../../../../public/images/check-img.svg";
 import { useRouter } from "next/router";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -75,7 +75,7 @@ export default function Productdetail() {
   return (
     <>
       <Headerlanding></Headerlanding>
-      <div className="">
+      <div className="pb-5">
         <Container>
           <div className="row">
             <div className="col-12 pt-3 pb-2">
@@ -121,14 +121,27 @@ export default function Productdetail() {
                   <div className="view-img">
                     <Image src={product} width={250} height={250} alt="" />
                   </div>
-                  <button
+                  <div className="my-4 d-flex">
+                    <button type="button" className="btn btn-primary">
+                      Verify Insurance
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-darkred ms-auto px-4"
+                      data-bs-toggle="modal"
+                      data-bs-target="#exampleModalCenter1"
+                    >
+                      Add to Cart
+                    </button>
+                  </div>
+                  {/* <button
                     type="button"
-                    className="w-100 my-4"
+                    className="w-100 my-4 l"
                     data-bs-toggle="modal"
                     data-bs-target="#exampleModalCenter1"
                   >
                     Add to Cart
-                  </button>
+                  </button> */}
                 </div>
               </div>
             </div>
@@ -1664,7 +1677,7 @@ export default function Productdetail() {
                           </div>
                           <button
                             type="button"
-                            className="w-100 my-3"
+                            className="w-100 my-3 "
                             onClick={() => router.push("/product")}
                             data-bs-dismiss="modal"
                           >

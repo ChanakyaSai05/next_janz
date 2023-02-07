@@ -45,15 +45,18 @@ import brand5 from "../public/images/brand/brand5.svg";
 import brand10 from "../public/images/brand/brand10.svg";
 import customerImg2 from "../public/images/customer-img2.svg";
 import axios from "axios";
+import { useRouter } from "next/router";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
+export default function Home(props) {
   // const origin = typeof window !== 'undefined' && window.location.origin ? window.location.origin : '';
 
   // useEffect(()=>{
   //   console.log(origin);
   // },[]);
+  const router = useRouter();
+  console.log(props, "props");
 
   let settings = {
     dots: true,
@@ -885,16 +888,35 @@ export default function Home() {
             <div className="col-12">
               <Slider {...sliderfive}>
                 <div className="d-flex justify-content-center">
-                  <div className="insurance-card">
+                  {/* <div className="insurance-card">
                     <Image
                       width={120}
                       height={60}
                       src={insuranceImg1}
                       alt="..."
                     />
-                  </div>
+                  </div> */}
+                  {props?.data?.insurance?.map((item, index) => (
+                    <div>
+                      <div
+                        className="insurance-card"
+                        onClick={() =>
+                          router.push(
+                            `/insurance_accepted/${item.insurance_slug}`
+                          )
+                        }
+                      >
+                        <Image
+                          width={120}
+                          height={60}
+                          src={`${process.env.NEXT_PUBLIC_MEDIA}${item.insurance_image}`}
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="d-flex justify-content-center">
+                {/* <div className="d-flex justify-content-center">
                   <div className="insurance-card">
                     <Image
                       width={126}
@@ -943,7 +965,7 @@ export default function Home() {
                       alt="..."
                     />
                   </div>
-                </div>
+                </div> */}
               </Slider>
             </div>
           </div>
@@ -964,7 +986,29 @@ export default function Home() {
           <div className="row">
             <div className="col-12">
               <Slider {...sliderfive}>
-                <div className="d-flex justify-content-center">
+                <div>
+                  {props?.data?.brands?.map((item, index) => (
+                    <div
+                      className="insurance-card mb-5"
+                      onClick={() =>
+                        router.push(`/shop_by_brand/${item.brand_slug}`)
+                      }
+                    >
+                      <>
+                        {item?.brand_image != null && (
+                          <Image
+                            width={199}
+                            height={157}
+                            src={`${process.env.NEXT_PUBLIC_MEDIA}${item?.brand_image}`}
+                            alt="..."
+                          />
+                        )}
+                      </>
+                    </div>
+                  ))}
+                </div>
+
+                {/* <div className="d-flex justify-content-center">
                   <div>
                     <div className="insurance-card mb-5">
                       <Image width={199} height={157} src={brand1} alt="..." />
@@ -1023,14 +1067,14 @@ export default function Home() {
                       <Image width={151} height={55} src={brand8} alt="..." />
                     </div>
                   </div>
-                </div>
+                </div> */}
               </Slider>
             </div>
           </div>
         </div>
       </div>
 
-      <div style={{ background: "#F2FAFF" }}>
+      {/* <div style={{ background: "#F2FAFF" }}>
         <div className="container py-5">
           <div className="row pb-5">
             <div className="col-12 line-heading text-center">
@@ -1140,9 +1184,36 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <Footer></Footer>
     </>
   );
 }
+
+export async function getServerSideProps({ params }) {
+  // console.log("before axios call");
+  const res = await axios.get(`${process.env.NEXT_PUBLIC_URL}menu/content`);
+  // console.log("after axios call");
+  const data = res.data;
+
+  return {
+    props: {
+      data,
+    },
+  };
+}
+// function RenderRow(props) {
+//   const { items } = props;
+//   return (
+//     <div className="d-flex justify-content-center">
+//       {items.map((item, index) => (
+//         <div key={index}>
+//           <div className="insurance-card mb-5">
+//             <Image width={199} height={157} src={item.src} alt={item.alt} />
+//           </div>
+//         </div>
+//       ))}
+//     </div>
+//   );
+// }

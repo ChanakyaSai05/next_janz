@@ -3,23 +3,23 @@ import Head from "next/head";
 import Image from "next/image";
 import Slider from "react-slick";
 import { Inter } from "@next/font/google";
-import styles from "../styles/Home.module.css";
+// import styles from "../styles/Home.module.css";
 import { Container, Nav, Tab, Col, Row, Dropdown } from "react-bootstrap";
-import Headerlanding from "../components/headerlanding";
-import Footer from "../components/footer";
+import Headerlanding from "../../../../components/headerlanding";
+import Footer from "../../../../components/footer";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import subCategoryHero from "../public/images/sub-category-hero.svg";
-import subCateg1 from "../public/images/sub-categ1.svg";
-import subCateg2 from "../public/images/sub-categ2.svg";
-import subCateg3 from "../public/images/sub-categ3.svg";
-import subCateg4 from "../public/images/sub-categ4.svg";
-import subCateg5 from "../public/images/sub-categ5.svg";
-import subCateg6 from "../public/images/sub-categ6.svg";
-import cardImg1 from "../public/images/card-img1.svg";
-import cardImg2 from "../public/images/card-img2.svg";
-import cardImg3 from "../public/images/card-img3.svg";
-import cardImg4 from "../public/images/card-img4.svg";
+import subCategoryHero from "../../../../public/images/sub-category-hero.svg";
+import subCateg1 from "../../../../public/images/sub-categ1.svg";
+import subCateg2 from "../../../../public/images/sub-categ2.svg";
+import subCateg3 from "../../../../public/images/sub-categ3.svg";
+import subCateg4 from "../../../../public/images/sub-categ4.svg";
+import subCateg5 from "../../../../public/images/sub-categ5.svg";
+import subCateg6 from "../../../../public/images/sub-categ6.svg";
+import cardImg1 from "../../../../public/images/card-img1.svg";
+import cardImg2 from "../../../../public/images/card-img2.svg";
+import cardImg3 from "../../../../public/images/card-img3.svg";
+import cardImg4 from "../../../../public/images/card-img4.svg";
 import { useRouter } from "next/router";
 // import video from "../public/images/video.svg";
 
@@ -27,6 +27,9 @@ const inter = Inter({ subsets: ["latin"] });
 
 export default function Subcategory() {
   const router = useRouter();
+  const params = router.query;
+  const { categoryId, sub_categoryId } = params;
+  // console.log(params, "params");
   const hero = {
     dots: true,
     infinite: true,
@@ -193,9 +196,23 @@ export default function Subcategory() {
       <div className="">
         <Container>
           <div className="row">
-            <div className="col-12 py-3">
-              <p>Home&#62;Maternity Care &#62;Breast Pump</p>
+            <div className="col-12 pt-3 pb-2">
+              <nav className="breadcrumb-wrap" aria-label="breadcrumb">
+                <ol className="breadcrumb">
+                  <li className="breadcrumb-item">
+                    <a href="#">Home</a>
+                  </li>
+                  <li className="breadcrumb-item">
+                    <a href="#">Maternity Care</a>
+                  </li>
+                  <li className="breadcrumb-item active" aria-current="page">
+                    Breast Pump
+                  </li>
+                </ol>
+              </nav>
             </div>
+          </div>
+          <div className="row">
             <div className="col-12 line-heading text-center mb-5">
               <h3>About Breast Pumps</h3>
             </div>
@@ -240,7 +257,11 @@ export default function Subcategory() {
                 <h5>Double Electric Pump</h5>
                 <button
                   type="button"
-                  onClick={() => router.push("/category_filter")}
+                  onClick={() =>
+                    router.push(
+                      `/category/${categoryId}/${sub_categoryId}/category_filter`
+                    )
+                  }
                 >
                   Show more
                 </button>

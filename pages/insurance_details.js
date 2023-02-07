@@ -3,15 +3,54 @@ import { Table, Dropdown } from "react-bootstrap";
 import Header from "../components/header";
 import Asidebar from "../components/asidebar";
 import Form from "react-bootstrap/Form";
+import { useEffect } from "react";
+import axios from "axios";
 
 export default function Insurancedetails() {
   const [editCancel, setEditCancel] = useState(false);
   const [numbereditCancel, setNumberEditCancel] = useState(false);
   const [formedit, setFormEdit] = useState(false);
   const [editform, setEditForm] = useState(false);
+  const [addEditMode, setaddEditMode] = useState(false);
+  // edit mode the above one true
+  //insurance details
+  const [insuranceDetails, setinsuranceDetails] = useState({
+    customer_insruance_id: "0",
+    insurance_default: "",
+    insurnace_id: "",
+    birth_date: "",
+    subscriber_id: "",
+    policy_number: "",
+    group_number: "",
+    sponsor_first_name: "",
+    sponsor_last_name: "",
+    sponsor_ssn: "",
+    sponsor_dbn: "",
+    insurance_name: "",
+  });
+  // console.log(insuranceDetails, "Insurance details");
+  const [insuranceList, setinsuranceList] = useState({});
+  // handle insurance details
+  const handleInsuranceDetails = (e) => {
+    setinsuranceDetails({ ...insuranceDetails, [e.target.id]: e.target.value });
+  };
 
   const editForm = (item) => {
-    setEditForm(!editform);
+    setinsuranceDetails({
+      customer_insruance_id: item.customer_insruance_id,
+      insurance_default: item.insurance_default == "1" ? "on" : "",
+      insurnace_id: item.insurnace_id,
+      birth_date: item.birth_date,
+      subscriber_id: item.subscriber_id,
+      policy_number: item.policy_number,
+      group_number: item.group_number,
+      sponsor_first_name: item.sponsor_first_name,
+      sponsor_last_name: item.sponsor_last_name,
+      sponsor_ssn: item.sponsor_ssn,
+      sponsor_dbn: item.sponsor_dbn,
+      insurance_name: "",
+    });
+    setEditForm(true);
   };
 
   const [table, setTable] = useState([
@@ -62,6 +101,127 @@ export default function Insurancedetails() {
     );
   };
 
+  // add insurance detials
+  const addInsuranceDetails = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const token = localStorage.getItem("janz_medical_login_token");
+      let insurnace_id = insuranceDetails.insurnace_id;
+      for (let i = 0; i < insuranceList.insurance.length; i++) {
+        let item = insuranceList.insurance[i];
+        // console.log(item);
+        if (item.insurance_name === insuranceDetails.insurance_name) {
+          insurnace_id = item.insurance_id;
+        }
+      }
+      // console.log(insurnace_id);
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/insurance/update`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        data: {
+          customer_insruance_id: insuranceDetails.customer_insruance_id,
+          insurance_default:
+            insuranceDetails.insurance_default === "on" ? 1 : 0,
+          insurnace_id: insurnace_id,
+          birth_date: insuranceDetails.birth_date,
+          subscriber_id: insuranceDetails.subscriber_id,
+          policy_number: insuranceDetails.policy_number,
+          group_number: insuranceDetails.group_number,
+          sponsor_first_name: insuranceDetails.sponsor_first_name,
+          sponsor_last_name: insuranceDetails.sponsor_last_name,
+          sponsor_ssn: insuranceDetails.sponsor_ssn,
+          sponsor_dbn: insuranceDetails.sponsor_dbn,
+          // insurance_name: insuranceDetails.insurance_name,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        alert("Error");
+      } else {
+        // console.log(response.data);
+        setEditForm(false);
+        setinsuranceDetails({
+          customer_insruance_id: "",
+          insurance_default: "",
+          insurnace_id: "",
+          birth_date: "",
+          subscriber_id: "",
+          policy_number: "",
+          group_number: "",
+          sponsor_first_name: "",
+          sponsor_last_name: "",
+          sponsor_ssn: "",
+          sponsor_dbn: "",
+          insurance_name: "",
+        });
+        getInsuranceList();
+        // alert("Success");
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Error");
+    }
+  };
+
+  // Insurance details
+  const getInsuranceList = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const token = localStorage.getItem("janz_medical_login_token");
+
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/insurance`,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        alert("Error");
+      } else {
+        setinsuranceList(response?.data);
+        setinsuranceDetails({
+          ...insuranceDetails,
+          insurance_name: response?.data?.insurance[0]?.insurance_name
+            ? response?.data?.insurance[0]?.insurance_name
+            : "",
+          insurnace_id: response?.data?.insurance[0].insurance_id
+            ? response?.data?.insurance[0].insurance_id
+            : "",
+        });
+        // setinsuranceList();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // console.log(insuranceList, "INSURANCE LIST");
+
+  const checkName = (item) => {
+    let name = "";
+    for (let i = 0; i < insuranceList.insurance.length; i++) {
+      let itemIn = insuranceList.insurance[i];
+      // console.log(itemIn, "in");
+      if (item.insurnace_id == itemIn.insurance_id) {
+        // console.log("Found" + i);
+        name = itemIn.insurance_name;
+      }
+    }
+    // console.log(item);
+    return name;
+  };
+  useEffect(() => {
+    getInsuranceList();
+  }, []);
+
   return (
     <>
       <Header></Header>
@@ -76,13 +236,16 @@ export default function Insurancedetails() {
           <button
             typeof="button"
             className="button button-blue w-100 p-3 fs-20"
+            onClick={() => {
+              setEditForm(true);
+            }}
           >
             <span className="plus-icon">
               <svg className="icon">
                 <use href="#icon_btnadd"></use>
               </svg>
             </span>
-            Add New Address
+            Add New Insurance
           </button>
         </div>
 
@@ -92,29 +255,45 @@ export default function Insurancedetails() {
             <div className="row">
               <div className="col-md-6">
                 <Form>
-                  {["radio"].map((type) => (
-                    <div key={`inline-${type}`} className="mb-3">
-                      <Form.Check
-                        inline
-                        label="Primary"
-                        name="primary"
-                        type={type}
-                        id={`inline-${type}-3`}
-                      />
-                    </div>
-                  ))}
+                  <div className="mb-3">
+                    <Form.Check
+                      inline
+                      label="Primary"
+                      name="primary"
+                      type="radio"
+                      id="insurance_default"
+                      checked={
+                        insuranceDetails.insurance_default === "on"
+                          ? true
+                          : false
+                      }
+                      onClick={() =>
+                        setinsuranceDetails({
+                          ...insuranceDetails,
+                          insurance_default:
+                            insuranceDetails.insurance_default === "on"
+                              ? ""
+                              : "on",
+                        })
+                      }
+                    />
+                  </div>
                   <div className="mb-3">
                     <label htmlFor="exampleInputName" className="form-label">
                       Insurance Name
                     </label>
                     <select
                       name="insurance"
-                      id="insurance"
+                      id="insurance_name"
                       className="form-select"
+                      value={insuranceDetails.insurance_name}
+                      onChange={handleInsuranceDetails}
                     >
-                      <option value="Tricare">Tricare</option>
-                      <option value="Tricare">Tricare</option>
-                      <option value="Tricare">Tricare</option>
+                      {insuranceList?.insurance?.map((item, index) => (
+                        <option value={item?.insurance_name}>
+                          {item?.insurance_name}
+                        </option>
+                      ))}
                     </select>
                   </div>
                   <div className="mb-3">
@@ -123,9 +302,10 @@ export default function Insurancedetails() {
                     </label>
                     <input
                       type="text"
-                      value="01-18-1958"
+                      value={insuranceDetails.birth_date}
                       className="form-control"
-                      id="exampleInputAddress"
+                      id="birth_date"
+                      onChange={handleInsuranceDetails}
                     />
                   </div>
                   <div className="mb-3">
@@ -134,9 +314,10 @@ export default function Insurancedetails() {
                     </label>
                     <input
                       type="text"
-                      value="989-924-2016"
+                      value={insuranceDetails.subscriber_id}
                       className="form-control"
-                      id="exampleInputId"
+                      id="subscriber_id"
+                      onChange={handleInsuranceDetails}
                     />
                   </div>
                   <div className="mb-3">
@@ -148,9 +329,10 @@ export default function Insurancedetails() {
                     </label>
                     <input
                       type="text"
-                      value="989-924-2016"
+                      value={insuranceDetails.policy_number}
                       className="form-control"
-                      id="exampleInputMedicalNumber"
+                      id="policy_number"
+                      onChange={handleInsuranceDetails}
                     />
                   </div>
                   <div className="mb-3">
@@ -159,9 +341,10 @@ export default function Insurancedetails() {
                     </label>
                     <input
                       type="text"
-                      value="9876543210"
+                      value={insuranceDetails.group_number}
                       className="form-control"
-                      id="exampleInputAddress"
+                      id="group_number"
+                      onChange={handleInsuranceDetails}
                     />
                   </div>
                   <div className="mb-3">
@@ -170,9 +353,10 @@ export default function Insurancedetails() {
                     </label>
                     <input
                       type="text"
-                      value="Abc"
+                      value={insuranceDetails.sponsor_first_name}
                       className="form-control"
-                      id="exampleInputAddress"
+                      id="sponsor_first_name"
+                      onChange={handleInsuranceDetails}
                     />
                   </div>
                   <div className="mb-3">
@@ -181,9 +365,10 @@ export default function Insurancedetails() {
                     </label>
                     <input
                       type="text"
-                      value="Def"
+                      value={insuranceDetails.sponsor_last_name}
                       className="form-control"
-                      id="exampleInputAddress"
+                      id="sponsor_last_name"
+                      onChange={handleInsuranceDetails}
                     />
                   </div>
                   <div className="mb-3">
@@ -192,9 +377,10 @@ export default function Insurancedetails() {
                     </label>
                     <input
                       type="text"
-                      value="00233"
+                      value={insuranceDetails.sponsor_ssn}
                       className="form-control"
-                      id="exampleInputAddress"
+                      id="sponsor_ssn"
+                      onChange={handleInsuranceDetails}
                     />
                   </div>
                   <div className="mb-3">
@@ -203,21 +389,39 @@ export default function Insurancedetails() {
                     </label>
                     <input
                       type="text"
-                      value="00233"
+                      value={insuranceDetails.sponsor_dbn}
                       className="form-control"
-                      id="exampleInputAddress"
+                      id="sponsor_dbn"
+                      onChange={handleInsuranceDetails}
                     />
                   </div>
                   <div className="d-flex justify-content-between ms-0">
                     <button
                       className="button button-default same-btn delete ml-10"
-                      onClick={() => setEditForm(!editform)}
+                      onClick={() => {
+                        setinsuranceDetails({
+                          customer_insruance_id: "",
+                          insurance_default: "",
+                          insurnace_id: "",
+                          birth_date: "",
+                          subscriber_id: "",
+                          policy_number: "",
+                          group_number: "",
+                          sponsor_first_name: "",
+                          sponsor_last_name: "",
+                          sponsor_ssn: "",
+                          sponsor_dbn: "",
+                          insurance_name: "",
+                        });
+                        setEditForm(false);
+                      }}
                     >
                       Cancel
                     </button>
                     <button
                       type="button"
                       className="button button-blue same-btn mr-10"
+                      onClick={addInsuranceDetails}
                     >
                       Save
                     </button>
@@ -240,16 +444,18 @@ export default function Insurancedetails() {
                       <col width="56" />
                     </colgroup>
                     <tbody>
-                      {table.map((item, index) => (
+                      {insuranceList?.customer_insurance?.map((item, index) => (
                         <tr key={index}>
                           <td>
                             <a style={{ textDecorationLine: "underline" }}>
-                              Tricare
+                              {checkName(item)}
                             </a>
                             <br />
-                            <span>Sponsor Name</span>
+                            <span>
+                              {item.sponsor_first_name} {item.sponsor_last_name}
+                            </span>
                           </td>
-                          <td>Policy Number</td>
+                          <td>{item.policy_number}</td>
                           <td>
                             <Dropdown className="dots-dropdown">
                               <Dropdown.Toggle as="button" className="btn">

@@ -16,12 +16,16 @@ import Form from "react-bootstrap/Form";
 import uploader from "../public/images/uploader.svg";
 import { useRouter } from "next/router";
 import UserContext from "../context/UserContext";
-
+// import csc from "country-state-city";
+import { Country, State, City } from "country-state-city";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Checkout() {
   const context = useContext(UserContext);
   const { closeRefRegisterModalandOpenLogin } = context;
+
+  // us states
+  const [usStates, setusStates] = useState([]);
 
   // Login open close
   const [loginUser, setloginUser] = useState(null);
@@ -71,6 +75,25 @@ export default function Checkout() {
     order_summary: false,
   });
 
+  // profile details
+  const [profileDetails, setprofileDetails] = useState({
+    name: "",
+    address1: "",
+    address2: "",
+    apoFpo: "yes",
+    addressType: "",
+    city: "",
+    state: "",
+    country: "",
+    zipCode: "",
+    unitBox: "",
+    us_states: "",
+  });
+  const handleProfileDetails = (e) => {
+    setprofileDetails({ ...profileDetails, [e.target.id]: e.target.value });
+  };
+  // console.log(profileDetails, "PROFILE DETAILS type address no");
+
   const [num, setNum] = useState(1);
   const [rawFile, setrawFile] = useState(null);
   const [rawFileTwo, setrawFileTwo] = useState(null);
@@ -104,8 +127,8 @@ export default function Checkout() {
     let file = e.target.files[0];
     setrawFileTwo(file);
   };
-  console.log(rawFile, "RAW");
-  console.log(previewUrl, "PREVIEW");
+  // console.log(rawFile, "RAW");
+  // console.log(previewUrl, "PREVIEW");
 
   useEffect(() => {
     if (!rawFile) {
@@ -173,6 +196,10 @@ export default function Checkout() {
     const user = JSON.parse(localStorage.getItem("janz_medical_user"));
     setloginUser(user);
   }, []);
+  useEffect(() => {
+    let states = State.getStatesOfCountry("US");
+    setusStates(states);
+  }, []);
   return (
     <>
       <Headerlanding></Headerlanding>
@@ -204,6 +231,7 @@ export default function Checkout() {
                 </div>
               </div>
 
+              {/* user profile */}
               {profileStates.user_profile ? (
                 <div className="card-shadow  p-4 d-flex align-items-center mb-4">
                   <div className="d-flex">
@@ -260,17 +288,16 @@ export default function Checkout() {
                           <div className="row">
                             <div className="col">
                               <Form>
-                                {["radio"].map((type) => (
-                                  <div key={`inline-${type}`} className="mb-3">
-                                    <Form.Check
-                                      inline
-                                      label="Primary"
-                                      name="primary"
-                                      type={type}
-                                      id={`inline-${type}-3`}
-                                    />
-                                  </div>
-                                ))}
+                                <div className="mb-3">
+                                  <Form.Check
+                                    inline
+                                    label="Primary"
+                                    name="primary"
+                                    type="radio"
+                                    id="primary"
+                                    onChange={handleProfileDetails}
+                                  />
+                                </div>
                                 <div className="mb-3 w-100">
                                   <label
                                     htmlFor="exampleInputName"
@@ -280,9 +307,10 @@ export default function Checkout() {
                                   </label>
                                   <input
                                     type="text"
-                                    value="Janz Corp"
+                                    value={profileDetails.name}
                                     className="form-control"
-                                    id="exampleInputName"
+                                    id="name"
+                                    onChange={handleProfileDetails}
                                   />
                                 </div>
                                 <div className="mb-3">
@@ -294,9 +322,10 @@ export default function Checkout() {
                                   </label>
                                   <input
                                     type="text"
-                                    value="abc 011"
+                                    value={profileDetails.address1}
                                     className="form-control"
-                                    id="exampleInputAddress"
+                                    id="address1"
+                                    onChange={handleProfileDetails}
                                   />
                                 </div>
                                 <div className="mb-3">
@@ -308,9 +337,10 @@ export default function Checkout() {
                                   </label>
                                   <input
                                     type="text"
-                                    value="abrrc22 01221"
+                                    value={profileDetails.address2}
                                     className="form-control"
-                                    id="exampleInputAddress"
+                                    id="address2"
+                                    onChange={handleProfileDetails}
                                   />
                                 </div>
                                 <div className="mb-3 d-flex justify-content-between">
@@ -328,7 +358,15 @@ export default function Checkout() {
                                         name="group4"
                                         type={type}
                                         id={`inline-${type}-4`}
-                                        onClick={() => setFormEdit(!formedit)}
+                                        onClick={() => {
+                                          setprofileDetails({
+                                            ...profileDetails,
+                                            apoFpo: "yes",
+                                          });
+                                        }}
+                                        checked={
+                                          profileDetails.apoFpo === "yes"
+                                        }
                                       />
                                       <Form.Check
                                         inline
@@ -336,12 +374,18 @@ export default function Checkout() {
                                         name="group4"
                                         type={type}
                                         id={`inline-${type}-5`}
-                                        onClick={() => setFormEdit(!formedit)}
+                                        onClick={() => {
+                                          setprofileDetails({
+                                            ...profileDetails,
+                                            apoFpo: "no",
+                                          });
+                                        }}
+                                        checked={profileDetails.apoFpo === "no"}
                                       />
                                     </div>
                                   ))}
                                 </div>
-                                {formedit ? (
+                                {profileDetails.apoFpo === "no" ? (
                                   <div className="yes-btn-show">
                                     <div className="mb-3 d-flex justify-content-between">
                                       <span>Address Type</span>
@@ -355,21 +399,39 @@ export default function Checkout() {
                                             label="APO"
                                             name="group5"
                                             type={type}
-                                            id={`inline-${type}-4`}
+                                            id="addressType"
+                                            onClick={() =>
+                                              setprofileDetails({
+                                                ...profileDetails,
+                                                addressType: "APO",
+                                              })
+                                            }
                                           />
                                           <Form.Check
                                             inline
                                             label="FPO"
                                             name="group5"
                                             type={type}
-                                            id={`inline-${type}-5`}
+                                            id="addressType"
+                                            onClick={() =>
+                                              setprofileDetails({
+                                                ...profileDetails,
+                                                addressType: "FPO",
+                                              })
+                                            }
                                           />
                                           <Form.Check
                                             inline
                                             label="DPO"
                                             name="group5"
                                             type={type}
-                                            id={`inline-${type}-6`}
+                                            id="addressType"
+                                            onClick={() =>
+                                              setprofileDetails({
+                                                ...profileDetails,
+                                                addressType: "DPO",
+                                              })
+                                            }
                                           />
                                         </div>
                                       ))}
@@ -383,9 +445,10 @@ export default function Checkout() {
                                       </label>
                                       <input
                                         type="text"
-                                        value="CMR 414 Box 1416"
+                                        value={profileDetails.unitBox}
                                         className="form-control"
-                                        id="exampleInputBox"
+                                        id="unitBox"
+                                        onChange={handleProfileDetails}
                                       />
                                     </div>
                                     <div className="mb-3 form-group">
@@ -394,10 +457,15 @@ export default function Checkout() {
                                       </label>
                                       <select
                                         className="form-control"
-                                        id="exampleFormControlSelect1"
+                                        id="state"
+                                        value={profileDetails.state}
+                                        onChange={handleProfileDetails}
                                       >
-                                        <option>AE</option>
-                                        <option>USA</option>
+                                        {["AE", "AP", "AA"].map(
+                                          (item, index) => (
+                                            <option key={index}>{item}</option>
+                                          )
+                                        )}
                                       </select>
                                     </div>
                                     <div className="mb-3">
@@ -409,9 +477,10 @@ export default function Checkout() {
                                       </label>
                                       <input
                                         type="text"
-                                        value="Italy"
+                                        value={profileDetails.country}
                                         className="form-control"
-                                        id="exampleInputCountry"
+                                        id="country"
+                                        onChange={handleProfileDetails}
                                       />
                                     </div>
                                     <div className="mb-3">
@@ -423,9 +492,10 @@ export default function Checkout() {
                                       </label>
                                       <input
                                         type="text"
-                                        value="00233"
+                                        value={profileDetails.zipCode}
                                         className="form-control"
-                                        id="exampleInputZipcode"
+                                        id="zipCode"
+                                        onChange={handleProfileDetails}
                                       />
                                     </div>
                                   </div>
@@ -440,9 +510,10 @@ export default function Checkout() {
                                       </label>
                                       <input
                                         type="text"
-                                        value="New York"
+                                        value={profileDetails.city}
                                         className="form-control"
-                                        id="exampleInputCity"
+                                        id="city"
+                                        onChange={handleProfileDetails}
                                       />
                                     </div>
                                     <div className="mb-3 form-group">
@@ -451,15 +522,19 @@ export default function Checkout() {
                                       </label>
                                       <select
                                         className="form-control"
-                                        id="exampleFormControlSelect1"
+                                        id="us_states"
+                                        value={profileDetails.us_states}
+                                        onChange={handleProfileDetails}
                                       >
-                                        <option>New York</option>
-                                        <option>United State</option>
-                                        <option>India</option>
-                                        <option>Nepal</option>
+                                        {usStates?.map((item, index) => (
+                                          <>
+                                            <option>Select state</option>
+                                            <option>{item?.name}</option>
+                                          </>
+                                        ))}
                                       </select>
                                     </div>
-                                    <div className="mb-3">
+                                    {/* <div className="mb-3">
                                       <label
                                         htmlFor="exampleInputCountry"
                                         className="form-label"
@@ -472,7 +547,7 @@ export default function Checkout() {
                                         className="form-control"
                                         id="exampleInputCountry"
                                       />
-                                    </div>
+                                    </div> */}
                                     <div className="mb-3">
                                       <label
                                         htmlFor="exampleInputZipcode"
@@ -482,9 +557,10 @@ export default function Checkout() {
                                       </label>
                                       <input
                                         type="text"
-                                        value="00033"
+                                        value={profileDetails.zipCode}
                                         className="form-control"
-                                        id="exampleInputZipcode"
+                                        id="zipCode"
+                                        onChange={handleProfileDetails}
                                       />
                                     </div>
                                   </div>
