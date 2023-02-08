@@ -897,7 +897,7 @@ export default function Home(props) {
                     />
                   </div> */}
                   {props?.data?.insurance?.map((item, index) => (
-                    <div>
+                    <div key={index}>
                       <div
                         className="insurance-card"
                         onClick={() =>
@@ -989,6 +989,7 @@ export default function Home(props) {
                 <div>
                   {props?.data?.brands?.map((item, index) => (
                     <div
+                      key={index}
                       className="insurance-card mb-5"
                       onClick={() =>
                         router.push(`/shop_by_brand/${item.brand_slug}`)

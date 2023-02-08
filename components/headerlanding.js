@@ -646,7 +646,7 @@ export default function Headerlanding() {
                   >
                     <ul>
                       {productsData?.insurance?.map((item, index) => (
-                        <li>{item?.insurance_name}</li>
+                        <li key={index}>{item?.insurance_name}</li>
                       ))}
                     </ul>
                   </Dropdown.Menu>
@@ -729,12 +729,12 @@ export default function Headerlanding() {
                     <div className="container">
                       <div className="row row-cols-1 row-cols-md-4">
                         {productsData?.stores?.map((item, index) => (
-                          <div className="col">
+                          <div className="col" key={item?.continent_name}>
                             <h5 className="pb-2">{item?.continent_name}</h5>
                             <ul>
                               {item?.stores?.map((item, index) => {
                                 return (
-                                  <li style={{ fontSize: "17px" }}>
+                                  <li style={{ fontSize: "17px" }} key={index}>
                                     {item?.store_name}
                                   </li>
                                 );

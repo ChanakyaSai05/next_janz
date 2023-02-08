@@ -290,7 +290,7 @@ export default function Insurancedetails() {
                       onChange={handleInsuranceDetails}
                     >
                       {insuranceList?.insurance?.map((item, index) => (
-                        <option value={item?.insurance_name}>
+                        <option value={item?.insurance_name} key={index}>
                           {item?.insurance_name}
                         </option>
                       ))}
