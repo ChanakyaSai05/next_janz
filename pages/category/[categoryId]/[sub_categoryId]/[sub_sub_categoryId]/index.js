@@ -9,14 +9,16 @@ import Footer from "../../../../../components/footer";
 // import product from "../public/images/product.svg";
 import cardImg2 from "../../../../../public/images/card-img2.svg";
 import { useRouter } from "next/router";
+import axios from "axios";
+import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Categoryfilter() {
+export default function Categoryfilter(props) {
   const router = useRouter();
   const params = router.query;
   const { categoryId, sub_categoryId, sub_sub_categoryId } = params;
-  console.log(params, "params");
+  console.log(props, "props");
   const [editCancel, setEditCancel] = useState(false);
   const nameSaveButton = () => {
     setEditCancel(!editCancel);
@@ -38,16 +40,18 @@ export default function Categoryfilter() {
               <nav className="breadcrumb-wrap" aria-label="breadcrumb">
                 <ol className="breadcrumb">
                   <li className="breadcrumb-item">
-                    <a href="#">Home</a>
+                    <Link href={"/"}>Home</Link>
                   </li>
                   <li className="breadcrumb-item">
-                    <a href="#">Maternity Care</a>
+                    <Link href={`/category/${categoryId}`}>{categoryId}</Link>
                   </li>
                   <li className="breadcrumb-item">
-                    <a href="#">Breast Pump</a>
+                    <Link href={`/category/${categoryId}/${sub_categoryId}`}>
+                      {sub_categoryId}
+                    </Link>
                   </li>
                   <li className="breadcrumb-item active" aria-current="page">
-                    Double Electric Pump
+                    {sub_sub_categoryId}
                   </li>
                 </ol>
               </nav>
@@ -87,16 +91,28 @@ export default function Categoryfilter() {
                     <div className="border-bottom mt-2 mb-3"></div>
                   </div>
                   <label className="form-check pb-2">
-                    <input class="form-check-input" type="checkbox" value="" />
-                    <span class="form-check-label">Spectra</span>
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      value=""
+                    />
+                    <span className="form-check-label">Spectra</span>
                   </label>
                   <label className="form-check pb-2">
-                    <input class="form-check-input" type="checkbox" value="" />
-                    <span class="form-check-label">Medela</span>
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      value=""
+                    />
+                    <span className="form-check-label">Medela</span>
                   </label>
                   <label className="form-check pb-2">
-                    <input class="form-check-input" type="checkbox" value="" />
-                    <span class="form-check-label">Babybuddha</span>
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      value=""
+                    />
+                    <span className="form-check-label">Babybuddha</span>
                   </label>
                 </div>
                 <div className="card border p-3 mb-4">
@@ -105,12 +121,20 @@ export default function Categoryfilter() {
                     <div className="border-bottom mt-2 mb-3"></div>
                   </div>
                   <label className="form-check pb-2">
-                    <input class="form-check-input" type="checkbox" value="" />
-                    <span class="form-check-label">United States</span>
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      value=""
+                    />
+                    <span className="form-check-label">United States</span>
                   </label>
                   <label className="form-check pb-2">
-                    <input class="form-check-input" type="checkbox" value="" />
-                    <span class="form-check-label">International</span>
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      value=""
+                    />
+                    <span className="form-check-label">International</span>
                   </label>
                 </div>
                 <div className="card border p-3 mb-4">
@@ -119,12 +143,20 @@ export default function Categoryfilter() {
                     <div className="border-bottom mt-2 mb-3"></div>
                   </div>
                   <label className="form-check pb-2">
-                    <input class="form-check-input" type="checkbox" value="" />
-                    <span class="form-check-label">Insurance</span>
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      value=""
+                    />
+                    <span className="form-check-label">Insurance</span>
                   </label>
                   <label className="form-check pb-2">
-                    <input class="form-check-input" type="checkbox" value="" />
-                    <span class="form-check-label">Cash</span>
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      value=""
+                    />
+                    <span className="form-check-label">Cash</span>
                   </label>
                 </div>
                 <div className="card border p-3 mb-4">
@@ -133,12 +165,20 @@ export default function Categoryfilter() {
                     <div className="border-bottom mt-2 mb-3"></div>
                   </div>
                   <label className="form-check pb-2">
-                    <input class="form-check-input" type="checkbox" value="" />
-                    <span class="form-check-label">HSA</span>
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      value=""
+                    />
+                    <span className="form-check-label">HSA</span>
                   </label>
                   <label className="form-check pb-2">
-                    <input class="form-check-input" type="checkbox" value="" />
-                    <span class="form-check-label">FSA</span>
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      value=""
+                    />
+                    <span className="form-check-label">FSA</span>
                   </label>
                 </div>
                 <div className="text-center pb-3">
@@ -150,12 +190,12 @@ export default function Categoryfilter() {
                     <div className="border-bottom mt-2 mb-3"></div>
                   </div>
                   <label className="form-check pb-2">
-                    <input class="form-check-input" type="radio" value="" />
-                    <span class="form-check-label">Product 1</span>
+                    <input className="form-check-input" type="radio" value="" />
+                    <span className="form-check-label">Product 1</span>
                   </label>
                   <label className="form-check pb-2">
-                    <input class="form-check-input" type="radio" value="" />
-                    <span class="form-check-label">Product 2</span>
+                    <input className="form-check-input" type="radio" value="" />
+                    <span className="form-check-label">Product 2</span>
                   </label>
                 </div>
                 <div className="card border p-3 mb-4">
@@ -164,12 +204,12 @@ export default function Categoryfilter() {
                     <div className="border-bottom mt-2 mb-3"></div>
                   </div>
                   <label className="form-check pb-2">
-                    <input class="form-check-input" type="radio" value="" />
-                    <span class="form-check-label">HSA</span>
+                    <input className="form-check-input" type="radio" value="" />
+                    <span className="form-check-label">HSA</span>
                   </label>
                   <label className="form-check pb-2">
-                    <input class="form-check-input" type="radio" value="" />
-                    <span class="form-check-label">FSA</span>
+                    <input className="form-check-input" type="radio" value="" />
+                    <span className="form-check-label">FSA</span>
                   </label>
                 </div>
               </div>
@@ -344,4 +384,31 @@ export default function Categoryfilter() {
       <Footer></Footer>
     </>
   );
+}
+export async function getServerSideProps({ params }) {
+  // console.log(params, "params");
+  try {
+    const response = await axios({
+      url: `${process.env.NEXT_PUBLIC_URL}category/details`,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: {
+        category_slug: params.sub_sub_categoryId,
+      },
+    });
+    // console.log(response.data);
+    if (response.data.status != false) {
+      // console.log(response.data);
+      return {
+        props: response.data,
+      };
+    }
+  } catch (error) {
+    console.log(error);
+    return {
+      props: {},
+    };
+  }
 }

@@ -23,14 +23,15 @@ import cardImg3 from "../../../public/images/card-img3.svg";
 import cardImg4 from "../../../public/images/card-img4.svg";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import axios from "axios";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Category() {
+export default function Category(props) {
   const router = useRouter();
   const params = router.query;
-  console.log(params, "params");
   const { categoryId } = params;
+  // console.log(props, "props");
   const hero = {
     dots: true,
     infinite: true,
@@ -179,7 +180,7 @@ export default function Category() {
               <nav className="breadcrumb-wrap" aria-label="breadcrumb">
                 <ol className="breadcrumb">
                   <li className="breadcrumb-item">
-                    <a href="#">Home</a>
+                    <Link href={"/"}>Home</Link>
                   </li>
                   <li className="breadcrumb-item active" aria-current="page">
                     {categoryId}
@@ -218,7 +219,20 @@ export default function Category() {
       <div className="medical-supplier">
         <div className="container py-5">
           <div className="row row-cols-1 row-cols-md-4">
-            <div className="col my-2">
+            {props?.categories?.subcategory?.map((item, index) => (
+              <div className="col my-2">
+                <div className="card-box">
+                  <Image width={296} height={300} src={category1} alt="..." />
+                  <h5>{item?.category_name}</h5>
+                  <Link href={`/category/${categoryId}/${item?.category_slug}`}>
+                    <button type="button">Show more</button>
+                  </Link>
+                </div>
+              </div>
+            ))}
+
+            {/*  <div className="col my-2">
+            
               <div className="card-box">
                 <Image width={296} height={300} src={category1} alt="..." />
                 <h5>Maternity Care 22</h5>
@@ -227,7 +241,7 @@ export default function Category() {
                 </Link>
               </div>
             </div>
-            <div className="col my-2">
+           <div className="col my-2">
               <div className="card-box">
                 <Image width={296} height={300} src={category2} alt="..." />
                 <h5>Respiratory Care</h5>
@@ -275,7 +289,7 @@ export default function Category() {
                 <h5>Support Bands and Braces</h5>
                 <button type="button">Show more</button>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
@@ -1053,4 +1067,35 @@ export default function Category() {
       <Footer></Footer>
     </>
   );
+}
+
+export async function getServerSideProps({ params }) {
+  // console.log(params.categoryId, "params");
+  // console.log("before axios call");
+  // get method is not possible in the dynamic page in this folder []
+  // const res = await axios.get(`${process.env.NEXT_PUBLIC_URL}category/details`);
+  try {
+    const response = await axios({
+      url: `${process.env.NEXT_PUBLIC_URL}category/details`,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: {
+        category_slug: params.categoryId,
+      },
+    });
+    // console.log(response.data);
+    if (response.data.status != false) {
+      // console.log(response.data);
+      return {
+        props: response.data,
+      };
+    }
+  } catch (error) {
+    console.log(error);
+    return {
+      props: {},
+    };
+  }
 }

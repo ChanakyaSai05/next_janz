@@ -29,9 +29,10 @@ export async function getServerSideProps({ params }) {
 
 export default function Headerlanding() {
   const context = useContext(UserContext);
-  const { closeRefRegisterModalandOpenLogin } = context;
+  const { closeRefRegisterModalandOpenLogin, productsData, setProductsData } =
+    context;
   // console.log(closeRefRegisterModalandOpenLogin, "LOGIN TOGGLE");
-  const [productsData, setProductsData] = useState(null);
+  // const [productsData, setProductsData] = useState(null);
   // console.log(props, "PROPS");
   const [preset, setPreset] = useState({
     one: true,
@@ -535,7 +536,7 @@ export default function Headerlanding() {
                                     onClick={() => {
                                       if (index == 0) {
                                         router.push(
-                                          `/category/${item?.category_name}`
+                                          `/category/${item?.category_slug}`
                                         );
                                       }
                                     }}
@@ -619,7 +620,13 @@ export default function Headerlanding() {
                     <div className="container">
                       <div className="row row-cols-1 row-cols-md-4">
                         {productsData?.brands?.map((item, index) => (
-                          <div className="col" key={index}>
+                          <div
+                            className="col"
+                            key={index}
+                            onClick={() =>
+                              router.push(`/shop_by_brand/${item?.brand_slug}`)
+                            }
+                          >
                             <ul>
                               <li>{item?.brand_name}</li>
                             </ul>
@@ -646,7 +653,16 @@ export default function Headerlanding() {
                   >
                     <ul>
                       {productsData?.insurance?.map((item, index) => (
-                        <li key={index}>{item?.insurance_name}</li>
+                        <li
+                          key={index}
+                          onClick={() =>
+                            router.push(
+                              `/insurance_accepted/${item?.insurance_slug}`
+                            )
+                          }
+                        >
+                          {item?.insurance_name}
+                        </li>
                       ))}
                     </ul>
                   </Dropdown.Menu>

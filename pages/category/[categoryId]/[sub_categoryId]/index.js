@@ -21,15 +21,17 @@ import cardImg2 from "../../../../public/images/card-img2.svg";
 import cardImg3 from "../../../../public/images/card-img3.svg";
 import cardImg4 from "../../../../public/images/card-img4.svg";
 import { useRouter } from "next/router";
+import axios from "axios";
+import Link from "next/link";
 // import video from "../public/images/video.svg";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Subcategory() {
+export default function Subcategory(props) {
   const router = useRouter();
   const params = router.query;
   const { categoryId, sub_categoryId } = params;
-  // console.log(params, "params");
+  // console.log(props, "props");
   const hero = {
     dots: true,
     infinite: true,
@@ -200,13 +202,13 @@ export default function Subcategory() {
               <nav className="breadcrumb-wrap" aria-label="breadcrumb">
                 <ol className="breadcrumb">
                   <li className="breadcrumb-item">
-                    <a href="#">Home</a>
+                    <Link href={"/"}>Home</Link>
                   </li>
                   <li className="breadcrumb-item">
-                    <a href="#">Maternity Care</a>
+                    <Link href={`/category/${categoryId}`}>{categoryId}</Link>
                   </li>
                   <li className="breadcrumb-item active" aria-current="page">
-                    Breast Pump
+                    {sub_categoryId}
                   </li>
                 </ol>
               </nav>
@@ -214,7 +216,7 @@ export default function Subcategory() {
           </div>
           <div className="row">
             <div className="col-12 line-heading text-center mb-5">
-              <h3>About Breast Pumps</h3>
+              <h3>About {props?.categories?.category_name}</h3>
             </div>
           </div>
           <div className="row">
@@ -251,7 +253,20 @@ export default function Subcategory() {
       <div className="medical-supplier">
         <div className="container py-5">
           <div className="row row-cols-1 row-cols-md-4">
-            <div className="col my-2">
+            {props?.categories?.subcategory?.map((item, index) => (
+              <div className="col my-2">
+                <div className="card-box">
+                  <Image width={296} height={300} src={subCateg1} alt="..." />
+                  <h5>{item?.category_name}</h5>
+                  <Link
+                    href={`/category/${categoryId}/${sub_categoryId}/${item?.category_slug}`}
+                  >
+                    <button type="button">Show more</button>
+                  </Link>
+                </div>
+              </div>
+            ))}
+            {/* <div className="col my-2">
               <div className="card-box">
                 <Image width={296} height={300} src={subCateg1} alt="..." />
                 <h5>Double Electric Pump</h5>
@@ -301,7 +316,7 @@ export default function Subcategory() {
                 <h5>Portable Pumps</h5>
                 <button type="button">Show more</button>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
@@ -726,4 +741,31 @@ export default function Subcategory() {
       <Footer></Footer>
     </>
   );
+}
+export async function getServerSideProps({ params }) {
+  // console.log(params, "params");
+  try {
+    const response = await axios({
+      url: `${process.env.NEXT_PUBLIC_URL}category/details`,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: {
+        category_slug: params.sub_categoryId,
+      },
+    });
+    // console.log(response.data);
+    if (response.data.status != false) {
+      // console.log(response.data);
+      return {
+        props: response.data,
+      };
+    }
+  } catch (error) {
+    console.log(error);
+    return {
+      props: {},
+    };
+  }
 }

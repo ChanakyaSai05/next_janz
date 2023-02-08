@@ -46,16 +46,17 @@ import brand10 from "../public/images/brand/brand10.svg";
 import customerImg2 from "../public/images/customer-img2.svg";
 import axios from "axios";
 import { useRouter } from "next/router";
+import { useContext } from "react";
+import UserContext from "../context/UserContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home(props) {
-  // const origin = typeof window !== 'undefined' && window.location.origin ? window.location.origin : '';
-
-  // useEffect(()=>{
-  //   console.log(origin);
-  // },[]);
+  const context = useContext(UserContext);
+  const { productsData, setProductsData } = context;
   const router = useRouter();
+  const { diabaticCare, maternityCare, respiratoryCare, mobility } =
+    props?.images;
   console.log(props, "props");
 
   let settings = {
@@ -217,7 +218,7 @@ export default function Home(props) {
                 className="carousel-img opacity-50"
                 width={4320}
                 height={1890}
-                src={maternityCare}
+                src={maternityCare?.src}
                 alt="..."
               />
               <div className="carousel-caption-box container">
@@ -240,7 +241,7 @@ export default function Home(props) {
               <Image
                 width={4320}
                 height={1890}
-                src={respiratoryCare}
+                src={respiratoryCare?.src}
                 className="carousel-img opacity-50"
                 alt="..."
               />
@@ -264,7 +265,7 @@ export default function Home(props) {
               <Image
                 width={4320}
                 height={1890}
-                src={diabaticCare}
+                src={diabaticCare?.src}
                 className="carousel-img opacity-50"
                 alt="..."
               />
@@ -285,7 +286,7 @@ export default function Home(props) {
               <Image
                 width={4320}
                 height={1890}
-                src={mobility}
+                src={mobility?.src}
                 className="carousel-img opacity-50"
                 alt="..."
               />
@@ -896,7 +897,7 @@ export default function Home(props) {
                       alt="..."
                     />
                   </div> */}
-                  {props?.data?.insurance?.map((item, index) => (
+                  {productsData?.insurance?.map((item, index) => (
                     <div key={index}>
                       <div
                         className="insurance-card"
@@ -987,7 +988,7 @@ export default function Home(props) {
             <div className="col-12">
               <Slider {...sliderfive}>
                 <div>
-                  {props?.data?.brands?.map((item, index) => (
+                  {productsData?.brands?.map((item, index) => (
                     <div
                       key={index}
                       className="insurance-card mb-5"
@@ -1192,29 +1193,15 @@ export default function Home(props) {
   );
 }
 
-export async function getServerSideProps({ params }) {
-  // console.log("before axios call");
-  const res = await axios.get(`${process.env.NEXT_PUBLIC_URL}menu/content`);
-  // console.log("after axios call");
-  const data = res.data;
-
+export async function getStaticProps({ params }) {
   return {
     props: {
-      data,
+      images: {
+        maternityCare,
+        respiratoryCare,
+        diabaticCare,
+        mobility,
+      },
     },
   };
 }
-// function RenderRow(props) {
-//   const { items } = props;
-//   return (
-//     <div className="d-flex justify-content-center">
-//       {items.map((item, index) => (
-//         <div key={index}>
-//           <div className="insurance-card mb-5">
-//             <Image width={199} height={157} src={item.src} alt={item.alt} />
-//           </div>
-//         </div>
-//       ))}
-//     </div>
-//   );
-// }
