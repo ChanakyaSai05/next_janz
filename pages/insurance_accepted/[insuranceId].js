@@ -195,7 +195,7 @@ export default function Product(props) {
               >
                 {/* insurance?.insurance_faqs */}
                 {insurance?.insurance_faqs.map((item, index) => (
-                  <div className="accordion-item py-2">
+                  <div className="accordion-item py-2" key={index}>
                     <h2
                       className="accordion-header"
                       id={`flush-heading${index + 1}`}
