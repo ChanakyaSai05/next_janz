@@ -960,7 +960,7 @@ export default function Home(props) {
             <div className="col-12">
               <Slider {...sliderfive2}>
                 {productsBrandsUpdatedImages?.map((item, index) => (
-                  <div className="d-flex justify-content-center">
+                  <div className="d-flex justify-content-center" key={index}>
                     <div>
                       <div className="insurance-card mb-5">
                         {item["first"]?.brand_image != null && (
