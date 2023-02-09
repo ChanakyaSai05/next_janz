@@ -9,7 +9,7 @@ import Headerlanding from "../components/headerlanding";
 import Footer from "../components/footer";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import maternityCare from "../public/images/maternity-care.svg";
 import respiratoryCare from "../public/images/respiratory-care.svg";
 import diabaticCare from "../public/images/diabetic-care.svg";
@@ -57,7 +57,9 @@ export default function Home(props) {
   const router = useRouter();
   const { diabaticCare, maternityCare, respiratoryCare, mobility } =
     props?.images;
-  console.log(props, "props");
+  const [productsBrandsUpdatedImages, setproductsBrandsUpdatedImages] =
+    useState([]);
+  // console.log(props, "props");
 
   let settings = {
     dots: true,
@@ -96,7 +98,51 @@ export default function Home(props) {
       },
     ],
   };
+
   let sliderfive = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow:
+      productsData?.insurance?.length >= 5
+        ? 5
+        : productsData?.insurance?.length,
+    slidesToScroll: 1,
+    initialSlide: 0,
+    autoplay: true,
+    autoplaySpeed: 2000,
+    pauseOnHover: true,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow:
+            productsData?.insurance?.length >= 5
+              ? 3
+              : productsData?.insurance?.length,
+          slidesToScroll: 3,
+          infinite: true,
+          dots: true,
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          initialSlide: 1,
+        },
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
+  };
+  let sliderfive2 = {
     dots: true,
     infinite: true,
     speed: 500,
@@ -110,7 +156,7 @@ export default function Home(props) {
       {
         breakpoint: 1024,
         settings: {
-          slidesToShow: 3,
+          slidesToShow: 1,
           slidesToScroll: 3,
           infinite: true,
           dots: true,
@@ -133,40 +179,25 @@ export default function Home(props) {
       },
     ],
   };
-  const centerslider = {
-    className: "center",
-    centerMode: true,
-    infinite: true,
-    centerPadding: "60px",
-    slidesToShow: 3,
-    speed: 500,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 3,
-          slidesToScroll: 3,
-          infinite: true,
-          dots: true,
-        },
-      },
-      {
-        breakpoint: 600,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-          initialSlide: 1,
-        },
-      },
-      {
-        breakpoint: 480,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
-      },
-    ],
-  };
+
+  useEffect(() => {
+    let productsDataBrandsUpdated = [];
+    let length = productsData?.brands?.length;
+    let half = Math.floor(length / 2);
+    for (let i = 0; i < half; i++) {
+      let obj = {};
+      obj["first"] = productsData?.brands[i];
+      if (i + half < length) {
+        obj["second"] = productsData?.brands[i + half];
+      } else {
+        obj["second"] = {};
+      }
+      productsDataBrandsUpdated.push(obj);
+    }
+    setproductsBrandsUpdatedImages(productsDataBrandsUpdated);
+    // console.log(productsDataBrandsUpdated, "updated");
+  }, [productsData?.brands?.length]);
+
   return (
     <>
       <Headerlanding></Headerlanding>
@@ -888,85 +919,26 @@ export default function Home(props) {
           <div className="row">
             <div className="col-12">
               <Slider {...sliderfive}>
-                <div className="d-flex justify-content-center">
-                  {/* <div className="insurance-card">
-                    <Image
-                      width={120}
-                      height={60}
-                      src={insuranceImg1}
-                      alt="..."
-                    />
-                  </div> */}
-                  {productsData?.insurance?.map((item, index) => (
-                    <div key={index}>
-                      <div
-                        className="insurance-card"
-                        onClick={() =>
-                          router.push(
-                            `/insurance_accepted/${item.insurance_slug}`
-                          )
-                        }
-                      >
-                        <Image
-                          width={120}
-                          height={60}
-                          src={`${process.env.NEXT_PUBLIC_MEDIA}${item.insurance_image}`}
-                          alt="..."
-                        />
-                      </div>
+                {productsData?.insurance?.map((item, index) => (
+                  <div key={index} className="d-flex justify-content-center">
+                    <div
+                      className="insurance-card"
+                      style={{ cursor: "pointer" }}
+                      onClick={() =>
+                        router.push(
+                          `/insurance_accepted/${item.insurance_slug}`
+                        )
+                      }
+                    >
+                      <Image
+                        width={120}
+                        height={60}
+                        src={`${process.env.NEXT_PUBLIC_MEDIA}${item.insurance_image}`}
+                        alt="..."
+                      />
                     </div>
-                  ))}
-                </div>
-                {/* <div className="d-flex justify-content-center">
-                  <div className="insurance-card">
-                    <Image
-                      width={126}
-                      height={60}
-                      src={insuranceImg2}
-                      alt="..."
-                    />
                   </div>
-                </div>
-                <div className="d-flex justify-content-center">
-                  <div className="insurance-card">
-                    <Image
-                      width={104}
-                      height={60}
-                      src={insuranceImg3}
-                      alt="..."
-                    />
-                  </div>
-                </div>
-                <div className="d-flex justify-content-center">
-                  <div className="insurance-card">
-                    <Image
-                      width={127}
-                      height={40}
-                      src={insuranceImg4}
-                      alt="..."
-                    />
-                  </div>
-                </div>
-                <div className="d-flex justify-content-center">
-                  <div className="insurance-card">
-                    <Image
-                      width={120}
-                      height={60}
-                      src={insuranceImg1}
-                      alt="..."
-                    />
-                  </div>
-                </div>
-                <div className="d-flex justify-content-center">
-                  <div className="insurance-card">
-                    <Image
-                      width={104}
-                      height={60}
-                      src={insuranceImg3}
-                      alt="..."
-                    />
-                  </div>
-                </div> */}
+                ))}
               </Slider>
             </div>
           </div>
@@ -986,207 +958,40 @@ export default function Home(props) {
           </div>
           <div className="row">
             <div className="col-12">
-              <Slider {...sliderfive}>
-                <div>
-                  {productsData?.brands?.map((item, index) => (
-                    <div
-                      key={index}
-                      className="insurance-card mb-5"
-                      onClick={() =>
-                        router.push(`/shop_by_brand/${item.brand_slug}`)
-                      }
-                    >
-                      <>
-                        {item?.brand_image != null && (
+              <Slider {...sliderfive2}>
+                {productsBrandsUpdatedImages?.map((item, index) => (
+                  <div className="d-flex justify-content-center">
+                    <div>
+                      <div className="insurance-card mb-5">
+                        {item["first"]?.brand_image != null && (
                           <Image
                             width={199}
                             height={157}
-                            src={`${process.env.NEXT_PUBLIC_MEDIA}${item?.brand_image}`}
+                            src={`${process.env.NEXT_PUBLIC_MEDIA}${item["first"]?.brand_image}`}
                             alt="..."
                           />
                         )}
-                      </>
-                    </div>
-                  ))}
-                </div>
-
-                {/* <div className="d-flex justify-content-center">
-                  <div>
-                    <div className="insurance-card mb-5">
-                      <Image width={199} height={157} src={brand1} alt="..." />
-                    </div>
-                    <div className="insurance-card">
-                      <Image width={148} height={58} src={brand6} alt="..." />
-                    </div>
-                  </div>
-                </div>
-                <div className="d-flex justify-content-center">
-                  <div>
-                    <div className="insurance-card mb-5">
-                      <Image width={144} height={33} src={brand2} alt="..." />
-                    </div>
-                    <div className="insurance-card">
-                      <Image width={127} height={50} src={brand7} alt="..." />
+                      </div>
+                      {Object.keys(item["second"]).length > 0 && (
+                        <div className="insurance-card">
+                          {item["second"]?.brand_image != null && (
+                            <Image
+                              width={199}
+                              height={157}
+                              src={`${process.env.NEXT_PUBLIC_MEDIA}${item["second"]?.brand_image}`}
+                              alt="..."
+                            />
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
-                <div className="d-flex justify-content-center">
-                  <div>
-                    <div className="insurance-card mb-5">
-                      <Image width={163} height={89} src={brand3} alt="..." />
-                    </div>
-                    <div className="insurance-card">
-                      <Image width={151} height={55} src={brand8} alt="..." />
-                    </div>
-                  </div>
-                </div>
-                <div className="d-flex justify-content-center">
-                  <div>
-                    <div className="insurance-card mb-5">
-                      <Image width={137} height={55} src={brand4} alt="..." />
-                    </div>
-                    <div className="insurance-card">
-                      <Image width={158} height={46} src={brand5} alt="..." />
-                    </div>
-                  </div>
-                </div>
-                <div className="d-flex justify-content-center">
-                  <div>
-                    <div className="insurance-card mb-5">
-                      <Image width={147} height={71} src={brand5} alt="..." />
-                    </div>
-                    <div className="insurance-card">
-                      <Image width={121} height={71} src={brand10} alt="..." />
-                    </div>
-                  </div>
-                </div>
-                <div className="d-flex justify-content-center">
-                  <div>
-                    <div className="insurance-card mb-5">
-                      <Image width={163} height={89} src={brand1} alt="..." />
-                    </div>
-                    <div className="insurance-card">
-                      <Image width={151} height={55} src={brand8} alt="..." />
-                    </div>
-                  </div>
-                </div> */}
+                ))}
               </Slider>
             </div>
           </div>
         </div>
       </div>
-
-      {/* <div style={{ background: "#F2FAFF" }}>
-        <div className="container py-5">
-          <div className="row pb-5">
-            <div className="col-12 line-heading text-center">
-              <h3>JANZ Medical In Real Customer Words</h3>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-12">
-              <Slider {...centerslider}>
-                <div className="card-box">
-                  <div className="customer-box text-center">
-                    <div className="user-box">
-                      <div>
-                        <Image
-                          width={80}
-                          height={80}
-                          src={customerImg2}
-                          alt="..."
-                        />
-                      </div>
-                    </div>
-                    <div className="py-3">
-                      <h4>Lorem ipsum</h4>
-                      <svg className="icon my-3">
-                        <use href="#icon_dualcollun"></use>
-                      </svg>
-                      <p>
-                        Lorem ipsum dolor sit amet consectetur adipiscing elid,
-                        bibendum felis
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="card-box">
-                  <div className="customer-box text-center">
-                    <div className="user-box">
-                      <div>
-                        <Image
-                          width={80}
-                          height={80}
-                          src={customerImg2}
-                          alt="..."
-                        />
-                      </div>
-                    </div>
-                    <div className="py-3">
-                      <h4>Lorem ipsum</h4>
-                      <svg className="icon my-3">
-                        <use href="#icon_dualcollun"></use>
-                      </svg>
-                      <p>
-                        Lorem ipsum dolor sit amet consectetur adipiscing elid,
-                        bibendum felis
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="card-box">
-                  <div className="customer-box text-center">
-                    <div className="user-box">
-                      <div>
-                        <Image
-                          width={80}
-                          height={80}
-                          src={customerImg2}
-                          alt="..."
-                        />
-                      </div>
-                    </div>
-                    <div className="py-3">
-                      <h4>Lorem ipsum</h4>
-                      <svg className="icon my-3">
-                        <use href="#icon_dualcollun"></use>
-                      </svg>
-                      <p>
-                        Lorem ipsum dolor sit amet consectetur adipiscing elid,
-                        bibendum felis
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="card-box">
-                  <div className="customer-box text-center">
-                    <div className="user-box">
-                      <div>
-                        <Image
-                          width={80}
-                          height={80}
-                          src={customerImg2}
-                          alt="..."
-                        />
-                      </div>
-                    </div>
-                    <div className="py-3">
-                      <h4>Lorem ipsum</h4>
-                      <svg className="icon my-3">
-                        <use href="#icon_dualcollun"></use>
-                      </svg>
-                      <p>
-                        Lorem ipsum dolor sit amet consectetur adipiscing elid,
-                        bibendum felis
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </Slider>
-            </div>
-          </div>
-        </div>
-      </div> */}
 
       <Footer></Footer>
     </>

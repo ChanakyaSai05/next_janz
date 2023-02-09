@@ -563,9 +563,9 @@ export default function Headerlanding() {
                                           <h5
                                             className="pb-2"
                                             onClick={() => {
-                                              if (child_index == 0) {
-                                                router.push("/sub_category");
-                                              }
+                                              router.push(
+                                                `/category/${item?.category_slug}/${child?.category_slug}`
+                                              );
                                             }}
                                             style={{ cursor: "pointer" }}
                                           >
@@ -578,6 +578,11 @@ export default function Headerlanding() {
                                                 grand_child_index
                                               ) => (
                                                 <li
+                                                  onClick={() => {
+                                                    router.push(
+                                                      `/category/${item?.category_slug}/${child?.category_slug}/${grand_child?.category_slug}`
+                                                    );
+                                                  }}
                                                   key={
                                                     grand_child.category_name
                                                   }

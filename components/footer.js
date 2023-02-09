@@ -20,9 +20,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                {/* <Link href={"/profile_details"} className="text-reset"> */}
-                Store
-                {/* </Link> */}
+                <a className="text-reset">Store</a>
               </li>
               <li>
                 <a className="text-reset">About Us</a>
