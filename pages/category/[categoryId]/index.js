@@ -220,7 +220,7 @@ export default function Category(props) {
         <div className="container py-5">
           <div className="row row-cols-1 row-cols-md-4">
             {props?.categories?.subcategory?.map((item, index) => (
-              <div className="col my-2">
+              <div className="col my-2" key={index}>
                 <div className="card-box">
                   <Image width={296} height={300} src={category1} alt="..." />
                   <h5>{item?.category_name}</h5>

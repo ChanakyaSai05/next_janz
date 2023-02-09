@@ -962,7 +962,15 @@ export default function Home(props) {
                 {productsBrandsUpdatedImages?.map((item, index) => (
                   <div className="d-flex justify-content-center" key={index}>
                     <div>
-                      <div className="insurance-card mb-5">
+                      <div
+                        className="insurance-card mb-5"
+                        style={{ cursor: "pointer" }}
+                        onClick={() =>
+                          router.push(
+                            `/shop_by_brand/${item["first"]?.brand_slug}`
+                          )
+                        }
+                      >
                         {item["first"]?.brand_image != null && (
                           <Image
                             width={199}
@@ -973,7 +981,15 @@ export default function Home(props) {
                         )}
                       </div>
                       {Object.keys(item["second"]).length > 0 && (
-                        <div className="insurance-card">
+                        <div
+                          className="insurance-card"
+                          style={{ cursor: "pointer" }}
+                          onClick={() =>
+                            router.push(
+                              `/shop_by_brand/${item["second"]?.brand_slug}`
+                            )
+                          }
+                        >
                           {item["second"]?.brand_image != null && (
                             <Image
                               width={199}
