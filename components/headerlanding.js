@@ -436,7 +436,7 @@ export default function Headerlanding() {
       setProductsData(res.data);
     }
   }
-  console.log(productsData, "PRODUCTS DATA");
+  // console.log(productsData, "PRODUCTS DATA");
 
   const handleModalToggle = (id) => {
     setShowModal({ [id]: true });
