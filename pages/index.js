@@ -956,7 +956,7 @@ export default function Home(props) {
               </p>
             </div>
           </div>
-          <div className="row">
+          {/* <div className="row">
             <div className="col-12">
               <Slider {...sliderfive2}>
                 {productsBrandsUpdatedImages?.map((item, index) => (
@@ -1005,7 +1005,7 @@ export default function Home(props) {
                 ))}
               </Slider>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 

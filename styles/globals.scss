@@ -975,9 +975,9 @@ aside {
   .dropdown-toggle::after {
     display: none;
   }
-  .dropdown-arrow {
+  .drop-arrow {
     .dropdown-toggle::after {
-      display: block;
+      display: inline-block;
       width: 10px;
       // position: relative;
       // left: 108px;

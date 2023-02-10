@@ -436,7 +436,7 @@ export default function Headerlanding() {
       setProductsData(res.data);
     }
   }
-  // console.log(productsData, "PRODUCTS DATA");
+  console.log(productsData, "PRODUCTS DATA");
 
   const handleModalToggle = (id) => {
     setShowModal({ [id]: true });
@@ -476,7 +476,7 @@ export default function Headerlanding() {
                   </div>
                   {/*   className="dropdown-arrow " */}
                   {loginUserAvalilable ? (
-                    <div className="header-btn  d-flex ">
+                    <div className="header-btn   drop-arrow ">
                       <MyAccountDropdown headerlanding />
                     </div>
                   ) : (
@@ -656,7 +656,7 @@ export default function Headerlanding() {
                             }
                           >
                             <ul>
-                              <li>{item?.brand_name}</li>
+                              <li>{item?.brand_slug}</li>
                             </ul>
                           </div>
                         ))}
