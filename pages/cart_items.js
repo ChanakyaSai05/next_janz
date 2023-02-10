@@ -40,8 +40,8 @@ export default function Cart() {
     let file = e.target.files[0];
     setrawFile(file);
   };
-  console.log(rawFile, "RAW");
-  console.log(previewUrl, "PREVIEW");
+  // console.log(rawFile, "RAW");
+  // console.log(previewUrl, "PREVIEW");
 
   useEffect(() => {
     if (!rawFile) {

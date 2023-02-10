@@ -141,7 +141,8 @@ export default function Insurancedetails() {
 
       // console.log(response, "result");
       if (response.data.status == false) {
-        alert("Error");
+        // alert("Error");
+        console.log("Error");
       } else {
         // console.log(response.data);
         setEditForm(false);
@@ -164,7 +165,7 @@ export default function Insurancedetails() {
       }
     } catch (error) {
       console.log(error);
-      alert("Error");
+      // alert("Error");
     }
   };
 
@@ -185,7 +186,8 @@ export default function Insurancedetails() {
 
       // console.log(response, "result");
       if (response.data.status == false) {
-        alert("Error");
+        // alert("Error");
+        console.log("Error");
       } else {
         setinsuranceList(response?.data);
         setinsuranceDetails({

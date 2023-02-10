@@ -4,9 +4,12 @@ import Link from "next/link";
 import Image from "next/image";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import logo from "../public/images/logo.svg";
+import { useRouter } from "next/router";
+import MyAccountDropdown from "./MyAccountDropdown";
 
 export default function Header() {
   // const [publicPath] = useState(process.env.NEXT_PUBLIC_URL);
+  const router = useRouter();
 
   const handleShow = () => setShow(true);
 
@@ -130,61 +133,7 @@ export default function Header() {
                   </Link>
                 </div>
                 <div className="header-btn">
-                  <Dropdown>
-                    <Dropdown.Toggle
-                      className="navdropdown"
-                      style={{}}
-                      id="dropdown-basic"
-                    >
-                      My Account
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu className="droplist">
-                      <Dropdown.Item className="droplistitem" href={"my_order"}>
-                        <span>
-                          <svg className="icon">
-                            <use href="#icon_kartplus"></use>
-                          </svg>
-                        </span>{" "}
-                        My Order
-                      </Dropdown.Item>
-                      <Dropdown.Divider />
-                      <Dropdown.Item className="droplistitem" href="#/action-2">
-                        <span>
-                          <svg className="icon">
-                            <use href="#icon_user"></use>
-                          </svg>
-                        </span>
-                        My Profile
-                      </Dropdown.Item>
-                      <Dropdown.Divider />
-                      <Dropdown.Item className="droplistitem" href="#/action-3">
-                        <span>
-                          <svg className="icon">
-                            <use href="#icon_insurdetail"></use>
-                          </svg>
-                        </span>
-                        Insurance Details
-                      </Dropdown.Item>
-                      <Dropdown.Divider />
-                      <Dropdown.Item className="droplistitem" href="#/action-3">
-                        <span>
-                          <svg className="icon">
-                            <use href="#icon_subscription"></use>
-                          </svg>
-                        </span>
-                        Subscription
-                      </Dropdown.Item>
-                      <Dropdown.Divider />
-                      <Dropdown.Item className="droplistitem" href="#/action-3">
-                        <span>
-                          <svg className="icon">
-                            <use href="#icon_signout"></use>
-                          </svg>
-                        </span>
-                        Logout
-                      </Dropdown.Item>
-                    </Dropdown.Menu>
-                  </Dropdown>
+                  <MyAccountDropdown />
                 </div>
                 <div className="header-icon">
                   <div className="icon-count">2</div>

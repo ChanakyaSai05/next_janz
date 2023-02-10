@@ -476,7 +476,6 @@ aside ul .nav-link .small {
   cursor: pointer;
   -webkit-user-select: none;
   -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
   border: 1px solid #212529;
   border-radius: 0.375rem;
@@ -777,7 +776,6 @@ aside ul .nav-link .small {
 }
 
 .landing-header {
-  position: -webkit-sticky;
   position: sticky;
   top: 0;
   left: 0;
@@ -905,6 +903,10 @@ aside ul .nav-link .small {
 
 .landing-header .dropdown-toggle::after {
   display: none;
+}
+.landing-header .dropdown-arrow .dropdown-toggle::after {
+  display: block;
+  width: 10px;
 }
 
 .carousel-control-prev {
@@ -1726,7 +1728,6 @@ footer .social-icon .icon {
 }
 
 .product-img-box {
-  position: -webkit-sticky;
   position: sticky;
   top: 122px;
   left: 0;

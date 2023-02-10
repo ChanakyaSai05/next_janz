@@ -65,7 +65,7 @@ export default function Profiledetails() {
   const handleProfileDetails = (e) => {
     setprofileDetails({ ...profileDetails, [e.target.id]: e.target.value });
   };
-  console.log(profileDetails, "PROFILE DETAILS type address no");
+  // console.log(profileDetails, "PROFILE DETAILS type address no");
 
   const editForm = (item) => {
     setprofileDetails({
@@ -196,7 +196,8 @@ export default function Profiledetails() {
 
       // console.log(response, "result");
       if (response.data.status == false) {
-        alert("Error");
+        // alert("Error");
+        console.log("Error");
       } else {
         // console.log(response.data);
         setEditForm(false);
@@ -220,7 +221,7 @@ export default function Profiledetails() {
       }
     } catch (error) {
       console.log(error);
-      alert("Error");
+      // alert("Error");
     }
   };
   //get address list
@@ -240,14 +241,15 @@ export default function Profiledetails() {
 
       // console.log(response, "result");
       if (response.data.status == false) {
-        alert("Error");
+        // alert("Error");
+        console.log("Error");
       } else {
-        console.log(response.data);
+        // console.log(response.data);
         setaddressList(response.data.address);
       }
     } catch (error) {
       console.log(error);
-      alert("Error");
+      // alert("Error");
     }
   };
 
@@ -269,14 +271,13 @@ export default function Profiledetails() {
 
       // console.log(response, "result");
       if (response.data.status == false) {
-        alert("Error");
+        console.log("Error");
       } else {
         alert("otp sent to your email");
         setBtnState((btnState) => !btnState);
       }
     } catch (error) {
       console.log(error);
-      alert("Error");
     }
   }
 
@@ -298,13 +299,12 @@ export default function Profiledetails() {
 
       // console.log(response, "result");
       if (response.data.status == false) {
-        alert("Error");
+        console.log("Error");
       } else {
         alert("otp sent to your email");
       }
     } catch (error) {
       console.log(error);
-      alert("Error");
     }
   }
 
@@ -346,7 +346,7 @@ export default function Profiledetails() {
     const isValid = Object.values(passwordValidation).every(
       (val) => val === true
     );
-    console.log(isValid, "IS VALID");
+    // console.log(isValid, "IS VALID");
     return isValid;
   };
   // Login details onchnage
@@ -440,11 +440,10 @@ export default function Profiledetails() {
       if (response.data.status != false) {
         setBtnState((btnState) => !btnState);
       } else {
-        alert("Error");
+        console.log("Error");
       }
     } catch (error) {
       console.log(error);
-      alert("Error");
     }
   };
 

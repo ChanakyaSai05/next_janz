@@ -51,7 +51,7 @@ export default function Footer() {
             <h6 className="">Helpful Links</h6>
             <ul>
               <li>
-                <Link href={"/product_detail"} className="text-reset">
+                <Link href={""} className="text-reset">
                   How to buy
                 </Link>
               </li>

@@ -13,6 +13,7 @@ import CryptoJS from "crypto-js";
 import { useRouter } from "next/router";
 import UserState from "../context/UserState";
 import UserContext from "../context/UserContext";
+import MyAccountDropdown from "./MyAccountDropdown";
 
 export async function getServerSideProps({ params }) {
   // console.log("before axios call");
@@ -29,8 +30,14 @@ export async function getServerSideProps({ params }) {
 
 export default function Headerlanding() {
   const context = useContext(UserContext);
-  const { closeRefRegisterModalandOpenLogin, productsData, setProductsData } =
-    context;
+  const {
+    closeRefRegisterModalandOpenLogin,
+    productsData,
+    setProductsData,
+    checkLoginUser,
+    loginUserAvalilable,
+    setloginUserAvalilable,
+  } = context;
   // console.log(closeRefRegisterModalandOpenLogin, "LOGIN TOGGLE");
   // const [productsData, setProductsData] = useState(null);
   // console.log(props, "PROPS");
@@ -69,6 +76,9 @@ export default function Headerlanding() {
   ]).current;
   const [showRules, setShowRules] = useState(false);
   const [forgotPasswordShowRules, setForgotPasswordShowRules] = useState(false);
+
+  // login logout if user already logged in
+  // const [loginUserAvalilable, setloginUserAvalilable] = useState(false);
 
   // Toggle
   const [activeToggleId, setactiveToggleId] = useState(null);
@@ -178,7 +188,7 @@ export default function Headerlanding() {
             number: false,
             special: false,
           });
-          alert("Registration Successful");
+          // alert("Registration Successful");
           closeRefRegisterModalandOpenLogin.current.click();
         }
       } catch (error) {
@@ -186,7 +196,7 @@ export default function Headerlanding() {
         alert("Error");
       }
     } else {
-      alert("password must follow specified rules");
+      // alert("password must follow specified rules");
     }
     // console.log(isValid, "IS VALID");
   };
@@ -245,16 +255,18 @@ export default function Headerlanding() {
           number: false,
           special: false,
         });
-        alert("Login Successful");
+        // alert("Login Successful");
 
         closeRefLoginModal.current.click();
+        checkLoginUser();
         router.push("/profile_details");
       } else {
-        alert("Error");
+        // alert("Error");
+        console.log("Error");
       }
     } catch (error) {
       console.log(error);
-      alert("Error");
+      // alert("Error");
     }
   };
 
@@ -274,7 +286,7 @@ export default function Headerlanding() {
 
       // console.log(response, "result");
       if (response.data.status == false) {
-        alert("Error");
+        // alert("Error");
       } else {
         setPreset({
           one: false,
@@ -284,7 +296,7 @@ export default function Headerlanding() {
       }
     } catch (error) {
       console.log(error);
-      alert("Error");
+      // alert("Error");
     }
   };
 
@@ -307,7 +319,7 @@ export default function Headerlanding() {
 
       // console.log(response, "result");
       if (response.data.status == false) {
-        alert("Error");
+        // alert("Error");
       } else {
         setPreset({
           one: false,
@@ -322,7 +334,7 @@ export default function Headerlanding() {
       }
     } catch (error) {
       console.log(error);
-      alert("Error");
+      // alert("Error");
     }
   };
   const resetPasswordLoginBtn = async () => {
@@ -386,11 +398,11 @@ export default function Headerlanding() {
         });
         closeRefRegisterModalandOpenLogin.current.click();
       } else {
-        alert("Error");
+        // alert("Error");
       }
     } catch (error) {
       console.log(error);
-      alert("Error");
+      // alert("Error");
     }
   };
   // Forgot pasword modal
@@ -434,6 +446,7 @@ export default function Headerlanding() {
   };
 
   useEffect(() => {
+    checkLoginUser();
     fetchData();
   }, []);
   return (
@@ -448,7 +461,7 @@ export default function Headerlanding() {
                 </Link>
               </div>
               <div className="ms-auto">
-                <form className="d-flex form-box" role="search">
+                <form className="d-flex form-box " role="search">
                   <div className="main">
                     <div className="form">
                       <a className="search-button">
@@ -461,22 +474,32 @@ export default function Headerlanding() {
                       <input type="text" placeholder="Search" />
                     </div>
                   </div>
-                  <button
-                    className="btn btn-outline-primary ms-5"
-                    type="button"
-                    data-bs-toggle="modal"
-                    data-bs-target="#exampleModalCenterOne"
-                  >
-                    Register
-                  </button>
-                  <button
-                    className="btn btn-outline-primary ms-5 me-4"
-                    type="button"
-                    data-bs-toggle="modal"
-                    data-bs-target="#exampleModalCenter"
-                  >
-                    Login
-                  </button>
+                  {/*   className="dropdown-arrow " */}
+                  {loginUserAvalilable ? (
+                    <div className="header-btn  d-flex ">
+                      <MyAccountDropdown headerlanding />
+                    </div>
+                  ) : (
+                    <>
+                      <button
+                        className="btn btn-outline-primary ms-5"
+                        type="button"
+                        data-bs-toggle="modal"
+                        data-bs-target="#exampleModalCenterOne"
+                      >
+                        Register
+                      </button>
+                      <button
+                        className="btn btn-outline-primary ms-5 me-4"
+                        type="button"
+                        data-bs-toggle="modal"
+                        data-bs-target="#exampleModalCenter"
+                      >
+                        Login
+                      </button>
+                    </>
+                  )}
+
                   <div className="header-icon">
                     <div className="d-flex align-items-center">
                       <Link href={"/cart_items"} className="link">

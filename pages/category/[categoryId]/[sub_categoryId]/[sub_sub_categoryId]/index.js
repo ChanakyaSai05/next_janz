@@ -18,7 +18,7 @@ export default function Categoryfilter(props) {
   const router = useRouter();
   const params = router.query;
   const { categoryId, sub_categoryId, sub_sub_categoryId } = params;
-  console.log(props, "props");
+  // console.log(props, "props");
   const [editCancel, setEditCancel] = useState(false);
   const nameSaveButton = () => {
     setEditCancel(!editCancel);
