@@ -791,7 +791,7 @@ export default function Home(props) {
           </div>
           <div className="row pb-5">
             <div className="col-12 line-heading text-center">
-              <h3>Service We Offer</h3>
+              <h3>Services We Offer</h3>
               <p className="large-para">
                 We provide maternity service through our janzmoms.com
               </p>
@@ -811,7 +811,17 @@ export default function Home(props) {
                   </p>
                 </div>
               </div>
-              <a className="btn btn-danger my-4 px-3"> Learn more</a>
+              <a
+                className="btn btn-danger my-4 px-3 "
+                style={{
+                  display: "block",
+                  margin: "0 auto",
+                  width: "fit-content",
+                }}
+              >
+                {" "}
+                Learn more
+              </a>
             </div>
             <div className="col py-2">
               <div className="service-img-box">
@@ -826,7 +836,17 @@ export default function Home(props) {
                   </p>
                 </div>
               </div>
-              <a className="btn btn-danger my-4 px-3"> Learn more</a>
+              <a
+                className="btn btn-danger my-4 px-3"
+                style={{
+                  display: "block",
+                  margin: "0 auto",
+                  width: "fit-content",
+                }}
+              >
+                {" "}
+                Learn more
+              </a>
             </div>
           </div>
         </div>

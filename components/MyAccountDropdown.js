@@ -34,7 +34,7 @@ function MyAccountDropdown({ headerlanding }) {
                 <use href="#icon_kartplus"></use>
               </svg>
             </span>{" "}
-            My Order
+            My Orders
           </Dropdown.Item>
           <Dropdown.Divider />
           <Dropdown.Item

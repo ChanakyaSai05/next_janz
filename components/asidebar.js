@@ -55,7 +55,7 @@ export default function Asidebar() {
                   <use href="#icon_kart"></use>
                 </svg>
               </span>
-              <strong>My Order</strong>
+              <strong>My Orders</strong>
             </Link>
           </li>
           <hr />
