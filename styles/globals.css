@@ -926,7 +926,7 @@ aside ul .nav-link .small {
 }
 
 .carousel-main .carousel-item {
-  height: calc(100vh - 114px);
+  height: calc(100vh - 114px - 210px);
 }
 .carousel-main .carousel-item .carousel-img {
   position: absolute;
@@ -942,7 +942,7 @@ aside ul .nav-link .small {
   left: 0;
   right: 0;
   margin: 0 auto;
-  margin-bottom: 4%;
+  margin-bottom: 2%;
   justify-content: space-between;
   display: flex;
   flex-wrap: wrap;
@@ -998,7 +998,7 @@ aside ul .nav-link .small {
 .blue-btn-box button {
   border: 1px solid #ffffff;
   border-radius: 6px;
-  padding: 30px;
+  padding: 15px 30px;
   background: transparent;
   color: #ffffff;
   font-style: normal;
@@ -1046,17 +1046,17 @@ aside ul .nav-link .small {
 }
 
 .medical-supplier .card-box {
-  background: rgba(0, 0, 0, 0.5019607843);
+  background: rgba(0, 0, 0, 0.6);
   border-radius: 8px;
   position: relative;
   min-width: 265px;
   min-height: 260px;
 }
 .medical-supplier .card-box:hover h5 {
-  display: none;
+  font-size: 22px;
 }
 .medical-supplier .card-box:hover img {
-  opacity: 10%;
+  opacity: 4%;
 }
 .medical-supplier .card-box:hover button {
   display: block;
@@ -1078,7 +1078,7 @@ aside ul .nav-link .small {
 .medical-supplier .card-box h5 {
   color: #ffffff;
   position: absolute;
-  top: 20px;
+  top: 15px;
   left: 20px;
 }
 .medical-supplier .card-box button {
@@ -1090,7 +1090,7 @@ aside ul .nav-link .small {
   position: absolute;
   left: 60px;
   right: 60px;
-  bottom: 20px;
+  bottom: 15px;
   display: none;
 }
 .medical-supplier .card-box button:hover {
@@ -1102,12 +1102,12 @@ aside ul .nav-link .small {
   position: absolute;
   display: none;
   font-style: normal;
-  font-weight: 700;
-  font-size: 18px;
+  font-weight: 500;
+  font-size: 16px;
   list-style: none;
   padding: 0;
-  margin-left: 15px;
-  top: 15px;
+  margin-left: 20px;
+  top: 40px;
 }
 .medical-supplier .card-box ul li a {
   color: #ffffff;
@@ -2588,6 +2588,9 @@ tbody hr {
   }
   .table-cartitems tbody hr {
     display: block;
+  }
+  .carousel-main .carousel-item {
+    height: calc(100vh - 114px);
   }
 }
 @media (max-width: 991px) {

@@ -1007,7 +1007,7 @@ aside {
 // =====carousel
 .carousel-main {
   .carousel-item {
-    height: calc(100vh - 114px);
+    height: calc(100vh - 114px - 210px);
     .carousel-img {
       position: absolute;
       width: 100%;
@@ -1022,7 +1022,7 @@ aside {
     left: 0;
     right: 0;
     margin: 0 auto;
-    margin-bottom: 4%;
+    margin-bottom: 2%;
     justify-content: space-between;
     display: flex;
     flex-wrap: wrap;
@@ -1079,7 +1079,7 @@ aside {
   button {
     border: 1px solid #ffffff;
     border-radius: 6px;
-    padding: 30px;
+    padding: 15px 30px;
     background: transparent;
     color: #ffffff;
     font-style: normal;
@@ -1129,17 +1129,18 @@ aside {
 
 .medical-supplier {
   .card-box {
-    background: #00000080;
+    // background: #00000080;
+    background: rgba(0, 0, 0, 0.6);
     border-radius: 8px;
     position: relative;
     min-width: 265px;
     min-height: 260px;
     &:hover {
       h5 {
-        display: none;
+        font-size: 22px;
       }
       img {
-        opacity: 10%;
+        opacity: 4%;
       }
       button {
         display: block;
@@ -1161,7 +1162,7 @@ aside {
     h5 {
       color: #ffffff;
       position: absolute;
-      top: 20px;
+      top: 15px;
       left: 20px;
     }
     button {
@@ -1173,7 +1174,7 @@ aside {
       position: absolute;
       left: 60px;
       right: 60px;
-      bottom: 20px;
+      bottom: 15px;
       display: none;
       &:hover {
         background: #ffffff;
@@ -1185,12 +1186,12 @@ aside {
       position: absolute;
       display: none;
       font-style: normal;
-      font-weight: 700;
-      font-size: 18px;
+      font-weight: 500;
+      font-size: 16px;
       list-style: none;
       padding: 0;
-      margin-left: 15px;
-      top: 15px;
+      margin-left: 20px;
+      top: 40px;
       li {
         a {
           color: #ffffff;
@@ -2754,6 +2755,11 @@ tbody {
       hr {
         display: block;
       }
+    }
+  }
+  .carousel-main {
+    .carousel-item {
+      height: calc(100vh - 114px);
     }
   }
 }

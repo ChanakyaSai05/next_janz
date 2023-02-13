@@ -341,7 +341,7 @@ export default function Home(props) {
       </div>
       <div className="blue-btn-box">
         <Container>
-          <div className="row row-cols-1 row-cols-md-3 py-5">
+          <div className="row row-cols-1 row-cols-md-3 py-3">
             <div className="col d-flex justify-content-center py-2">
               <button type="button" className="w-100">
                 <svg className="icon">
