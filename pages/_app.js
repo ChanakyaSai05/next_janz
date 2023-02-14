@@ -6,6 +6,7 @@ import SSRProvider from "react-bootstrap/SSRProvider";
 import { Roboto } from "@next/font/google";
 import UserState from "../context/UserState";
 const roboto = Roboto({
+  subsets: ["latin"],
   weight: ["300", "400", "500", "700"],
   display: "swap",
 });
