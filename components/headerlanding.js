@@ -81,7 +81,7 @@ export default function Headerlanding() {
   // const [loginUserAvalilable, setloginUserAvalilable] = useState(false);
 
   // Toggle
-  const [activeToggleId, setactiveToggleId] = useState(null);
+  const [activeKey, setActiveKey] = useState("0");
 
   const handleChange = (e, index) => {
     if (e.target.value.length > 1) return;
@@ -529,7 +529,10 @@ export default function Headerlanding() {
               >
                 <Dropdown
                   className="has-megamenu"
-                  onMouseLeave={() => handleDropdownClose("dropdown1")}
+                  onMouseLeave={() => {
+                    handleDropdownClose("dropdown1");
+                    setActiveKey("0");
+                  }}
                 >
                   <Dropdown.Toggle
                     id="dropdown1"
@@ -542,7 +545,11 @@ export default function Headerlanding() {
                     className="megamenu p-3 rounded-0 border-white"
                     show={showModal["toggle-1"]}
                   >
-                    <Tab.Container id="left-tabs-example" defaultActiveKey="0">
+                    <Tab.Container
+                      id="left-tabs-example"
+                      activeKey={activeKey}
+                      defaultActiveKey="0"
+                    >
                       <Row>
                         <Col sm={3}>
                           <Nav
@@ -554,14 +561,15 @@ export default function Headerlanding() {
                                 <Nav.Link
                                   eventKey={`${index}`}
                                   className="rg-arrow"
+                                  onMouseEnter={() => {
+                                    setActiveKey(`${index}`);
+                                  }}
                                 >
                                   <strong
                                     onClick={() => {
-                                      if (index == 0) {
-                                        router.push(
-                                          `/category/${item?.category_slug}`
-                                        );
-                                      }
+                                      router.push(
+                                        `/category/${item?.category_slug}`
+                                      );
                                     }}
                                   >
                                     {item?.category_name}

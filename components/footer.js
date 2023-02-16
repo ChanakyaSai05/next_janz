@@ -59,7 +59,7 @@ export default function Footer() {
                 <a className="text-reset">Refund Policy</a>
               </li>
               <li>
-                <a className="text-reset">Term of use</a>
+                <a className="text-reset">Terms of use</a>
               </li>
               <li>
                 <a className="text-reset">Privacy Policy</a>

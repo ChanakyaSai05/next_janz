@@ -20,11 +20,25 @@ import fullmask3 from "../../../../../../public/images/fullmask3.svg";
 import fullmask4 from "../../../../../../public/images/fullmask4.svg";
 import checkImg from "../../../../../../public/images/check-img.svg";
 import { useRouter } from "next/router";
+import Link from "next/link";
+import axios from "axios";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Productdetail() {
+export default function Productdetail(props) {
+  // console.log(props, "props");
   const router = useRouter();
+  const params = router.query;
+  const {
+    categoryId,
+    sub_categoryId,
+    sub_sub_categoryId,
+    sub_sub_sub_categoryId,
+  } = params;
+  // console.log(params);
+
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
   let settings = {
     dots: true,
     infinite: true,
@@ -82,19 +96,25 @@ export default function Productdetail() {
               <nav className="breadcrumb-wrap" aria-label="breadcrumb">
                 <ol className="breadcrumb">
                   <li className="breadcrumb-item">
-                    <a href="#">Home</a>
+                    <Link href="/">Home</Link>
                   </li>
                   <li className="breadcrumb-item">
-                    <a href="#">Maternity Care</a>
+                    <Link href={`/category/${categoryId}`}>{categoryId}</Link>
                   </li>
                   <li className="breadcrumb-item">
-                    <a href="#">Breast Pump</a>
+                    <Link href={`/category/${categoryId}/${sub_categoryId}`}>
+                      {sub_categoryId}
+                    </Link>
                   </li>
                   <li className="breadcrumb-item">
-                    <a href="#">Double Electric Pump</a>
+                    <Link
+                      href={`/category/${categoryId}/${sub_categoryId}/${sub_sub_categoryId}`}
+                    >
+                      {sub_sub_categoryId}
+                    </Link>
                   </li>
                   <li className="breadcrumb-item active" aria-current="page">
-                    Spectra S1 Plus Electric Breast Pump Dual Voltage
+                    {sub_sub_sub_categoryId}
                   </li>
                 </ol>
               </nav>
@@ -104,22 +124,31 @@ export default function Productdetail() {
             <div className="col-md-5 col-sm-12">
               <div className="product-img-box">
                 <div className="multiple-img">
-                  <div className="img-box">
-                    <Image src={product} width={50} height={50} alt="" />
-                  </div>
-                  <div className="img-box">
-                    <Image src={product} width={50} height={50} alt="" />
-                  </div>
-                  <div className="img-box">
-                    <Image src={product} width={50} height={50} alt="" />
-                  </div>
-                  <div className="img-box">
-                    <Image src={product} width={50} height={50} alt="" />
-                  </div>
+                  {props?.product?.mproduct.product_image?.map(
+                    (item, index) => (
+                      <div
+                        className="img-box"
+                        onClick={() => setSelectedImageIndex(index)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <Image
+                          src={`${process.env.NEXT_PUBLIC_MEDIA}${item.image_file}`}
+                          width={50}
+                          height={50}
+                          alt=""
+                        />
+                      </div>
+                    )
+                  )}
                 </div>
                 <div className="view-box">
                   <div className="view-img">
-                    <Image src={product} width={250} height={250} alt="" />
+                    <Image
+                      src={`${process.env.NEXT_PUBLIC_MEDIA}${props?.product?.mproduct.product_image[selectedImageIndex]?.image_file}`}
+                      width={250}
+                      height={250}
+                      alt=""
+                    />
                   </div>
                   <div className="my-4 d-flex">
                     <button type="button" className="btn btn-primary">
@@ -146,10 +175,12 @@ export default function Productdetail() {
               </div>
             </div>
             <div className="col-md-7 col-sm-12">
-              <h5>SPECTRA S1 PLUS ELECTRIC BREAST PUMP DUAL VOLTAGE</h5>
+              <h5>{props?.product?.mproduct?.product_name.toUpperCase()}</h5>
               <div className="d-flex py-2">
                 <span className="fs-6 fw-bold me-2">by</span>
-                <span className="fs-6 fw-bold text-primary">Spectra</span>
+                <span className="fs-6 fw-bold text-primary">
+                  {props?.product?.variant_manufacturer}
+                </span>
               </div>
               <div className="d-flex">
                 <div>
@@ -163,26 +194,44 @@ export default function Productdetail() {
                 </a>
               </div>
               <strong className="fs-20 fw-bold">$150</strong>
-              <p className="py-4 fs-18">
-                The Spectra S1 Plus Electric Breast Pump is the perfect solution
-                for any new mom who needs to pump their breastmilk. This
-                award-winning, dual voltage pump was designed with convenience,
-                comfort and efficiency in mind. Featuring an ultra quiet
-                motor...
+              <p className="py-4 fs-18" style={{ textAlign: "justify" }}>
+                {props?.product?.mproduct?.product_description
+                  .replace(/<\/?p>/gi, "")
+                  .replace(/&nbsp;/gi, " ")
+                  .slice(0, 650) +
+                  (props?.product?.mproduct?.product_description.length <= 650
+                    ? ""
+                    : "...")}
               </p>
               <div className="d-flex">
-                <div className="d-flex align-items-center">
-                  <svg className="icon fs-2 me-2">
-                    <use href="#icon_rx-required"></use>
-                  </svg>
-                  <span className="fs-18">Rx Required</span>
-                </div>
-                <div className="d-flex align-items-center mx-auto">
-                  <svg className="icon fs-2 me-2">
-                    <use href="#icon_insurance-only"></use>
-                  </svg>
-                  <span className="fs-18">Insurance Only</span>
-                </div>
+                {props?.product?.mproduct?.rx_required === "y" ||
+                  (props?.product?.mproduct?.rx_required === "Y" && (
+                    <div className="d-flex align-items-center">
+                      <svg className="icon fs-2 me-2">
+                        <use href="#icon_rx-required"></use>
+                      </svg>
+                      <span className="fs-18">Rx Required</span>
+                    </div>
+                  ))}
+
+                {props?.product?.mproduct?.insurance_only === "y" ||
+                  (props?.product?.mproduct?.insurance_only === "Y" && (
+                    <div className="d-flex align-items-center mx-autol">
+                      <svg className="icon fs-2 me-2">
+                        <use href="#icon_insurance-only"></use>
+                      </svg>
+                      <span className="fs-18">Insurance Only</span>
+                    </div>
+                  ))}
+                {props?.product?.mproduct?.hsa_fsa === "y" ||
+                  (props?.product?.mproduct?.hsa_fsa === "Y" && (
+                    <div className="d-flex align-items-center ">
+                      <svg className="icon fs-2 me-2">
+                        <use href="#icon_wallet"></use>
+                      </svg>
+                      <span className="fs-18">HSA/FSA</span>
+                    </div>
+                  ))}
               </div>
               <div>
                 <form action="/action_page.php">
@@ -291,8 +340,14 @@ export default function Productdetail() {
                           aria-labelledby="flush-headingOne"
                           data-bs-parent="#accordionFlushExample"
                         >
-                          <div className="accordion-body">
-                            <ol>
+                          <div
+                            className="accordion-body"
+                            style={{ textAlign: "justify" }}
+                          >
+                            {props?.product?.product_includes
+                              .replace("<p>", "")
+                              .replace("</p>", "")}
+                            {/* <ol>
                               <li>24mm Spectra Breast Flanges</li>
                               <li>28mm Spectra Breast Flanges</li>
                               <li>Spectra Tubing</li>
@@ -302,7 +357,7 @@ export default function Productdetail() {
                                 Includes silicone membrane, uppercase, and
                                 lowercase for each Backflow Protector
                               </li>
-                            </ol>
+                            </ol> */}
                           </div>
                         </div>
                       </div>
@@ -1789,4 +1844,28 @@ export default function Productdetail() {
       <Footer></Footer>
     </>
   );
+}
+export async function getServerSideProps({ params }) {
+  // console.log(params, "params");
+  try {
+    const response = await axios({
+      url: `${process.env.NEXT_PUBLIC_URL}product/${params.sub_sub_sub_categoryId}`,
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    // console.log(response.data);
+    if (response.data.status != false) {
+      // console.log(response.data);
+      return {
+        props: response.data,
+      };
+    }
+  } catch (error) {
+    console.log(error);
+    return {
+      props: {},
+    };
+  }
 }
