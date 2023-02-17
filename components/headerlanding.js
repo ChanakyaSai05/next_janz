@@ -161,10 +161,29 @@ export default function Headerlanding() {
   };
   // Onclick create account function
   const createAccountFn = async () => {
-    isValid = checkDisbledCreateAccountBtn();
+    let isValid = checkDisbledCreateAccountBtn();
 
     if (isValid) {
       try {
+        var CryptoJSAesJson = {
+          stringify: function (cipherParams) {
+            var j = {
+              ct: cipherParams.ciphertext.toString(CryptoJS.enc.Base64),
+            };
+            if (cipherParams.iv) j.iv = cipherParams.iv.toString();
+            if (cipherParams.salt) j.s = cipherParams.salt.toString();
+            return JSON.stringify(j);
+          },
+        };
+        const key = "JAnz23M4o6m";
+        let encrypted = CryptoJS.AES.encrypt(
+          JSON.stringify(regiterDetails.password),
+          key,
+          {
+            format: CryptoJSAesJson,
+          }
+        ).toString();
+        encrypted = JSON.parse(encrypted);
         const response = await axios({
           url: `${process.env.NEXT_PUBLIC_URL}register`,
           method: "POST",
@@ -174,7 +193,12 @@ export default function Headerlanding() {
           },
           data: {
             email: regiterDetails.email,
-            password: regiterDetails.password,
+            encryptp: {
+              ct: encrypted.ct,
+              iv: encrypted.iv,
+              s: encrypted.s,
+            },
+            password: "123",
           },
         });
 

@@ -18,7 +18,7 @@ export default function Categoryfilter(props) {
   const router = useRouter();
   const params = router.query;
   const { categoryId, sub_categoryId, sub_sub_categoryId } = params;
-  // console.log(props, "props");
+  console.log(props, "props");
   const [editCancel, setEditCancel] = useState(false);
   const nameSaveButton = () => {
     setEditCancel(!editCancel);
@@ -214,12 +214,13 @@ export default function Categoryfilter(props) {
                 </div>
               </div>
             </div>
-            <div className="col-sm-12 col-lg-9">
+            <div className="col-lg-1"></div>
+            <div className="col-sm-12 col-lg-9l col-lg-7">
               {props?.products?.map((product, product_index) => (
                 <>
                   {product?.products?.map((sub_product, sub_product_index) => (
-                    <div className="d-flex justify-content-center pb-5">
-                      <div className="card-shadow rounded-2 p-4 sm-w-100 lg-w-75">
+                    <div className="d-flex justify-content-center pb-5 ">
+                      <div className="card-shadow rounded-2 p-4 sm-w-100 lg-w-75 w-100 ">
                         <div className="d-flex align-items-center justify-content-between">
                           <p className="fw-bold fs-18 p-0 m-0 me-2">
                             {sub_product?.product_name}
@@ -319,168 +320,6 @@ export default function Categoryfilter(props) {
                   ))}
                 </>
               ))}
-              {/* <div className="d-flex justify-content-center pb-5">
-                <div className="card-shadow rounded-2 p-4 sm-w-100 lg-w-75">
-                  <div className="d-flex align-items-center justify-content-between">
-                    <p className="fw-bold fs-18 p-0 m-0 me-2">
-                      SPECTRA S1 PLUS ELECTRIC BREAST PUMP DUAL VOLTAGE
-                    </p>
-                    {editCancel ? (
-                      <div
-                        className="like-down-box"
-                        onClick={() => setEditCancel(!editCancel)}
-                      >
-                        <svg className="icon">
-                          <use href="#icon_like-dull"></use>
-                        </svg>
-                      </div>
-                    ) : (
-                      <div
-                        className="like-down-box"
-                        onClick={() => setEditCancel(!editCancel)}
-                      >
-                        <svg className="icon">
-                          <use href="#icon_like"></use>
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                  <div className="d-flex py-2">
-                    <span className="fs-6 fw-bold me-2">by</span>
-                    <span className="fs-6 fw-bold text-primary">
-                      Spectra (SKU: 12345)
-                    </span>
-                  </div>
-                  <div className="d-flex pb-3">
-                    <div>
-                      <span className="badge text-bg-primary p-2 px-3 me-2">
-                        4.3 &#9733;
-                      </span>
-                      <span className="fw-bold">257 Ratings & 30 Reviews </span>
-                    </div>
-                  </div>
-                  <p>
-                    The Spectra S1 Plus Electric Breast Pump is the perfect
-                    solution for any new .........
-                  </p>
-                  <div className="row">
-                    <div className="col-lg-4 col-sm-12 d-flex justify-content-center">
-                      <Image
-                        width={180}
-                        height={180}
-                        src={cardImg2}
-                        alt="..."
-                      />
-                    </div>
-                    <div className="col-lg-4 col-sm-12 d-flex align-items-center">
-                      <ul>
-                        <li>Feature list 01</li>
-                        <li>Feature list 02</li>
-                        <li>Feature list 03</li>
-                      </ul>
-                    </div>
-                    <div className="col-lg-4 col-sm-12 d-flex align-items-center ">
-                      <div className="text-center text-md-start w-100">
-                        <button
-                          type="button"
-                          className="btn btn-primary"
-                          onClick={() =>
-                            router.push(
-                              `/category/${categoryId}/${sub_categoryId}/${sub_sub_categoryId}/product_detail`
-                            )
-                          }
-                        >
-                          View Details
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="form-check py-2">
-                    <input
-                      className="form-check-input rounded-0"
-                      type="checkbox"
-                      value=""
-                      id="flexCheckDefault"
-                    />
-                    <label
-                      className="form-check-label text-secondary"
-                      for="flexCheckDefault"
-                    >
-                      Add to compare
-                    </label>
-                  </div>
-                </div>
-              </div>
-              <div className="d-flex justify-content-center pb-5">
-                <div className="card-shadow rounded-2 p-4 sm-w-100 lg-w-75">
-                  <div className="d-flex align-items-center justify-content-between">
-                    <p className="fw-bold fs-18 p-0 m-0 me-2">
-                      SPECTRA S1 PLUS ELECTRIC BREAST PUMP DUAL VOLTAGE
-                    </p>
-                    <div className="like-down-box">
-                      <svg className="icon">
-                        <use href="#icon_like-dull"></use>
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="d-flex py-2">
-                    <span className="fs-6 fw-bold me-2">by</span>
-                    <span className="fs-6 fw-bold text-primary">
-                      Spectra (SKU: 12345)
-                    </span>
-                  </div>
-                  <div className="d-flex pb-3">
-                    <div>
-                      <span className="badge text-bg-primary p-2 px-3 me-2">
-                        4.3 &#9733;
-                      </span>
-                      <span className="fw-bold">257 Ratings & 30 Reviews </span>
-                    </div>
-                  </div>
-                  <p>
-                    The Spectra S1 Plus Electric Breast Pump is the perfect
-                    solution for any new .........
-                  </p>
-                  <div className="row">
-                    <div className="col-lg-4 col-sm-12 d-flex justify-content-center">
-                      <Image
-                        width={180}
-                        height={180}
-                        src={cardImg2}
-                        alt="..."
-                      />
-                    </div>
-                    <div className="col-lg-4 col-sm-12 d-flex align-items-center">
-                      <ul>
-                        <li>Feature list 01</li>
-                        <li>Feature list 02</li>
-                        <li>Feature list 03</li>
-                      </ul>
-                    </div>
-                    <div className="col-lg-4 col-sm-12 d-flex align-items-center ">
-                      <div className="text-center text-md-start w-100">
-                        <button type="button" className="btn btn-primary">
-                          View Details
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="form-check py-2">
-                    <input
-                      className="form-check-input rounded-0"
-                      type="checkbox"
-                      value=""
-                      id="flexCheckDefault"
-                    />
-                    <label
-                      className="form-check-label text-secondary"
-                      for="flexCheckDefault"
-                    >
-                      Add to compare
-                    </label>
-                  </div>
-                </div>
-              </div> */}
             </div>
           </div>
         </Container>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import Slider from "react-slick";
@@ -26,7 +26,7 @@ import axios from "axios";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Productdetail(props) {
-  // console.log(props, "props");
+  console.log(props, "props");
   const router = useRouter();
   const params = router.query;
   const {
@@ -38,8 +38,88 @@ export default function Productdetail(props) {
   // console.log(params);
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  // quantity
+  const [qty, setqty] = useState("1");
+  const [addToCartBtnState, setaddToCartBtnState] = useState(false);
 
-  let settings = {
+  let settingsBoughtTogether = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow:
+      props?.bought_togethers?.length >= 4
+        ? 4
+        : props?.bought_togethers?.length,
+    slidesToScroll: 1,
+    initialSlide: 0,
+    autoplay: true,
+    autoplaySpeed: 2000,
+    pauseOnHover: true,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 3,
+          infinite: true,
+          dots: true,
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          initialSlide: 1,
+        },
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
+  };
+  let settingsSimilarProducts = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 4,
+    slidesToScroll: 1,
+    initialSlide: 0,
+    autoplay: true,
+    autoplaySpeed: 2000,
+    pauseOnHover: true,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 3,
+          infinite: true,
+          dots: true,
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          initialSlide: 1,
+        },
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
+  };
+  let settingsRecentlyViewed = {
     dots: true,
     infinite: true,
     speed: 500,
@@ -86,8 +166,103 @@ export default function Productdetail(props) {
 
   const [editCancel, setEditCancel] = useState(false);
 
+  // add to cart from machine only
+  const machineOnlyBtn = () => {
+    // logic to add to cart
+  };
+
+  // add to cart button
+  const addToCartButton = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      let product = props?.product;
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}product/addtocart`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          product_id: product?.product_id,
+          product_variant_id: product?.product_variant_id,
+          customer_id: user ? user.customer_id : "",
+          variant_msrp: product?.variant_msrp ? product?.variant_msrp : "",
+          variant_store_price: product?.variant_store_price
+            ? product?.variant_store_price
+            : "",
+          variant_sale_price: product?.variant_sale_price
+            ? product?.variant_sale_price
+            : "",
+          variant_weight: product?.variant_weight
+            ? product?.variant_weight
+            : "",
+          variant_unit: product?.variant_unit ? product?.variant_unit : "",
+          qty: qty,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        router.push("/cart_items");
+        getCartItemsFn();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const getCartItemsFn = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}product/cartproducts`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          customer_id: user.customer_id,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        console.log(response?.data);
+        let data = response?.data?.cart_products;
+        for (let i = 0; i < data?.length; i++) {
+          if (data[i].product_id == props?.product?.mproduct?.product_id) {
+            setaddToCartBtnState(true);
+            return;
+          }
+        }
+        setaddToCartBtnState(false);
+        // router.push("/cart_items");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    getCartItemsFn();
+  }, []);
+
   return (
     <>
+      <Head>
+        <title>Fastkart - Add New Product</title>
+        <meta
+          name="description"
+          content="Fastkart admin is super flexible, powerful, clean &amp; modern responsive bootstrap 5 admin template with unlimited possibilities."
+        />
+        <meta
+          name="keywords"
+          content="admin template, Fastkart admin template, dashboard template, flat admin template, responsive admin template, web app"
+        />
+      </Head>
+
       <Headerlanding></Headerlanding>
       <div className="pb-5">
         <Container>
@@ -121,28 +296,50 @@ export default function Productdetail(props) {
             </div>
           </div>
           <div className="row">
-            <div className="col-md-5 col-sm-12">
-              <div className="product-img-box">
+            <div className="col-md-5 col-sm-12 ">
+              <div className="product-img-box ">
                 <div className="multiple-img">
                   {props?.product?.mproduct.product_image?.map(
                     (item, index) => (
                       <div
-                        className="img-box"
+                        className="img-box "
                         onClick={() => setSelectedImageIndex(index)}
-                        style={{ cursor: "pointer" }}
+                        style={{
+                          cursor: "pointer",
+                          background: " rgba(255, 255, 255, 0.5)",
+                        }}
                       >
                         <Image
                           src={`${process.env.NEXT_PUBLIC_MEDIA}${item.image_file}`}
                           width={50}
                           height={50}
                           alt=""
+                          className={
+                            props?.product?.mproduct?.in_stock === "0" &&
+                            "opacity-25"
+                          }
                         />
                       </div>
                     )
                   )}
                 </div>
                 <div className="view-box">
-                  <div className="view-img">
+                  <div className="view-img position-relative">
+                    {props?.product?.mproduct?.in_stock === "0" && (
+                      <div
+                        className=" w-100 h-100 d-flex text-center align-items-center justify-content-center"
+                        style={{
+                          position: "absolute",
+                          zIndex: "10",
+                          background: " rgba(255, 255, 255, 0.5)",
+                        }}
+                      >
+                        <p className="text-danger fw-bold fs-20 bg-white p-2 ">
+                          OUT OF STOCK
+                        </p>
+                      </div>
+                    )}
+
                     <Image
                       src={`${process.env.NEXT_PUBLIC_MEDIA}${props?.product?.mproduct.product_image[selectedImageIndex]?.image_file}`}
                       width={250}
@@ -150,27 +347,33 @@ export default function Productdetail(props) {
                       alt=""
                     />
                   </div>
-                  <div className="my-4 d-flex">
-                    <button type="button" className="btn btn-primary">
-                      Verify Insurance
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-darkred ms-auto px-4"
-                      data-bs-toggle="modal"
-                      data-bs-target="#exampleModalCenter1"
-                    >
-                      Add to Cart
-                    </button>
-                  </div>
-                  {/* <button
-                    type="button"
-                    className="w-100 my-4 l"
-                    data-bs-toggle="modal"
-                    data-bs-target="#exampleModalCenter1"
-                  >
-                    Add to Cart
-                  </button> */}
+                  {props?.product?.mproduct?.in_stock !== "0" && (
+                    <div className="my-4 d-flex">
+                      <button type="button" className="btn btn-primary">
+                        Verify Insurance
+                      </button>
+                      {addToCartBtnState ? (
+                        <button
+                          type="button"
+                          className="btn btn-darkred ms-auto px-4"
+                          disabled
+                          onClick={addToCartButton}
+                        >
+                          Added to Cart
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="btn btn-darkred ms-auto px-4"
+                          // data-bs-toggle="modal"
+                          // data-bs-target="#exampleModalCenter1"
+                          onClick={addToCartButton}
+                        >
+                          Add to Cart
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -179,7 +382,8 @@ export default function Productdetail(props) {
               <div className="d-flex py-2">
                 <span className="fs-6 fw-bold me-2">by</span>
                 <span className="fs-6 fw-bold text-primary">
-                  {props?.product?.variant_manufacturer}
+                  {/* {props?.product?.variant_manufacturer} */}
+                  {props?.product?.mproduct?.brand?.brand_name}
                 </span>
               </div>
               <div className="d-flex">
@@ -193,13 +397,16 @@ export default function Productdetail(props) {
                   Write a review
                 </a>
               </div>
-              <strong className="fs-20 fw-bold">$150</strong>
+              <strong className="fs-20 fw-bold">
+                ₹ {props?.product?.variant_msrp}
+              </strong>
               <p className="py-4 fs-18" style={{ textAlign: "justify" }}>
                 {props?.product?.mproduct?.product_description
                   .replace(/<\/?p>/gi, "")
                   .replace(/&nbsp;/gi, " ")
                   .slice(0, 650) +
-                  (props?.product?.mproduct?.product_description.length <= 650
+                  (props?.product?.mproduct?.product_short_description.length <=
+                  650
                     ? ""
                     : "...")}
               </p>
@@ -235,18 +442,26 @@ export default function Productdetail(props) {
               </div>
               <div>
                 <form action="/action_page.php">
-                  <div className="py-3">
-                    <label htmlFor="quantity" className="me-2 fs-18">
-                      Number of Quantity
-                    </label>
-                    <select name="quantity" id="quantity" className="px-1">
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3">3</option>
-                      <option value="4">4</option>
-                    </select>
-                  </div>
-                  <div className="d-flex align-items-center py-2">
+                  {!addToCartBtnState && (
+                    <div className="py-3">
+                      <label htmlFor="quantity" className="me-2 fs-18">
+                        Number of Quantity
+                      </label>
+                      <select
+                        name="quantity"
+                        id="quantity"
+                        className="px-1"
+                        value={qty}
+                        onChange={(e) => setqty(e.target.value)}
+                      >
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                      </select>
+                    </div>
+                  )}
+                  {/* <div className="d-flex align-items-center py-2">
                     <span className="me-4 fs-18 fw-bold">Color</span>
                     <label
                       className="itemcolor-radio"
@@ -276,8 +491,8 @@ export default function Productdetail(props) {
                       <input type="radio" name="color" />
                       <span></span>
                     </label>
-                  </div>
-                  <div className="d-flex align-items-center py-3">
+                  </div> */}
+                  {/* <div className="d-flex align-items-center py-3">
                     <span className="me-4 fs-18 fw-bold">Size</span>
                     <label className="itemsize-radio">
                       <input type="radio" name="size" />
@@ -301,18 +516,18 @@ export default function Productdetail(props) {
                       </svg>
                       <span className="fs-18">Size Guide</span>
                     </div>
-                  </div>
-                  <div className="py-3">
+                  </div> */}
+                  {/* <div className="py-3">
                     <span className="me-4 fs-18 fw-bold">Location</span>
                     <span className="me-4 fs-18 text-primary">USA only</span>
                     <span className="fs-18">International</span>
-                  </div>
-                  <div className="d-flex align-items-center">
+                  </div> */}
+                  {/* <div className="d-flex align-items-center">
                     <svg className="icon fs-3 me-2">
                       <use href="#icon_user-guide"></use>
                     </svg>
                     <span className="fs-18">User Guide</span>
-                  </div>
+                  </div> */}
                 </form>
                 <div className="border-bottom py-3"></div>
                 <div className="row">
@@ -361,65 +576,74 @@ export default function Productdetail(props) {
                           </div>
                         </div>
                       </div>
-                      <div className="accordion-item py-2">
-                        <h2 className="accordion-header" id="flush-headingTwo">
-                          <button
-                            className="accordion-button collapsed"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#flush-collapseTwo"
-                            aria-expanded="false"
-                            aria-controls="flush-collapseTwo"
+                      {props?.product?.product_feature && (
+                        <div className="accordion-item py-2">
+                          <h2
+                            className="accordion-header"
+                            id="flush-headingTwo"
                           >
-                            Features
-                          </button>
-                        </h2>
-                        <div
-                          id="flush-collapseTwo"
-                          className="accordion-collapse collapse"
-                          aria-labelledby="flush-headingTwo"
-                          data-bs-parent="#accordionFlushExample"
-                        >
-                          <div className="accordion-body">
-                            Lorem ipsum, dolor sit amet consectetur adipisicing
-                            elit. Blanditiis eveniet harum dolorem pariatur
-                            laudantium animi numquam quos voluptate itaque, odio
-                            impedit distinctio repudiandae quas, illum ipsa
-                            consequatur explicabo adipisci natus!
+                            <button
+                              className="accordion-button collapsed"
+                              type="button"
+                              data-bs-toggle="collapse"
+                              data-bs-target="#flush-collapseTwo"
+                              aria-expanded="false"
+                              aria-controls="flush-collapseTwo"
+                            >
+                              Features
+                            </button>
+                          </h2>
+                          <div
+                            id="flush-collapseTwo"
+                            className="accordion-collapse collapse"
+                            aria-labelledby="flush-headingTwo"
+                            data-bs-parent="#accordionFlushExample"
+                          >
+                            <div className="accordion-body">
+                              Lorem ipsum, dolor sit amet consectetur
+                              adipisicing elit. Blanditiis eveniet harum dolorem
+                              pariatur laudantium animi numquam quos voluptate
+                              itaque, odio impedit distinctio repudiandae quas,
+                              illum ipsa consequatur explicabo adipisci natus!
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="accordion-item py-2">
-                        <h2
-                          className="accordion-header"
-                          id="flush-headingThree"
-                        >
-                          <button
-                            className="accordion-button collapsed"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#flush-collapseThree"
-                            aria-expanded="false"
-                            aria-controls="flush-collapseThree"
+                      )}
+
+                      {props?.product?.product_specification && (
+                        <div className="accordion-item py-2">
+                          <h2
+                            className="accordion-header"
+                            id="flush-headingThree"
                           >
-                            Product Specifications
-                          </button>
-                        </h2>
-                        <div
-                          id="flush-collapseThree"
-                          className="accordion-collapse collapse"
-                          aria-labelledby="flush-headingThree"
-                          data-bs-parent="#accordionFlushExample"
-                        >
-                          <div className="accordion-body">
-                            Lorem ipsum dolor sit amet consectetur adipisicing
-                            elit. Sequi modi deserunt voluptatum dicta vero
-                            soluta consequuntur laborum molestias architecto,
-                            provident deleniti autem illum aspernatur eveniet
-                            sapiente! Atque cumque iste nulla?
+                            <button
+                              className="accordion-button collapsed"
+                              type="button"
+                              data-bs-toggle="collapse"
+                              data-bs-target="#flush-collapseThree"
+                              aria-expanded="false"
+                              aria-controls="flush-collapseThree"
+                            >
+                              Product Specifications
+                            </button>
+                          </h2>
+                          <div
+                            id="flush-collapseThree"
+                            className="accordion-collapse collapse"
+                            aria-labelledby="flush-headingThree"
+                            data-bs-parent="#accordionFlushExample"
+                          >
+                            <div className="accordion-body">
+                              Lorem ipsum dolor sit amet consectetur adipisicing
+                              elit. Sequi modi deserunt voluptatum dicta vero
+                              soluta consequuntur laborum molestias architecto,
+                              provident deleniti autem illum aspernatur eveniet
+                              sapiente! Atque cumque iste nulla?
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      )}
+
                       <div className="accordion-item py-2">
                         <h2 className="accordion-header" id="flush-headingFour">
                           <button
@@ -458,184 +682,57 @@ export default function Productdetail(props) {
       </div>
 
       {/* Slider 1*/}
-      <div className="product-slider-box">
-        <div className="container py-5">
-          <div className="row pb-5">
-            <div className="col-12">
-              <h3>Bought Togather</h3>
+      {props?.bought_togethers?.length > 0 && (
+        <div className="product-slider-box">
+          <div className="container py-5">
+            <div className="row pb-5">
+              <div className="col-12">
+                <h3>Bought Together</h3>
+              </div>
             </div>
-          </div>
-          <div className="row">
-            <div className="12">
-              <Slider {...settings}>
-                <div className="card">
-                  <div className="card-bodys">
-                    <div className="d-flex justify-content-between">
-                      <div className="like-down-box">
-                        <svg className="icon">
-                          <use href="#icon_like-dull"></use>
-                        </svg>
-                      </div>
-                      <div className="download-box">
-                        <svg className="icon">
-                          <use href="#icon_loader-dull"></use>
-                        </svg>
-                      </div>
-                    </div>
-                    <div className="d-flex my-2 py-2 justify-content-center">
-                      <div className="card-img">
-                        <Image
-                          width={180}
-                          height={180}
-                          src={cardImg1}
-                          alt="..."
-                        />
-                      </div>
-                    </div>
-                    <p className="card-text">5 OZ Breast Milk Bottle Set</p>
-                    <span className="badge text-bg-primary p-2 px-3 me-2">
-                      4.2 &#9733;
-                    </span>
-                    <span>(166)</span>
-                  </div>
-                </div>
-                <div className="card">
-                  <div className="card-bodys">
-                    <div className="d-flex justify-content-between">
-                      <div className="like-down-box">
-                        <svg className="icon">
-                          <use href="#icon_like"></use>
-                        </svg>
-                      </div>
-                      <div className="download-box">
-                        <svg className="icon">
-                          <use href="#icon_loader"></use>
-                        </svg>
-                        <span>1</span>
+            <div className="row">
+              <div className="12">
+                <Slider {...settingsBoughtTogether}>
+                  {props?.bought_togethers?.map((item, index) => (
+                    <div className="card">
+                      <div className="card-bodys">
+                        <div className="d-flex justify-content-between">
+                          <div className="like-down-box">
+                            <svg className="icon">
+                              <use href="#icon_like-dull"></use>
+                            </svg>
+                          </div>
+                          <div className="download-box">
+                            <svg className="icon">
+                              <use href="#icon_loader-dull"></use>
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="d-flex my-2 py-2 justify-content-center">
+                          <div className="card-img">
+                            <Image
+                              width={180}
+                              height={180}
+                              src={cardImg1}
+                              alt="..."
+                            />
+                          </div>
+                        </div>
+                        <p className="card-text">{item?.product_name}</p>
+                        <span className="badge text-bg-primary p-2 px-3 me-2">
+                          4.2 &#9733;
+                        </span>
+                        <span>(166)</span>
                       </div>
                     </div>
-                    <div className="d-flex my-2 py-2 justify-content-center">
-                      <div className="card-img">
-                        <Image
-                          width={159}
-                          height={160}
-                          src={cardImg2}
-                          alt="..."
-                        />
-                      </div>
-                    </div>
-                    <p className="card-text">
-                      Spectra S1 Plus Electric Breast Pump Dual Voltage
-                    </p>
-                    <span className="badge text-bg-primary p-2 px-3 me-2">
-                      4.1 &#9733;
-                    </span>
-                    <span>(176)</span>
-                  </div>
-                </div>
-                <div className="card">
-                  <div className="card-bodys">
-                    <div className="d-flex justify-content-between">
-                      <div className="like-down-box">
-                        <svg className="icon">
-                          <use href="#icon_like-dull"></use>
-                        </svg>
-                      </div>
-                      <div className="download-box">
-                        <svg className="icon">
-                          <use href="#icon_loader-dull"></use>
-                        </svg>
-                        {/* <span>1</span> */}
-                      </div>
-                    </div>
-                    <div className="d-flex my-2 py-2 justify-content-center">
-                      <div className="card-img">
-                        <Image
-                          width={180}
-                          height={180}
-                          src={cardImg3}
-                          alt="..."
-                        />
-                      </div>
-                    </div>
-                    <p className="card-text">Lansinoh Resupply Kit</p>
-                    <span className="badge text-bg-primary p-2 px-3 me-2">
-                      4.4 &#9733;
-                    </span>
-                    <span>(200)</span>
-                  </div>
-                </div>
-                <div className="card">
-                  <div className="card-bodys">
-                    <div className="d-flex justify-content-between">
-                      <div className="like-down-box">
-                        <svg className="icon">
-                          <use href="#icon_like-dull"></use>
-                        </svg>
-                      </div>
-                      <div className="download-box">
-                        <svg className="icon">
-                          <use href="#icon_loader-dull"></use>
-                        </svg>
-                        {/* <span>1</span> */}
-                      </div>
-                    </div>
-                    <div className="d-flex my-2 py-2 justify-content-center">
-                      <div className="card-img">
-                        <Image
-                          width={125}
-                          height={160}
-                          src={cardImg4}
-                          alt="..."
-                        />
-                      </div>
-                    </div>
-                    <p className="card-text">Bambo Nature Love Balm</p>
-                    <span className="badge text-bg-primary p-2 px-3 me-2">
-                      4.0 &#9733;
-                    </span>
-                    <span>(123)</span>
-                  </div>
-                </div>
-                <div className="card">
-                  <div className="card-bodys">
-                    <div className="d-flex justify-content-between">
-                      <div className="like-down-box">
-                        <svg className="icon">
-                          <use href="#icon_like"></use>
-                        </svg>
-                      </div>
-                      <div className="download-box">
-                        <svg className="icon">
-                          <use href="#icon_loader"></use>
-                        </svg>
-                        <span>1</span>
-                      </div>
-                    </div>
-                    <div className="d-flex my-2 py-2 justify-content-center">
-                      <div className="card-img">
-                        <Image
-                          width={159}
-                          height={160}
-                          src={cardImg2}
-                          alt="..."
-                        />
-                      </div>
-                    </div>
-                    <p className="card-text">
-                      Spectra S1 Plus Electric Breast Pump Dual Voltage
-                    </p>
-                    <span className="badge text-bg-primary p-2 px-3 me-2">
-                      4.1 &#9733;
-                    </span>
-                    <span>(176)</span>
-                  </div>
-                </div>
-              </Slider>
+                  ))}
+                </Slider>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
+
       <div className="product-slider-box">
         <div className="container py-5">
           <div className="row pb-5">
@@ -645,7 +742,7 @@ export default function Productdetail(props) {
           </div>
           <div className="row">
             <div className="12">
-              <Slider {...settings}>
+              <Slider {...settingsSimilarProducts}>
                 <div className="card">
                   <div className="card-bodys">
                     <div className="d-flex justify-content-between">
@@ -824,7 +921,7 @@ export default function Productdetail(props) {
           </div>
           <div className="row">
             <div className="12">
-              <Slider {...settings}>
+              <Slider {...settingsRecentlyViewed}>
                 <div className="card">
                   <div className="card-bodys">
                     <div className="d-flex justify-content-between">
@@ -1013,7 +1110,9 @@ export default function Productdetail(props) {
                   </p>
                   <ul>
                     <li>
-                      <h5 className="pb-2">MACHINE ONLY</h5>
+                      <h5 className="pb-2" onClick={machineOnlyBtn}>
+                        MACHINE ONLY
+                      </h5>
                       <p>
                         I already have a mask, would like to buy only machine
                       </p>

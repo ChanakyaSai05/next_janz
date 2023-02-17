@@ -77,6 +77,11 @@ export default function Category(props) {
       },
     ],
   };
+
+  // add to cart button
+  const cartIconBtn = () => {
+    // need to sent to local storage
+  };
   return (
     <>
       <Headerlanding></Headerlanding>
@@ -264,7 +269,12 @@ export default function Category(props) {
                                             <use href="#icon_like"></use>
                                           </svg>
                                         </div>
-                                        <div className="download-box">
+                                        <div
+                                          className="download-box"
+                                          onClick={() =>
+                                            cartIconBtn(sub_product)
+                                          }
+                                        >
                                           <svg className="icon">
                                             <use href="#icon_loader"></use>
                                           </svg>
