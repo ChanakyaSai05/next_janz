@@ -158,58 +158,13 @@ export default function Categoryfilter(props) {
                     />
                     <span className="form-check-label">Cash</span>
                   </label>
-                </div>
-                <div className="card border p-3 mb-4">
-                  <div className="card-headerl">
-                    <span className="fw-bold">HSA/FSA</span>
-                    <div className="border-bottom mt-2 mb-3"></div>
-                  </div>
                   <label className="form-check pb-2">
                     <input
                       className="form-check-input"
                       type="checkbox"
                       value=""
                     />
-                    <span className="form-check-label">HSA</span>
-                  </label>
-                  <label className="form-check pb-2">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      value=""
-                    />
-                    <span className="form-check-label">FSA</span>
-                  </label>
-                </div>
-                <div className="text-center pb-3">
-                  <strong>OR</strong>
-                </div>
-                <div className="card border p-3 mb-4">
-                  <div className="card-headerl">
-                    <span className="fw-bold">Other</span>
-                    <div className="border-bottom mt-2 mb-3"></div>
-                  </div>
-                  <label className="form-check pb-2">
-                    <input className="form-check-input" type="radio" value="" />
-                    <span className="form-check-label">Product 1</span>
-                  </label>
-                  <label className="form-check pb-2">
-                    <input className="form-check-input" type="radio" value="" />
-                    <span className="form-check-label">Product 2</span>
-                  </label>
-                </div>
-                <div className="card border p-3 mb-4">
-                  <div className="card-headerl">
-                    <span className="fw-bold">Other</span>
-                    <div className="border-bottom mt-2 mb-3"></div>
-                  </div>
-                  <label className="form-check pb-2">
-                    <input className="form-check-input" type="radio" value="" />
-                    <span className="form-check-label">HSA</span>
-                  </label>
-                  <label className="form-check pb-2">
-                    <input className="form-check-input" type="radio" value="" />
-                    <span className="form-check-label">FSA</span>
+                    <span className="form-check-label">HSA/FSA</span>
                   </label>
                 </div>
               </div>

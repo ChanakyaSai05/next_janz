@@ -6,18 +6,47 @@ import Offcanvas from "react-bootstrap/Offcanvas";
 import logo from "../public/images/logo.svg";
 import { useRouter } from "next/router";
 import MyAccountDropdown from "./MyAccountDropdown";
+import axios from "axios";
 
 export default function Header() {
   // const [publicPath] = useState(process.env.NEXT_PUBLIC_URL);
   const router = useRouter();
+  const [cartItems, setcartItems] = useState([]);
 
   const handleShow = () => setShow(true);
 
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
+  const getCartItemsFn = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}product/cartproducts`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          customer_id: user ? user.customer_id : "",
+        },
+      });
 
-  useEffect(() => {}, []);
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        console.log(response?.data);
+        setcartItems(response?.data?.cart_products);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  console.log(cartItems, "cart_items");
+  useEffect(() => {
+    getCartItemsFn();
+  }, []);
 
   return (
     <>
@@ -136,7 +165,7 @@ export default function Header() {
                   <MyAccountDropdown />
                 </div>
                 <div className="header-icon">
-                  <div className="icon-count">2</div>
+                  <div className="icon-count">{cartItems?.length}</div>
                   <div className="d-flex align-items-center">
                     <Link href={"/cart_items"} className="link">
                       <div className="kart">

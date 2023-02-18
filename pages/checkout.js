@@ -18,6 +18,7 @@ import { useRouter } from "next/router";
 import UserContext from "../context/UserContext";
 // import csc from "country-state-city";
 import { Country, State, City } from "country-state-city";
+import axios from "axios";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Checkout() {
@@ -29,6 +30,9 @@ export default function Checkout() {
 
   // Login open close
   const [loginUser, setloginUser] = useState(null);
+
+  // address list
+  const [addressList, setaddressList] = useState([]);
 
   // Router
   const router = useRouter();
@@ -200,6 +204,41 @@ export default function Checkout() {
     let states = State.getStatesOfCountry("US");
     setusStates(states);
   }, []);
+
+  const getAddressList = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const token = localStorage.getItem("janz_medical_login_token");
+
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/address`,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        // alert("Error");
+        console.log("Error");
+      } else {
+        // console.log(response.data);
+        setaddressList(response.data.address);
+      }
+    } catch (error) {
+      console.log(error);
+      // alert("Error");
+    }
+  };
+
+  console.log(addressList, "address list");
+  useEffect(() => {
+    let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+
+    getAddressList();
+  }, []);
   return (
     <>
       <Headerlanding></Headerlanding>
@@ -233,31 +272,33 @@ export default function Checkout() {
 
               {/* user profile */}
               {profileStates.user_profile ? (
-                <div className="card-shadow  p-4 d-flex align-items-center mb-4">
-                  <div className="d-flex">
-                    <div className="me-4">
-                      <svg className="icon fs-24">
-                        <use href="#icon_greencheck"></use>
-                      </svg>
+                <>
+                  <div className="card-shadow  p-4 d-flex align-items-center mb-4">
+                    <div className="d-flex">
+                      <div className="me-4">
+                        <svg className="icon fs-24">
+                          <use href="#icon_greencheck"></use>
+                        </svg>
+                      </div>
+                      <div className="">
+                        <p className="fw-bold p-0 m-0">User Profile</p>
+                        <span>
+                          JANZ Corp, 9876543210 Address 1, Address 2, City,
+                          State, Zip code{" "}
+                        </span>
+                      </div>
                     </div>
-                    <div className="">
-                      <p className="fw-bold p-0 m-0">User Profile</p>
-                      <span>
-                        JANZ Corp, 9876543210 Address 1, Address 2, City, State,
-                        Zip code{" "}
-                      </span>
+                    <div className="ms-auto">
+                      <button
+                        type="button"
+                        className="btn btn-default btn-outline-secondary px-4"
+                        onClick={deliverHereBtn}
+                      >
+                        Change
+                      </button>
                     </div>
                   </div>
-                  <div className="ms-auto">
-                    <button
-                      type="button"
-                      className="btn btn-default btn-outline-secondary px-4"
-                      onClick={deliverHereBtn}
-                    >
-                      Change
-                    </button>
-                  </div>
-                </div>
+                </>
               ) : (
                 <div className="card-shadow p-4 mb-4 position-relative">
                   <div className="d-flex pb-3">
@@ -584,32 +625,52 @@ export default function Checkout() {
                           </div>
                         </div>
                       ) : (
-                        <div class="form-check">
-                          <input
-                            class="form-check-input"
-                            type="radio"
-                            name="flexRadioDefault"
-                            id="flexRadioDefault1"
-                            checked
-                          />
-                          <div className="ms-4">
-                            <label
-                              class="form-check-label"
-                              for="flexRadioDefault1"
-                            >
-                              JANZ Corp <br /> 9876543210 <br /> Address 1,
-                              Address 2, City, State, Zip code
-                            </label>
-                            <br />
-                            <button
-                              type="button"
-                              className="btn btn-primary px-4 mt-3"
-                              onClick={deliverHereBtn}
-                            >
-                              Deliver Here
-                            </button>
-                          </div>
-                        </div>
+                        <>
+                          {addressList?.map((item, index) => (
+                            <>
+                              <div class="form-check">
+                                <input
+                                  class="form-check-input"
+                                  type="radio"
+                                  name="flexRadioDefault"
+                                  id="flexRadioDefault1"
+                                  // checked={true}
+                                />
+                                <div className="ms-4">
+                                  <label
+                                    class="form-check-label"
+                                    for="flexRadioDefault1"
+                                  >
+                                    {item?.contact_name}
+                                    <br />
+                                    {item?.phone ? item.phone : "phone num"}
+                                    <br />
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        flexWrap: "wrap",
+                                      }}
+                                    >
+                                      {item?.address1},{item?.address2}
+                                    </div>
+                                    {/* JANZ Corp <br /> 9876543210 <br /> Address
+                                    1, Address 2, City, State, Zip code */}
+                                    <div>{item?.zip_code}</div>
+                                  </label>
+                                  <br />
+                                  <button
+                                    type="button"
+                                    className="btn btn-primary px-4 mt-3"
+                                    onClick={deliverHereBtn}
+                                  >
+                                    Deliver Here
+                                  </button>
+                                </div>
+                              </div>
+                              {/* <hr /> */}
+                            </>
+                          ))}
+                        </>
                       )}
                     </div>
                     <div
@@ -634,20 +695,6 @@ export default function Checkout() {
                     </div>
                   </div>
                   <hr />
-                  <div class="form-check">
-                    <input
-                      class="form-check-input"
-                      type="radio"
-                      name="flexRadioDefault"
-                      id="flexRadioDefault2"
-                    />
-                    <div className="ms-4">
-                      <label class="form-check-label" for="flexRadioDefault2">
-                        JANZ Corp <br /> 9876543210 <br /> Address 1, Address 2,
-                        City, State, Zip code
-                      </label>
-                    </div>
-                  </div>
                 </div>
               )}
 
@@ -1249,7 +1296,9 @@ export default function Checkout() {
                 )}
             </div>
             <div className="col-md-4">
-              <h5 className="fs-22 fw-bold py-4">Customer ID: 987654</h5>
+              <h5 className="fs-22 fw-bold py-4">
+                Customer ID: {loginUser?.customer_id}
+              </h5>
               <div className="bg-light px-3 py-3 rounded-2">
                 <p className="fw-bold">Pricing Summary</p>
                 <hr />
@@ -1488,7 +1537,7 @@ export default function Checkout() {
               <div className="mt-1">
                 <label
                   htmlFor="fileUpload2"
-                  className="button button-blue upload-btn w-100 py-2 fs-20"
+                  className="btn btn-primary upload-btn w-100 py-2 fs-20"
                 >
                   Upload
                 </label>

@@ -447,8 +447,14 @@ export default function Profiledetails() {
     }
   };
 
-  // Use effect
+  // // Use effect
+  // useEffect(() => {
+
+  // }, []);
   useEffect(() => {
+    let states = State.getStatesOfCountry("US");
+    setusStates(states);
+    getAddressList();
     let user = JSON.parse(localStorage.getItem("janz_medical_user"));
     // console.log(user);
     setformdata({
@@ -469,11 +475,6 @@ export default function Profiledetails() {
           : "off"
         : "off",
     });
-  }, []);
-  useEffect(() => {
-    let states = State.getStatesOfCountry("US");
-    setusStates(states);
-    getAddressList();
   }, []);
 
   return (

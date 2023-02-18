@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { Inter } from "@next/font/google";
 import {
@@ -26,30 +26,24 @@ export default function Cart() {
   const [cartItems, setcartItems] = useState([]);
   // logged in user
   const [loggedInUser, setloggedInUser] = useState({});
+
   const router = useRouter();
-  const incNum = () => {
-    if (num < 10) {
-      setNum(Number(num) + 1);
-    }
-  };
-  const decNum = () => {
-    if (num > 1) {
-      setNum(num - 1);
-    }
-  };
 
   // counter increment
-  const handleChangeIncrement = (index) => {
+  const handleChangeIncrement = (index, item) => {
     // setNum(e.target.value);
     setcartItems((previous) => {
       return previous.map((prev, prev_index) => {
         if (prev_index === index) {
+          let qtyIncreased = parseInt(prev.qty) + 1;
+          updateCartFn(item, qtyIncreased);
           return { ...prev, qty: parseInt(prev.qty) + 1 };
         } else {
           return prev;
         }
       });
     });
+    updateCartFn(item);
   };
   // counter decrement
   const handleChangeDecrement = (index, item) => {
@@ -60,6 +54,8 @@ export default function Cart() {
           if (parseInt(prev.qty) == 1) {
             return prev;
           } else {
+            let qtyDecreased = parseInt(prev.qty) - 1;
+            updateCartFn(item, qtyDecreased);
             return { ...prev, qty: parseInt(prev.qty) - 1 };
           }
         } else {
@@ -67,13 +63,10 @@ export default function Cart() {
         }
       });
     });
-    // setTimeout(() => {
-    //   updateCartFn(item);
-    // }, 100);
   };
 
   // update function from the cart
-  const updateCartFn = async (item) => {
+  const updateCartFn = async (item, qty) => {
     try {
       let user = JSON.parse(localStorage.getItem("janz_medical_user"));
       let product = item;
@@ -98,7 +91,7 @@ export default function Cart() {
             ? product?.variant_weight
             : "",
           variant_unit: product?.variant_unit ? product?.variant_unit : "",
-          qty: item?.qty,
+          qty: qty,
         },
       });
 
@@ -140,7 +133,7 @@ export default function Cart() {
           "Content-Type": "application/json",
         },
         data: {
-          customer_id: user.customer_id,
+          customer_id: user ? user.customer_id : "",
         },
       });
 
@@ -275,7 +268,7 @@ export default function Cart() {
                               className="btn p-0 bg-grey rounded-0 mmwh-28"
                               type="button"
                               id="button-addon2"
-                              onClick={() => handleChangeIncrement(index)}
+                              onClick={() => handleChangeIncrement(index, item)}
                               title="Plus"
                             >
                               <svg className="icon">
@@ -289,7 +282,7 @@ export default function Cart() {
                           >
                             Remove item
                           </span>
-                          <div>
+                          {/* <div>
                             <button
                               type="button"
                               className="btn btn-primary mt-2"
@@ -297,9 +290,9 @@ export default function Cart() {
                             >
                               Update
                             </button>
-                          </div>
+                          </div> */}
                         </td>
-                        <td>$0.00</td>
+                        <td>${item?.variant_sale_price}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -313,7 +306,7 @@ export default function Cart() {
               <div className="bg-light px-3 py-3 rounded-2">
                 <p className="fw-bold">Pricing Summary</p>
                 <hr />
-                <p>Apply Discount Coupon</p>
+                {/* <p>Apply Discount Coupon</p>
                 <div className="d-flex">
                   <input
                     type="text"
@@ -328,8 +321,8 @@ export default function Cart() {
                     </svg>
                     Applied
                   </button>
-                </div>
-                <hr />
+                </div> */}
+                {/* <hr /> */}
                 <div className="d-flex pb-2">
                   <span>Subtotal (2 Items)</span>
                   <span className="ms-auto">$400.00</span>

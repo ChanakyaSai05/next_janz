@@ -42,6 +42,27 @@ export default function Productdetail(props) {
   const [qty, setqty] = useState("1");
   const [addToCartBtnState, setaddToCartBtnState] = useState(false);
 
+  // check insurance availability
+  const [insuranceAvalilability, setinsuranceAvalilability] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    gender: "",
+    dob: "",
+    choose_insurance: "",
+    subscriber_id: "",
+  });
+
+  // insurance avaibily details change
+  const handleInsuranceAvalibilityChange = (e) => {
+    setinsuranceAvalilability({
+      ...insuranceAvalilability,
+      [e.target.id]: e.target.value,
+    });
+  };
+
+  // console.log(insuranceAvalilability, "insurance availability");
+
   let settingsBoughtTogether = {
     dots: true,
     infinite: true,
@@ -171,6 +192,42 @@ export default function Productdetail(props) {
     // logic to add to cart
   };
 
+  // insurance availability submit button
+  const insuranceAvalilabilitySubmitButton = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      let product = props?.product;
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}insurance/eligiblity/verify`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          customer_first_name: insuranceAvalilability.first_name,
+          customer_last_name: insuranceAvalilability.last_name,
+          birth_date: insuranceAvalilability.dob,
+          member_no: "EDU811727682",
+          insurance_order: "PRIMARY",
+          insurance_name: insuranceAvalilability.choose_insurance,
+          brand: props?.product?.mproduct?.brand.brand_name,
+          variant_sku: props?.product?.variant_sku,
+          hcpcs_code: props?.product?.variant_hcpcs_code,
+          gender: insuranceAvalilability.gender,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        // router.push("/cart_items");
+        // getCartItemsFn();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   // add to cart button
   const addToCartButton = async () => {
     try {
@@ -222,7 +279,7 @@ export default function Productdetail(props) {
           "Content-Type": "application/json",
         },
         data: {
-          customer_id: user.customer_id,
+          customer_id: user ? user.customer_id : "",
         },
       });
 
@@ -349,7 +406,12 @@ export default function Productdetail(props) {
                   </div>
                   {props?.product?.mproduct?.in_stock !== "0" && (
                     <div className="my-4 d-flex">
-                      <button type="button" className="btn btn-primary">
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        data-bs-target="#exampleModalToggleVerifyInsurance"
+                        data-bs-toggle="modal"
+                      >
                         Verify Insurance
                       </button>
                       {addToCartBtnState ? (
@@ -397,9 +459,12 @@ export default function Productdetail(props) {
                   Write a review
                 </a>
               </div>
-              <strong className="fs-20 fw-bold">
-                ₹ {props?.product?.variant_msrp}
-              </strong>
+
+              <div>
+                <strong className="fs-20 fw-bold">
+                  ${props?.product?.variant_sale_price}
+                </strong>
+              </div>
               <p className="py-4 fs-18" style={{ textAlign: "justify" }}>
                 {props?.product?.mproduct?.product_description
                   .replace(/<\/?p>/gi, "")
@@ -713,7 +778,7 @@ export default function Productdetail(props) {
                             <Image
                               width={180}
                               height={180}
-                              src={cardImg1}
+                              src={`${process.env.NEXT_PUBLIC_MEDIA}${item?.product_image[0]?.image_file}`}
                               alt="..."
                             />
                           </div>
@@ -1936,6 +2001,141 @@ export default function Productdetail(props) {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="modal fade"
+        id="exampleModalToggleVerifyInsurance"
+        aria-hidden="true"
+        aria-labelledby="exampleModalToggleLabel"
+        tabIndex="-1"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+      >
+        <div className="modal-dialog modal-600 modal-dialog-scrollable">
+          <div className="modal-content px-3">
+            <div className="modal-header pb-0 border-0">
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body">
+              <h4 className="text-center m-0 pb-2 fs-22">
+                Check Insurance Eligibility
+              </h4>
+              <form>
+                <div className="mb-2">
+                  <label htmlFor="exampleInputFirstName" className="form-label">
+                    First Name
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter First Name"
+                    id="first_name"
+                    value={insuranceAvalilability.first_name}
+                    onChange={handleInsuranceAvalibilityChange}
+                  />
+                </div>
+                <div className="mb-2">
+                  <label htmlFor="exampleInputLastName" className="form-label">
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter Last Name"
+                    className="form-control"
+                    id="last_name"
+                    value={insuranceAvalilability.last_name}
+                    onChange={handleInsuranceAvalibilityChange}
+                  />
+                </div>
+                <div className="mb-2">
+                  <label htmlFor="exampleInputEmail" className="form-label">
+                    Email id
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="Enter Email id"
+                    className="form-control"
+                    id="email"
+                    value={insuranceAvalilability.email}
+                    onChange={handleInsuranceAvalibilityChange}
+                  />
+                </div>
+                <div className="mb-2">
+                  <label className="form-label">Gender</label>
+                  <select
+                    className="form-select"
+                    aria-label="Default select example"
+                    value={insuranceAvalilability.gender}
+                    onChange={handleInsuranceAvalibilityChange}
+                    id="gender"
+                  >
+                    <option selected>Choose Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                </div>
+                <div className="mb-2">
+                  <label htmlFor="birthday" className="form-label">
+                    Date of birth
+                  </label>
+                  <input
+                    className="form-control"
+                    type="date"
+                    id="dob"
+                    name="birthday"
+                    value={insuranceAvalilability.dob}
+                    onChange={handleInsuranceAvalibilityChange}
+                  />
+                </div>
+                <div className="mb-2">
+                  <label className="form-label">Choose Insurance</label>
+                  <select
+                    className="form-select"
+                    aria-label="Default select example"
+                    value={insuranceAvalilability.choose_insurance}
+                    onChange={handleInsuranceAvalibilityChange}
+                    id="choose_insurance"
+                  >
+                    <option selected>Choose Insurance</option>
+                    <option value="1">Insurance 1</option>
+                    <option value="2">Insurance 2</option>
+                    <option value="3">Insurance 3</option>
+                  </select>
+                </div>
+                <div className="mb-2">
+                  <label
+                    htmlFor="exampleInputSubscribeId"
+                    className="form-label"
+                  >
+                    Subscriber ID
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter Subscriber ID"
+                    id="subscriber_id"
+                    value={insuranceAvalilability.subscriber_id}
+                    onChange={handleInsuranceAvalibilityChange}
+                  />
+                </div>
+                <div className="text-center">
+                  <button
+                    type="button"
+                    className="btn btn-primary px-4"
+                    onClick={insuranceAvalilabilitySubmitButton}
+                  >
+                    Submit
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

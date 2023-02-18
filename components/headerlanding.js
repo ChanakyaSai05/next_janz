@@ -49,6 +49,8 @@ export default function Headerlanding() {
   // console.log(process.env.NEXT_PUBLIC_URL, "ROOT URL");
   // const [publicPath] = useState(process.env.NEXT_PUBLIC_URL);
   const [regiterDetails, setregiterDetails] = useState({
+    first_name: "",
+    last_name: "",
     email: "",
     password: "",
     eyeShown: false,
@@ -82,6 +84,8 @@ export default function Headerlanding() {
 
   // Toggle
   const [activeKey, setActiveKey] = useState("0");
+  // cart items
+  const [cartItems, setcartItems] = useState([]);
 
   const handleChange = (e, index) => {
     if (e.target.value.length > 1) return;
@@ -126,6 +130,11 @@ export default function Headerlanding() {
   const registerDetailsChangeFn = (e) => {
     if (e.target.id === "password") {
       let value = e.target.value;
+      if (value.length > 0) {
+        setShowRules(true);
+      } else {
+        setShowRules(false);
+      }
       setpasswordValidation({
         length: value.length >= 8,
         lowercase: /[a-z]/.test(value),
@@ -192,6 +201,9 @@ export default function Headerlanding() {
             withCredentials: true,
           },
           data: {
+            name: regiterDetails.first_name + " " + regiterDetails.last_name,
+            customer_first_name: regiterDetails.first_name,
+            customer_last_name: regiterDetails.last_name,
             email: regiterDetails.email,
             encryptp: {
               ct: encrypted.ct,
@@ -469,7 +481,33 @@ export default function Headerlanding() {
     // }
   };
 
+  const getCartItemsFn = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}product/cartproducts`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          customer_id: user ? user.customer_id : "",
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        console.log(response?.data);
+        setcartItems(response?.data?.cart_products);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   useEffect(() => {
+    getCartItemsFn();
     checkLoginUser();
     fetchData();
   }, []);
@@ -525,6 +563,7 @@ export default function Headerlanding() {
                   )}
 
                   <div className="header-icon">
+                    <div className="icon-count">{cartItems?.length}</div>
                     <div className="d-flex align-items-center">
                       <Link href={"/cart_items"} className="link">
                         <div className="kart">
@@ -903,6 +942,30 @@ export default function Headerlanding() {
                     </h3>
                     <div className="mb-3">
                       <label htmlFor="exampleInputPws0" className="form-label">
+                        First Name
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="first_name"
+                        value={regiterDetails.first_name}
+                        onChange={registerDetailsChangeFn}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label htmlFor="exampleInputPws0" className="form-label">
+                        Last Name
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="last_name"
+                        value={regiterDetails.last_name}
+                        onChange={registerDetailsChangeFn}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label htmlFor="exampleInputPws0" className="form-label">
                         Email (username)
                       </label>
                       <input
@@ -925,7 +988,7 @@ export default function Headerlanding() {
                           id="password"
                           value={regiterDetails.password}
                           onChange={registerDetailsChangeFn}
-                          onFocus={() => setShowRules(true)}
+                          // onFocus={() => setShowRules(true)}
                           // autoComplete="current-password"
                         />
                         <button

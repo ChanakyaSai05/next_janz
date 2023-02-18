@@ -60,6 +60,7 @@ export default function Home(props) {
   const [productsBrandsUpdatedImages, setproductsBrandsUpdatedImages] =
     useState([]);
   // console.log(props, "props");
+  console.log(productsData);
 
   let settings = {
     dots: true,
@@ -382,34 +383,33 @@ export default function Home(props) {
             </div>
           </div>
           <div className="row row-cols-1 row-cols-md-4 py-5">
-            <div className="col my-2">
-              <div className="card-box">
-                <Image width={296} height={300} src={medicalImg1} alt="..." />
-                <h5>Maternity Care</h5>
-                <ul>
-                  <li>
-                    <a href="#">Sub category 01</a>
-                  </li>
-                  <li>
-                    <a href="#">Sub category 02</a>
-                  </li>
-                  <li>
-                    <a href="#">Sub category 03</a>
-                  </li>
-                  <li>
-                    <a href="#">Sub category 04</a>
-                  </li>
-                  <li>
-                    <a href="#">Sub category 05</a>
-                  </li>
-                  <li>
-                    <a href="#">Sub category 06</a>
-                  </li>
-                </ul>
-                <button type="button">Show more</button>
+            {productsData?.categories?.map((item, index) => (
+              <div className="col my-2">
+                <div className="card-box">
+                  <Image
+                    width={296}
+                    height={300}
+                    src={`${process.env.NEXT_PUBLIC_MEDIA}${item?.category_image}`}
+                    alt="..."
+                  />
+                  <h5>{item?.category_name}</h5>
+                  <ul>
+                    {item.children?.map((child, child_index) => (
+                      <li>
+                        <Link
+                          href={`/category/${item?.category_slug}/${child?.category_slug}`}
+                        >
+                          {child?.category_name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                  <button type="button">Show more</button>
+                </div>
               </div>
-            </div>
-            <div className="col my-2">
+            ))}
+
+            {/* <div className="col my-2">
               <div className="card-box">
                 <Image width={296} height={300} src={medicalImg2} alt="..." />
                 <h5>Respiratory Care</h5>
@@ -597,7 +597,7 @@ export default function Home(props) {
                 </ul>
                 <button type="button">Show more</button>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
