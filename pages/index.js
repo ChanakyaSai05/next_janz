@@ -53,7 +53,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export default function Home(props) {
   const context = useContext(UserContext);
-  const { productsData, setProductsData } = context;
+  const { productsData, setProductsData, getCartItemsFn } = context;
   const router = useRouter();
   const { diabaticCare, maternityCare, respiratoryCare, mobility } =
     props?.images;
@@ -198,6 +198,10 @@ export default function Home(props) {
     setproductsBrandsUpdatedImages(productsDataBrandsUpdated);
     // console.log(productsDataBrandsUpdated, "updated");
   }, [productsData?.brands?.length]);
+  //
+  useEffect(() => {
+    getCartItemsFn();
+  }, []);
 
   return (
     <>

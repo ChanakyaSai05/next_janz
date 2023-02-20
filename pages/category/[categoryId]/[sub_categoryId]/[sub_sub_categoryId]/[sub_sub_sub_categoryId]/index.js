@@ -22,11 +22,15 @@ import checkImg from "../../../../../../public/images/check-img.svg";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import axios from "axios";
+import { useContext } from "react";
+import UserContext from "../../../../../../context/UserContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Productdetail(props) {
-  console.log(props, "props");
+  const context = useContext(UserContext);
+  const { getCartItemsFromProductsDetail } = context;
+  // console.log(props, "props");
   const router = useRouter();
   const params = router.query;
   const {
@@ -262,7 +266,8 @@ export default function Productdetail(props) {
       if (response.data.status == false) {
         console.log("Error");
       } else {
-        router.push("/cart_items");
+        // router.push("/cart_items");
+        getCartItemsFromProductsDetail();
         getCartItemsFn();
       }
     } catch (error) {
@@ -302,6 +307,9 @@ export default function Productdetail(props) {
       console.log(error);
     }
   };
+  // useEffect(() => {
+  //   getCartItemsFromProductsDetail();
+  // });
   useEffect(() => {
     getCartItemsFn();
   }, []);
@@ -405,10 +413,10 @@ export default function Productdetail(props) {
                     />
                   </div>
                   {props?.product?.mproduct?.in_stock !== "0" && (
-                    <div className="my-4 d-flex">
+                    <div className="my-4 d-flex gap-3">
                       <button
                         type="button"
-                        className="btn btn-primary"
+                        className="btn btn-primary w-100 py-3"
                         data-bs-target="#exampleModalToggleVerifyInsurance"
                         data-bs-toggle="modal"
                       >
@@ -417,7 +425,7 @@ export default function Productdetail(props) {
                       {addToCartBtnState ? (
                         <button
                           type="button"
-                          className="btn btn-darkred ms-auto px-4"
+                          className="btn btn-darkred ms-auto px-4 w-100 py-3"
                           disabled
                           onClick={addToCartButton}
                         >
@@ -426,7 +434,7 @@ export default function Productdetail(props) {
                       ) : (
                         <button
                           type="button"
-                          className="btn btn-darkred ms-auto px-4"
+                          className="btn btn-darkred ms-auto px-4 w-100 py-3"
                           // data-bs-toggle="modal"
                           // data-bs-target="#exampleModalCenter1"
                           onClick={addToCartButton}

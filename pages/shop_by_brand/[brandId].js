@@ -92,26 +92,7 @@ export default function Product(props) {
               <h3>{brand?.brand_name}</h3>
             </div>
             <div className="col-12 pt-5">
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
-                elementum accumsan interdum. Sed tempus, dolor vel interdum
-                tempor, justo ligula molestie lorem, quis luctus purus lorem ac
-                sapien. Donec sit amet consequat enim, ac finibus sem. Quisque
-                facilisis ex a ante pretium, eget fermentum mauris mollis.
-                Suspendisse potenti. Ut pharetra lorem ligula, nec tempus ante
-                faucibus a. Suspendisse faucibus placerat faucibus. Donec erat
-                ipsum, semper non dapibus in, placerat ac massa. Etiam
-                scelerisque rhoncus lectus sit amet malesuada. Vivamus mollis
-                leo et lectus finibus vestibulum. Nam id lectus nibh.
-              </p>
-              <p>
-                Duis ut auctor nulla. Suspendisse potenti. In varius, felis ut
-                tristique egestas, urna erat vestibulum velit, ut auctor metus
-                ante a urna. Donec justo quam, tincidunt ac dui id, vehicula
-                commodo lorem. Nam accumsan ultrices purus, vitae molestie
-                mauris aliquet nec. Suspendisse gravida nec orci non tincidunt.
-                Vivamus et tristique felis.
-              </p>
+              <p>{brand?.brand_content}</p>
             </div>
           </div>
         </div>
@@ -176,109 +157,118 @@ export default function Product(props) {
         <div className="container">
           <div className="row pb-2">
             <div className="col-12 line-heading text-center">
-              <h3>Browse All Products From BabyBuddha</h3>
+              <h3>Browse All Products From {brand?.brand_name}</h3>
             </div>
             <div className="col-12 text-center text-md-end pt-4">
               <p className="fw-bold">Total Items: 347</p>
             </div>
           </div>
           <div className="row d-flex justify-content-center pb-5">
-            <div className="col-sm-12 col-lg-9">
-              <div className="d-flex justify-content-center">
-                <div className="card-shadow rounded-2 p-4 sm-w-100 lg-w-75">
-                  <div className="d-flex align-items-center justify-content-between">
-                    <p className="fw-bold fs-18 p-0 m-0 me-2">
-                      SPECTRA S1 PLUS ELECTRIC BREAST PUMP DUAL VOLTAGE
-                    </p>
-                    {editCancel ? (
-                      <div
-                        className="like-down-box"
-                        onClick={() => setEditCancel(!editCancel)}
-                      >
-                        <svg className="icon">
-                          <use href="#icon_like-dull"></use>
-                        </svg>
-                      </div>
-                    ) : (
-                      <div
-                        className="like-down-box"
-                        onClick={() => setEditCancel(!editCancel)}
-                      >
-                        <svg className="icon">
-                          <use href="#icon_like"></use>
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                  <div className="d-flex py-2">
-                    <span className="fs-6 fw-bold me-2">by</span>
-                    <span className="fs-6 fw-bold text-primary">
-                      Spectra (SKU: 12345)
-                    </span>
-                  </div>
-                  <div className="d-flex pb-3">
-                    <div>
-                      <span className="badge text-bg-primary p-2 px-3 me-2">
-                        4.3 &#9733;
-                      </span>
-                      <span className="fw-bold">257 Ratings & 30 Reviews </span>
-                    </div>
-                  </div>
-                  <p>
-                    The Spectra S1 Plus Electric Breast Pump is the perfect
-                    solution for any new .........
-                  </p>
-                  <div className="row">
-                    <div className="col-lg-4 col-sm-12 d-flex justify-content-center">
-                      <Image
-                        width={180}
-                        height={180}
-                        src={cardImg2}
-                        alt="..."
-                      />
-                    </div>
-                    <div className="col-lg-4 col-sm-12 d-flex align-items-center">
-                      <ul>
-                        <li>Feature list 01</li>
-                        <li>Feature list 02</li>
-                        <li>Feature list 03</li>
-                      </ul>
-                    </div>
-                    <div className="col-lg-4 col-sm-12 d-flex align-items-center ">
-                      <div className="text-center text-md-start w-100">
-                        <button
-                          type="button"
-                          className="btn btn-primary"
-                          onClick={() =>
-                            router.push(
-                              `/category/${categoryId}/${sub_categoryId}/${sub_sub_categoryId}/product_detail`
-                            )
-                          }
+            {products?.data.map((pro, pro_index) => (
+              <div className="col-sm-12 col-lg-9 mb-3">
+                <div className="d-flex justify-content-center">
+                  <div className="card-shadow rounded-2 p-4 sm-w-100 lg-w-75">
+                    <div className="d-flex align-items-center justify-content-between">
+                      <p className="fw-bold fs-18 p-0 m-0 me-2">
+                        SPECTRA S1 PLUS ELECTRIC BREAST PUMP DUAL VOLTAGE
+                      </p>
+                      {editCancel ? (
+                        <div
+                          className="like-down-box"
+                          onClick={() => setEditCancel(!editCancel)}
                         >
-                          View Details
-                        </button>
+                          <svg className="icon">
+                            <use href="#icon_like-dull"></use>
+                          </svg>
+                        </div>
+                      ) : (
+                        <div
+                          className="like-down-box"
+                          onClick={() => setEditCancel(!editCancel)}
+                        >
+                          <svg className="icon">
+                            <use href="#icon_like"></use>
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                    <div className="d-flex py-2">
+                      <span className="fs-6 fw-bold me-2">by</span>
+                      <span className="fs-6 fw-bold text-primary">
+                        {brand.brand_name}
+                      </span>
+                    </div>
+                    <div className="d-flex pb-3">
+                      <div>
+                        <span className="badge text-bg-primary p-2 px-3 me-2">
+                          4.3 &#9733;
+                        </span>
+                        <span className="fw-bold">
+                          257 Ratings & 30 Reviews{" "}
+                        </span>
                       </div>
                     </div>
-                  </div>
-                  <div className="form-check py-2">
-                    <input
-                      className="form-check-input rounded-0"
-                      type="checkbox"
-                      value=""
-                      id="flexCheckDefault"
-                    />
-                    <label
-                      className="form-check-label text-secondary"
-                      for="flexCheckDefault"
-                    >
-                      Add to compare
-                    </label>
+                    <p>
+                      {pro?.product_short_description.slice(0, 80)}{" "}
+                      {pro?.product_short_description.length > 80 && <>...</>}
+                    </p>
+
+                    <div className="row">
+                      <div className="col-lg-4 col-sm-12 d-flex justify-content-center">
+                        <Image
+                          width={180}
+                          height={180}
+                          src={
+                            pro?.product_image?.length == 0
+                              ? cardImg1
+                              : `${process.env.NEXT_PUBLIC_MEDIA}${pro?.product_image[0]?.image_file}`
+                          }
+                          alt="..."
+                        />
+                      </div>
+                      <div className="col-lg-4 col-sm-12 d-flex align-items-center">
+                        <ul>
+                          <li>Feature list 01</li>
+                          <li>Feature list 02</li>
+                          <li>Feature list 03</li>
+                        </ul>
+                      </div>
+                      <div className="col-lg-4 col-sm-12 d-flex align-items-center ">
+                        <div className="text-center text-md-start w-100">
+                          <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={() =>
+                              router.push(
+                                `/category/${categoryId}/${sub_categoryId}/${sub_sub_categoryId}/product_detail`
+                              )
+                            }
+                          >
+                            View Details
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="form-check py-2">
+                      <input
+                        className="form-check-input rounded-0"
+                        type="checkbox"
+                        value=""
+                        id="flexCheckDefault"
+                      />
+                      <label
+                        className="form-check-label text-secondary"
+                        for="flexCheckDefault"
+                      >
+                        Add to compare
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
-          <div className="row d-flex justify-content-center pb-5">
+          {/* <div className="row d-flex justify-content-center pb-5">
             <div className="d-flex justify-content-center">
               <div className="card-shadow rounded-2 p-4 sm-w-100 lg-w-75">
                 <div className="d-flex align-items-center justify-content-between">
@@ -344,7 +334,7 @@ export default function Product(props) {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
       <Footer></Footer>

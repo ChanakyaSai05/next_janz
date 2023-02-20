@@ -93,6 +93,8 @@ export default function Checkout() {
     unitBox: "",
     us_states: "",
   });
+  const [selectedAddress, setSelectedAddress] = useState(null);
+
   const handleProfileDetails = (e) => {
     setprofileDetails({ ...profileDetails, [e.target.id]: e.target.value });
   };
@@ -233,7 +235,19 @@ export default function Checkout() {
     }
   };
 
-  console.log(addressList, "address list");
+  //address button checked
+  const addressListHandleChange = (e, item) => {
+    // console.log(e.target.checked);
+    setSelectedAddress(item);
+  };
+
+  // address edit button
+  const editButtonClickedFn = (item) => {
+    setEditCancel(true);
+  };
+
+  // console.log(addressList, "address list");
+  console.log(selectedAddress, "selected address");
   useEffect(() => {
     let user = JSON.parse(localStorage.getItem("janz_medical_user"));
 
@@ -628,6 +642,28 @@ export default function Checkout() {
                         <>
                           {addressList?.map((item, index) => (
                             <>
+                              <div
+                                className="position-absolute"
+                                style={{ right: "25px" }}
+                              >
+                                {editCancel == true ? (
+                                  <button
+                                    className="border-btn text-primary"
+                                    onClick={() => setEditCancel(false)}
+                                  >
+                                    Cancel
+                                  </button>
+                                ) : (
+                                  <button
+                                    className="border-btn text-primary"
+                                    onClick={() => {
+                                      editButtonClickedFn(item);
+                                    }}
+                                  >
+                                    Edit
+                                  </button>
+                                )}
+                              </div>
                               <div class="form-check">
                                 <input
                                   class="form-check-input"
@@ -635,6 +671,9 @@ export default function Checkout() {
                                   name="flexRadioDefault"
                                   id="flexRadioDefault1"
                                   // checked={true}
+                                  onChange={(e) =>
+                                    addressListHandleChange(e, item)
+                                  }
                                 />
                                 <div className="ms-4">
                                   <label
@@ -667,13 +706,18 @@ export default function Checkout() {
                                   </button>
                                 </div>
                               </div>
-                              {/* <hr /> */}
+                              <hr
+                                style={{
+                                  display:
+                                    index === addressList.length - 1 && "none",
+                                }}
+                              />
                             </>
                           ))}
                         </>
                       )}
                     </div>
-                    <div
+                    {/* <div
                       className="position-absolute"
                       style={{ right: "25px" }}
                     >
@@ -692,9 +736,9 @@ export default function Checkout() {
                           Edit
                         </button>
                       )}
-                    </div>
+                    </div> */}
                   </div>
-                  <hr />
+                  {/* <hr /> */}
                 </div>
               )}
 

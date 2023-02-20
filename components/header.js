@@ -7,46 +7,50 @@ import logo from "../public/images/logo.svg";
 import { useRouter } from "next/router";
 import MyAccountDropdown from "./MyAccountDropdown";
 import axios from "axios";
+import { useContext } from "react";
+import UserContext from "../context/UserContext";
 
 export default function Header() {
   // const [publicPath] = useState(process.env.NEXT_PUBLIC_URL);
+  const context = useContext(UserContext);
+  const { cartItems } = context;
   const router = useRouter();
-  const [cartItems, setcartItems] = useState([]);
+  // const [cartItems, setcartItems] = useState([]);
 
   const handleShow = () => setShow(true);
 
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
-  const getCartItemsFn = async () => {
-    try {
-      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
-      const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}product/cartproducts`,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: {
-          customer_id: user ? user.customer_id : "",
-        },
-      });
+  // const getCartItemsFn = async () => {
+  //   try {
+  //     let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+  //     const response = await axios({
+  //       url: `${process.env.NEXT_PUBLIC_URL}product/cartproducts`,
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       data: {
+  //         customer_id: user ? user.customer_id : "",
+  //       },
+  //     });
 
-      // console.log(response, "result");
-      if (response.data.status == false) {
-        console.log("Error");
-      } else {
-        console.log(response?.data);
-        setcartItems(response?.data?.cart_products);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  console.log(cartItems, "cart_items");
-  useEffect(() => {
-    getCartItemsFn();
-  }, []);
+  //     // console.log(response, "result");
+  //     if (response.data.status == false) {
+  //       console.log("Error");
+  //     } else {
+  //       console.log(response?.data);
+  //       setcartItems(response?.data?.cart_products);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+  // console.log(cartItems, "cart_items");
+  // useEffect(() => {
+  //   getCartItemsFn();
+  // }, []);
 
   return (
     <>

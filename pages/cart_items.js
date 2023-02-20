@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import { Inter } from "@next/font/google";
 import {
@@ -17,15 +17,27 @@ import airMini from "../public/images/air-mini.svg";
 import uploader from "../public/images/uploader.svg";
 import { useRouter } from "next/router";
 import axios from "axios";
+import UserContext from "../context/UserContext";
 
 export default function Cart() {
+  const context = useContext(UserContext);
+  const {
+    getCartItemsFn,
+    calculateTotalCartPrice,
+    cartItems,
+    totalPrice,
+    settotalPrice,
+    setcartItems,
+  } = context;
   const [num, setNum] = useState(1);
   const [rawFile, setrawFile] = useState(null);
   const [previewUrl, setpreviewUrl] = useState(null);
   // cart items
-  const [cartItems, setcartItems] = useState([]);
+  // const [cartItems, setcartItems] = useState([]);
   // logged in user
   const [loggedInUser, setloggedInUser] = useState({});
+  // total cart price
+  // const [totalPrice, settotalPrice] = useState(0);
 
   const router = useRouter();
 
@@ -43,7 +55,6 @@ export default function Cart() {
         }
       });
     });
-    updateCartFn(item);
   };
   // counter decrement
   const handleChangeDecrement = (index, item) => {
@@ -99,7 +110,6 @@ export default function Cart() {
       if (response.data.status == false) {
         console.log("Error");
       } else {
-        router.push("/cart_items");
         getCartItemsFn();
       }
     } catch (error) {
@@ -123,16 +133,46 @@ export default function Cart() {
     setpreviewUrl(objectURL);
   }, [rawFile]);
 
-  const getCartItemsFn = async () => {
+  // const getCartItemsFn = async () => {
+  //   try {
+  //     let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+  //     const response = await axios({
+  //       url: `${process.env.NEXT_PUBLIC_URL}product/cartproducts`,
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       data: {
+  //         customer_id: user ? user.customer_id : "",
+  //       },
+  //     });
+
+  //     // console.log(response, "result");
+  //     if (response.data.status == false) {
+  //       console.log("Error");
+  //     } else {
+  //       console.log(response?.data);
+  //       calculateTotalCartPrice(response?.data?.cart_products);
+  //       setcartItems(response?.data?.cart_products);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+  // remove item from cart
+  const removeItemFromCart = async (item) => {
+    // console.log(item);
     try {
       let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      let product = item;
       const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}product/cartproducts`,
+        url: `${process.env.NEXT_PUBLIC_URL}product/cartproduct/delete`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         data: {
+          product_variant_id: product?.product_variant_id,
           customer_id: user ? user.customer_id : "",
         },
       });
@@ -141,18 +181,35 @@ export default function Cart() {
       if (response.data.status == false) {
         console.log("Error");
       } else {
-        console.log(response?.data);
-        setcartItems(response?.data?.cart_products);
+        getCartItemsFn();
       }
     } catch (error) {
       console.log(error);
     }
   };
+
+  // calculate item price
+  const calculateItemPrice = (item) => {
+    let price = item?.variant_sale_price ? item?.variant_sale_price : 0;
+    let qty = item?.qty;
+    return price * qty;
+  };
+
+  // // calculate total cart price
+  // const calculateTotalCartPrice = (data) => {
+  //   let price = 0;
+  //   for (let i = 0; i < data.length; i++) {
+  //     console.log(data[i]?.variant_sale_price);
+  //     price += parseInt(data[i]?.variant_sale_price) * parseInt(data[i]?.qty);
+  //   }
+  //   settotalPrice(price);
+  // };
   useEffect(() => {
     let user = JSON.parse(localStorage.getItem("janz_medical_user"));
     setloggedInUser(user);
     getCartItemsFn();
   }, []);
+  // console.log(cartItems, "cart items");
 
   return (
     <>
@@ -279,6 +336,7 @@ export default function Cart() {
                           <span
                             className="text-primary fs-12 d-block"
                             style={{ cursor: "pointer" }}
+                            onClick={() => removeItemFromCart(item)}
                           >
                             Remove item
                           </span>
@@ -292,7 +350,7 @@ export default function Cart() {
                             </button>
                           </div> */}
                         </td>
-                        <td>${item?.variant_sale_price}</td>
+                        <td>${calculateItemPrice(item)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -324,21 +382,21 @@ export default function Cart() {
                 </div> */}
                 {/* <hr /> */}
                 <div className="d-flex pb-2">
-                  <span>Subtotal (2 Items)</span>
-                  <span className="ms-auto">$400.00</span>
+                  <span>Subtotal ({cartItems?.length} Items)</span>
+                  <span className="ms-auto">${totalPrice}</span>
                 </div>
-                <div className="d-flex pb-2">
+                {/* <div className="d-flex pb-2">
                   <span>Delivery Fees</span>
                   <span className="ms-auto">$40.00</span>
-                </div>
-                <div className="d-flex text-green pb-2">
+                </div> */}
+                {/* <div className="d-flex text-green pb-2">
                   <span>Discount</span>
                   <span className="ms-auto">$40.00</span>
-                </div>
+                </div> */}
                 <hr />
                 <div className="d-flex pb-2">
                   <span>Order Total</span>
-                  <span className="ms-auto">$400.00</span>
+                  <span className="ms-auto">${totalPrice}</span>
                 </div>
               </div>
               <button

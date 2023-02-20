@@ -37,10 +37,13 @@ export default function Headerlanding() {
     checkLoginUser,
     loginUserAvalilable,
     setloginUserAvalilable,
+    cartItems,
+    fetchData,
   } = context;
   // console.log(closeRefRegisterModalandOpenLogin, "LOGIN TOGGLE");
   // const [productsData, setProductsData] = useState(null);
   // console.log(props, "PROPS");
+  console.log(productsData, "pdata");
   const [preset, setPreset] = useState({
     one: true,
     two: false,
@@ -85,7 +88,7 @@ export default function Headerlanding() {
   // Toggle
   const [activeKey, setActiveKey] = useState("0");
   // cart items
-  const [cartItems, setcartItems] = useState([]);
+  // const [cartItems, setcartItems] = useState([]);
 
   const handleChange = (e, index) => {
     if (e.target.value.length > 1) return;
@@ -464,14 +467,6 @@ export default function Headerlanding() {
     setForgotPasswordShowRules(false);
   };
 
-  async function fetchData() {
-    const res = await axios.get(`${process.env.NEXT_PUBLIC_URL}menu/content`);
-    // setProductsData(res.data);
-    if (res.data.status != false) {
-      // console.log(res.data, "RES DATA");
-      setProductsData(res.data);
-    }
-  }
   // console.log(productsData, "PRODUCTS DATA");
 
   const handleModalToggle = (id) => {
@@ -481,33 +476,33 @@ export default function Headerlanding() {
     // }
   };
 
-  const getCartItemsFn = async () => {
-    try {
-      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
-      const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}product/cartproducts`,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: {
-          customer_id: user ? user.customer_id : "",
-        },
-      });
+  // const getCartItemsFn = async () => {
+  //   try {
+  //     let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+  //     const response = await axios({
+  //       url: `${process.env.NEXT_PUBLIC_URL}product/cartproducts`,
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       data: {
+  //         customer_id: user ? user.customer_id : "",
+  //       },
+  //     });
 
-      // console.log(response, "result");
-      if (response.data.status == false) {
-        console.log("Error");
-      } else {
-        console.log(response?.data);
-        setcartItems(response?.data?.cart_products);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //     // console.log(response, "result");
+  //     if (response.data.status == false) {
+  //       console.log("Error");
+  //     } else {
+  //       console.log(response?.data);
+  //       setcartItems(response?.data?.cart_products);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
   useEffect(() => {
-    getCartItemsFn();
+    // getCartItemsFn();
     checkLoginUser();
     fetchData();
   }, []);
