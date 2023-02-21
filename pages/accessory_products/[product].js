@@ -129,7 +129,7 @@ export default function Product(props) {
                 </h4>
                 <div className="collapse show" id="items">
                   {cartItems.map((item, index) => (
-                    <a href="#" className="d-block my-3 ">
+                    <a href="#" className="d-block my-3 " key={index}>
                       <p>{item?.mproduct?.product_name}</p>
                       <div className="d-flex justify-content-center">
                         <Image
@@ -158,7 +158,7 @@ export default function Product(props) {
                 {props?.product?.mproduct?.product_name}
               </h4>
               {props?.accessory_products?.map((item, index) => (
-                <div className="d-flex pb-5">
+                <div className="d-flex pb-5" key={index}>
                   <div className="me-3 title-img card-shadow">
                     <Image
                       width={120}

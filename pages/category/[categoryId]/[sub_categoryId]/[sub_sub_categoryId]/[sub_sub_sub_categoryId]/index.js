@@ -371,6 +371,7 @@ export default function Productdetail(props) {
                   {props?.product?.mproduct.product_image?.map(
                     (item, index) => (
                       <div
+                        key={index}
                         className="img-box "
                         onClick={() => setSelectedImageIndex(index)}
                         style={{
@@ -771,7 +772,7 @@ export default function Productdetail(props) {
               <div className="12">
                 <Slider {...settingsBoughtTogether}>
                   {props?.bought_togethers?.map((item, index) => (
-                    <div className="card">
+                    <div className="card" key={index}>
                       <div className="card-bodys">
                         <div className="d-flex justify-content-between">
                           <div className="like-down-box">

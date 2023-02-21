@@ -67,7 +67,7 @@ export default function Categoryfilter(props) {
 
   // console.log(checkedItems, "checked items");
   // console.log(checkedLocationItems, "checked location items");
-  console.log(checkedTypeOfProductItems, "checkedTypeOfProducts");
+  // console.log(checkedTypeOfProductItems, "checkedTypeOfProducts");
   const nameSaveButton = () => {
     setEditCancel(!editCancel);
   };
@@ -151,7 +151,7 @@ export default function Categoryfilter(props) {
                     <div className="border-bottom mt-2 mb-3"></div>
                   </div>
                   {productsData?.brands?.map((item, index) => (
-                    <label className="form-check pb-2">
+                    <label className="form-check pb-2" key={index}>
                       <input
                         className="form-check-input"
                         type="checkbox"
@@ -171,7 +171,7 @@ export default function Categoryfilter(props) {
                     <div className="border-bottom mt-2 mb-3"></div>
                   </div>
                   {["United States", "International"]?.map((item, index) => (
-                    <label className="form-check pb-2">
+                    <label className="form-check pb-2" key={index}>
                       <input
                         className="form-check-input"
                         type="checkbox"
@@ -189,7 +189,7 @@ export default function Categoryfilter(props) {
                     <div className="border-bottom mt-2 mb-3"></div>
                   </div>
                   {["Insurance", "Cash", "HSA/FSA"]?.map((item, index) => (
-                    <label className="form-check pb-2">
+                    <label className="form-check pb-2" key={index}>
                       <input
                         className="form-check-input"
                         type="checkbox"
@@ -271,7 +271,10 @@ export default function Categoryfilter(props) {
                       }
                     })
                     ?.map((sub_product, sub_product_index) => (
-                      <div className="d-flex justify-content-center pb-5 ">
+                      <div
+                        className="d-flex justify-content-center pb-5 "
+                        key={sub_product_index}
+                      >
                         <div className="card-shadow rounded-2 p-4 sm-w-100 lg-w-75 w-100 ">
                           <div className="d-flex align-items-center justify-content-between">
                             <p className="fw-bold fs-18 p-0 m-0 me-2">

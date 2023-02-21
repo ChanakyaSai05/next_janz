@@ -388,7 +388,7 @@ export default function Home(props) {
           </div>
           <div className="row row-cols-1 row-cols-md-4 py-5">
             {productsData?.categories?.map((item, index) => (
-              <div className="col my-2">
+              <div className="col my-2" key={index}>
                 <div className="card-box">
                   <Image
                     width={296}
@@ -399,7 +399,7 @@ export default function Home(props) {
                   <h5>{item?.category_name}</h5>
                   <ul>
                     {item.children?.map((child, child_index) => (
-                      <li>
+                      <li key={child_index}>
                         <Link
                           href={`/category/${item?.category_slug}/${child?.category_slug}`}
                         >

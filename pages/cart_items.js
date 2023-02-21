@@ -237,7 +237,7 @@ export default function Cart() {
                   </thead>
                   <tbody>
                     {cartItems.map((item, index) => (
-                      <tr>
+                      <tr key={index}>
                         <td>
                           <div>
                             <div

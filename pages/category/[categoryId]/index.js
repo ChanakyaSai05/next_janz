@@ -88,7 +88,7 @@ export default function Category(props) {
       <div className="slider-box-category">
         <Slider {...hero}>
           {props?.categories?.category_banner?.map((banner, banner_index) => (
-            <div className="slider-content">
+            <div className="slider-content" key={banner_index}>
               <Image
                 width={4320}
                 height={1890}
@@ -261,7 +261,10 @@ export default function Category(props) {
                             <>
                               {product?.products?.map(
                                 (sub_product, sub_productIndex) => (
-                                  <div className="card">
+                                  <div
+                                    className="card"
+                                    key={sub_category_index}
+                                  >
                                     <div className="card-bodys">
                                       <div className="d-flex justify-content-between">
                                         <div className="like-down-box">

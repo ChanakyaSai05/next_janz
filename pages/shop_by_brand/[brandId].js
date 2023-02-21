@@ -110,7 +110,7 @@ export default function Product(props) {
             <div className="12">
               <Slider {...settings}>
                 {products?.data.map((pro, pro_index) => (
-                  <div className="card">
+                  <div className="card" key={pro_index}>
                     <div className="card-bodys">
                       <div className="d-flex justify-content-between">
                         <div className="like-down-box">
@@ -165,7 +165,7 @@ export default function Product(props) {
           </div>
           <div className="row d-flex justify-content-center pb-5">
             {products?.data.map((pro, pro_index) => (
-              <div className="col-sm-12 col-lg-9 mb-3">
+              <div className="col-sm-12 col-lg-9 mb-3" key={pro_index}>
                 <div className="d-flex justify-content-center">
                   <div className="card-shadow rounded-2 p-4 sm-w-100 lg-w-75">
                     <div className="d-flex align-items-center justify-content-between">
