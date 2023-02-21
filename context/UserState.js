@@ -60,8 +60,11 @@ const UserState = (props) => {
   const calculateTotalCartPrice = (data) => {
     let price = 0;
     for (let i = 0; i < data.length; i++) {
-      console.log(data[i]?.variant_sale_price);
-      price += parseInt(data[i]?.variant_sale_price) * parseInt(data[i]?.qty);
+      // console.log(data[i]?.variant_sale_price);
+      price +=
+        parseInt(
+          data[i]?.variant_sale_price ? data[i]?.variant_sale_price : 0
+        ) * parseInt(data[i]?.qty);
     }
     settotalPrice(price);
   };

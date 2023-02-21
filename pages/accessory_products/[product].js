@@ -1,26 +1,32 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import Slider from "react-slick";
 import { Inter } from "@next/font/google";
-import styles from "../styles/Home.module.css";
+// import styles from "../styles/Home.module.css";
 import { Container, Nav, Tab, Col, Row, Dropdown } from "react-bootstrap";
-import Headerlanding from "../components/headerlanding";
-import Footer from "../components/footer";
+import Headerlanding from "../../components/headerlanding";
+import Footer from "../../components/footer";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import product from "../public/images/product.svg";
-import cardImg1 from "../public/images/card-img1.svg";
-import cardImg2 from "../public/images/card-img2.svg";
-import cardImg3 from "../public/images/card-img3.svg";
-import cardImg4 from "../public/images/card-img4.svg";
-import airminiImg from "../public/images/air-mini.svg";
-import fullmask2 from "../public/images/fullmask2.svg";
+// import product from "../public/images/product.svg";
+import cardImg1 from "../../public/images/card-img1.svg";
+import cardImg2 from "../../public/images/card-img2.svg";
+import cardImg3 from "../../public/images/card-img3.svg";
+import cardImg4 from "../../public/images/card-img4.svg";
+import airminiImg from "../../public/images/air-mini.svg";
+import fullmask2 from "../../public/images/fullmask2.svg";
 import { useRouter } from "next/router";
+import axios from "axios";
+import UserContext from "../../context/UserContext";
+import { useEffect } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Product() {
+export default function Product(props) {
+  // console.log(props, "props");
+  const context = useContext(UserContext);
+  const { getCartItemsFn, cartItems, setcartItems } = context;
   const router = useRouter();
   let settings = {
     dots: true,
@@ -60,14 +66,50 @@ export default function Product() {
     ],
   };
 
-  // const [chooseMask, setChooseMask] = useState(true);
-  const [stateObj, setstateObj] = useState({
-    first: true,
-    second: false,
-    third: false,
-  });
+  // add to cart button
+  const addToCartButton = async (item) => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      let product = item;
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}product/addtocart`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          product_id: product?.product_id,
+          product_variant_id: product?.product_variant_id,
+          customer_id: user ? user.customer_id : "",
+          variant_msrp: product?.variant_msrp ? product?.variant_msrp : "",
+          variant_store_price: product?.variant_store_price
+            ? product?.variant_store_price
+            : "",
+          variant_sale_price: product?.variant_sale_price
+            ? product?.variant_sale_price
+            : "",
+          variant_weight: product?.variant_weight
+            ? product?.variant_weight
+            : "",
+          variant_unit: product?.variant_unit ? product?.variant_unit : "",
+          qty: 1,
+        },
+      });
 
-  const [editCancel, setEditCancel] = useState(false);
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        getCartItemsFn();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  console.log(cartItems, "cart_items");
+  useEffect(() => {
+    getCartItemsFn();
+  }, []);
 
   return (
     <>
@@ -86,19 +128,20 @@ export default function Product() {
                   In Cart
                 </h4>
                 <div className="collapse show" id="items">
-                  <a href="#" className="d-block my-3">
-                    <p>AirMini Autoset</p>
-                    <Image
-                      width={160}
-                      height={120}
-                      src={airminiImg}
-                      alt="..."
-                    />
-                  </a>
-                  <a href="#" className="d-block my-3">
-                    <p>AirTouch F20 Replacement Frame System</p>
-                    <Image width={160} height={120} src={fullmask2} alt="..." />
-                  </a>
+                  {cartItems.map((item, index) => (
+                    <a href="#" className="d-block my-3 ">
+                      <p>{item?.mproduct?.product_name}</p>
+                      <div className="d-flex justify-content-center">
+                        <Image
+                          width={130}
+                          height={120}
+                          src={`${process.env.NEXT_PUBLIC_MEDIA}${item?.mproduct?.product_image[0]?.image_file}`}
+                          alt="..."
+                        />
+                      </div>
+                    </a>
+                  ))}
+
                   <button
                     type="button"
                     className="btn btn-primary w-100"
@@ -111,71 +154,44 @@ export default function Product() {
             </div>
             <div className="col-sm-12 col-lg-9">
               <h4 className="py-4">
-                Other Accessories bought with AirMini Autoset{" "}
+                Other Accessories bought with{" "}
+                {props?.product?.mproduct?.product_name}
               </h4>
-              <div className="d-flex pb-5">
-                <div className="me-3 title-img card-shadow">
-                  <Image width={120} height={120} src={cardImg2} alt="..." />
+              {props?.accessory_products?.map((item, index) => (
+                <div className="d-flex pb-5">
+                  <div className="me-3 title-img card-shadow">
+                    <Image
+                      width={120}
+                      height={120}
+                      src={`${process.env.NEXT_PUBLIC_MEDIA}${item?.product_image[0]?.image_file}`}
+                      alt="..."
+                    />
+                  </div>
+                  <div className="">
+                    <h4 className="pb-2">{item?.product_name}</h4>
+                    <p>{item?.product_short_description}</p>
+                    {cartItems?.filter(
+                      (cart_item) => cart_item?.product_id == item.product_id
+                    ).length > 0 ? (
+                      <button
+                        type="button"
+                        className="btn btn-outline-primary px-3"
+                        disabled
+                      >
+                        Added to Cart
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn btn-outline-primary px-3"
+                        onClick={() => addToCartButton(item)}
+                      >
+                        Add to Cart
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div className="">
-                  <h4 className="pb-2">Title 1</h4>
-                  <p>
-                    The Spectra S1 Plus Electric Breast Pump is the perfect
-                    solution for any new mom who needs to pump their breastmilk.
-                    This award-winning, dual voltage pump was designed with
-                    convenience, comfort and efficiency in mind. Featuring an
-                    ultra
-                  </p>
-                  <button
-                    type="button"
-                    className="btn btn-outline-primary px-3"
-                  >
-                    Add to Cart
-                  </button>
-                </div>
-              </div>
-              <div className="d-flex pb-5">
-                <div className="me-3 title-img card-shadow">
-                  <Image width={120} height={120} src={cardImg2} alt="..." />
-                </div>
-                <div className="">
-                  <h4 className="pb-2">Title 1</h4>
-                  <p>
-                    The Spectra S1 Plus Electric Breast Pump is the perfect
-                    solution for any new mom who needs to pump their breastmilk.
-                    This award-winning, dual voltage pump was designed with
-                    convenience, comfort and efficiency in mind. Featuring an
-                    ultra
-                  </p>
-                  <button
-                    type="button"
-                    className="btn btn-outline-primary px-3"
-                  >
-                    Add to Cart
-                  </button>
-                </div>
-              </div>
-              <div className="d-flex pb-5">
-                <div className="me-3 title-img card-shadow">
-                  <Image width={120} height={120} src={cardImg2} alt="..." />
-                </div>
-                <div className="">
-                  <h4 className="pb-2">Title 1</h4>
-                  <p>
-                    The Spectra S1 Plus Electric Breast Pump is the perfect
-                    solution for any new mom who needs to pump their breastmilk.
-                    This award-winning, dual voltage pump was designed with
-                    convenience, comfort and efficiency in mind. Featuring an
-                    ultra
-                  </p>
-                  <button
-                    type="button"
-                    className="btn btn-outline-primary px-3"
-                  >
-                    Add to Cart
-                  </button>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
@@ -364,4 +380,28 @@ export default function Product() {
       <Footer></Footer>
     </>
   );
+}
+export async function getServerSideProps({ params }) {
+  // console.log(params, "params");
+  try {
+    const response = await axios({
+      url: `${process.env.NEXT_PUBLIC_URL}product/${params.product}`,
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    // console.log(response.data);
+    if (response.data.status != false) {
+      // console.log(response.data);
+      return {
+        props: response.data,
+      };
+    }
+  } catch (error) {
+    console.log(error);
+    return {
+      props: {},
+    };
+  }
 }

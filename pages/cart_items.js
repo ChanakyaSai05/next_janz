@@ -28,6 +28,7 @@ export default function Cart() {
     totalPrice,
     settotalPrice,
     setcartItems,
+    closeRefRegisterModalandOpenLogin,
   } = context;
   const [num, setNum] = useState(1);
   const [rawFile, setrawFile] = useState(null);
@@ -190,6 +191,7 @@ export default function Cart() {
 
   // calculate item price
   const calculateItemPrice = (item) => {
+    // console.log(item?.variant_sale_price)
     let price = item?.variant_sale_price ? item?.variant_sale_price : 0;
     let qty = item?.qty;
     return price * qty;
@@ -359,7 +361,11 @@ export default function Cart() {
             </div>
             <div className="col-md-4">
               <h5 className="fs-22 fw-bold py-4">
-                Customer ID: {loggedInUser ? loggedInUser?.customer_id : ""}
+                {loggedInUser ? (
+                  <>Customer ID: {loggedInUser?.customer_id}</>
+                ) : (
+                  ""
+                )}
               </h5>
               <div className="bg-light px-3 py-3 rounded-2">
                 <p className="fw-bold">Pricing Summary</p>

@@ -160,7 +160,7 @@ export default function Product(props) {
               <h3>Browse All Products From {brand?.brand_name}</h3>
             </div>
             <div className="col-12 text-center text-md-end pt-4">
-              <p className="fw-bold">Total Items: 347</p>
+              <p className="fw-bold">Total Items: {products?.data.length}</p>
             </div>
           </div>
           <div className="row d-flex justify-content-center pb-5">

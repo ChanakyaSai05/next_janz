@@ -269,6 +269,10 @@ export default function Productdetail(props) {
         // router.push("/cart_items");
         getCartItemsFromProductsDetail();
         getCartItemsFn();
+        if (props?.accessory_products?.length > 0) {
+          router.push(`/accessory_products/${sub_sub_sub_categoryId}`);
+          return;
+        }
       }
     } catch (error) {
       console.log(error);
@@ -292,7 +296,7 @@ export default function Productdetail(props) {
       if (response.data.status == false) {
         console.log("Error");
       } else {
-        console.log(response?.data);
+        // console.log(response?.data);
         let data = response?.data?.cart_products;
         for (let i = 0; i < data?.length; i++) {
           if (data[i].product_id == props?.product?.mproduct?.product_id) {
