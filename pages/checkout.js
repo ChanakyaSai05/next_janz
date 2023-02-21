@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
-// import SignaturePad from "react-signature-pad";
+import SignaturePad from "react-signature-pad";
 import Image from "next/image";
 import { Inter } from "@next/font/google";
 import {
@@ -1055,11 +1055,11 @@ export default function Checkout() {
                                 maxHeight: "200px",
                               }}
                             >
-                              {/* <SignaturePad
+                              <SignaturePad
                                 className="sigCanvas"
                                 ref={sigPad}
                                 penColor="black"
-                              /> */}
+                              />
                             </div>
                             <div className="py-3 d-flex justify-content-center">
                               <button

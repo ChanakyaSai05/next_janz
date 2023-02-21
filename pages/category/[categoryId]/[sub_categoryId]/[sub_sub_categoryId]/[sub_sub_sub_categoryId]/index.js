@@ -539,7 +539,7 @@ export default function Productdetail(props) {
                       </select>
                     </div>
                   )}
-                  {/* <div className="d-flex align-items-center py-2">
+                  <div className="d-flex align-items-center py-2">
                     <span className="me-4 fs-18 fw-bold">Color</span>
                     <label
                       className="itemcolor-radio"
@@ -569,8 +569,8 @@ export default function Productdetail(props) {
                       <input type="radio" name="color" />
                       <span></span>
                     </label>
-                  </div> */}
-                  {/* <div className="d-flex align-items-center py-3">
+                  </div>
+                  <div className="d-flex align-items-center py-3">
                     <span className="me-4 fs-18 fw-bold">Size</span>
                     <label className="itemsize-radio">
                       <input type="radio" name="size" />
@@ -594,18 +594,18 @@ export default function Productdetail(props) {
                       </svg>
                       <span className="fs-18">Size Guide</span>
                     </div>
-                  </div> */}
-                  {/* <div className="py-3">
+                  </div>
+                  <div className="py-3">
                     <span className="me-4 fs-18 fw-bold">Location</span>
                     <span className="me-4 fs-18 text-primary">USA only</span>
                     <span className="fs-18">International</span>
-                  </div> */}
-                  {/* <div className="d-flex align-items-center">
+                  </div>
+                  <div className="d-flex align-items-center">
                     <svg className="icon fs-3 me-2">
                       <use href="#icon_user-guide"></use>
                     </svg>
                     <span className="fs-18">User Guide</span>
-                  </div> */}
+                  </div>
                 </form>
                 <div className="border-bottom py-3"></div>
                 <div className="row">
