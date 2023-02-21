@@ -20,6 +20,7 @@ import cardImg1 from "../../../../public/images/card-img1.svg";
 import cardImg2 from "../../../../public/images/card-img2.svg";
 import cardImg3 from "../../../../public/images/card-img3.svg";
 import cardImg4 from "../../../../public/images/card-img4.svg";
+import no_image from "../../../../public/images/no_image.jpg";
 import { useRouter } from "next/router";
 import axios from "axios";
 import Link from "next/link";
@@ -31,7 +32,7 @@ export default function Subcategory(props) {
   const router = useRouter();
   const params = router.query;
   const { categoryId, sub_categoryId } = params;
-  // console.log(props, "props");
+  console.log(props, "props");
   const hero = {
     dots: true,
     infinite: true,
@@ -104,94 +105,29 @@ export default function Subcategory(props) {
       <Headerlanding></Headerlanding>
       <div className="slider-box-category">
         <Slider {...hero}>
-          <div className="slider-content">
-            <Image
-              width={4320}
-              height={1890}
-              src={subCategoryHero}
-              className="carousel-img opacity-50"
-              alt="..."
-            />
-            <Container className="h-100">
-              <div className="row h-100 d-flex align-items-center">
-                <div className="col-md-6 col-sm-12 text-white">
-                  <h1>Breast Pump</h1>
-                  <p>
-                    We carry a wide range of maternity care products, so you
-                    have one less thing to worry about as your family grows.
-                    From breast pumps, refill bags and accessories, we have you
-                    covered.
-                  </p>
+          {props?.categories?.category_banner?.map((item, index) => (
+            <div className="slider-content">
+              <Image
+                width={4320}
+                height={1890}
+                src={
+                  item?.banner_image
+                    ? `${process.env.NEXT_PUBLIC_MEDIA}${item?.banner_image}`
+                    : no_image
+                }
+                className="carousel-img opacity-50"
+                alt="..."
+              />
+              <Container className="h-100">
+                <div className="row h-100 d-flex align-items-center">
+                  <div className="col-md-6 col-sm-12 text-white">
+                    <h1>{item?.banner_title}</h1>
+                    <p>{item?.banner_description}</p>
+                  </div>
                 </div>
-              </div>
-            </Container>
-          </div>
-          <div className="slider-content">
-            <Image
-              width={4320}
-              height={1890}
-              src={subCategoryHero}
-              className="carousel-img opacity-50"
-              alt="..."
-            />
-            <Container className="h-100">
-              <div className="row h-100 d-flex align-items-center">
-                <div className="col-md-6 col-sm-12 text-white">
-                  <h1>Breast Pump</h1>
-                  <p>
-                    We carry a wide range of maternity care products, so you
-                    have one less thing to worry about as your family grows.
-                    From breast pumps, refill bags and accessories, we have you
-                    covered.
-                  </p>
-                </div>
-              </div>
-            </Container>
-          </div>
-          <div className="slider-content">
-            <Image
-              width={4320}
-              height={1890}
-              src={subCategoryHero}
-              className="carousel-img opacity-50"
-              alt="..."
-            />
-            <Container className="h-100">
-              <div className="row h-100 d-flex align-items-center">
-                <div className="col-md-6 col-sm-12 text-white">
-                  <h1>Breast Pump</h1>
-                  <p>
-                    We carry a wide range of maternity care products, so you
-                    have one less thing to worry about as your family grows.
-                    From breast pumps, refill bags and accessories, we have you
-                    covered.
-                  </p>
-                </div>
-              </div>
-            </Container>
-          </div>
-          <div className="slider-content">
-            <Image
-              width={4320}
-              height={1890}
-              src={subCategoryHero}
-              className="carousel-img opacity-50"
-              alt="..."
-            />
-            <Container className="h-100">
-              <div className="row h-100 d-flex align-items-center">
-                <div className="col-md-6 col-sm-12 text-white">
-                  <h1>Breast Pump</h1>
-                  <p>
-                    We carry a wide range of maternity care products, so you
-                    have one less thing to worry about as your family grows.
-                    From breast pumps, refill bags and accessories, we have you
-                    covered.
-                  </p>
-                </div>
-              </div>
-            </Container>
-          </div>
+              </Container>
+            </div>
+          ))}
         </Slider>
       </div>
 
@@ -221,29 +157,8 @@ export default function Subcategory(props) {
           </div>
           <div className="row">
             <div className="col-12 py-4">
-              <p>
-                Welcome to JANZ Medical Supply, your source for TRICARE-covered
-                breast pumps. Whether you&apos;re a first-time mom or
-                experienced pro, our breast pumps make it easier to manage and
-                control the feeding schedule of your newborn—so that you can
-                take care of everyday responsibilities without stress. We offer
-                both manual and electric pumps, so whatever suits your lifestyle
-                best is within reach.
-              </p>
-              <p>
-                Our team of highly trained professionals knows exactly how
-                important this transition can be for mothers, which is why we
-                strive to provide you with the best service possible. Our
-                selection provides the best-in-class products to meet all
-                different types of needs for mothers during this time. TRICARE
-                covers one manual or electric pump per birth or adoption, with a
-                prescription from a network or non-network physician required
-                for reimbursement.
-              </p>
-              <p>
-                Together at JANZ Medical Supply, let&apos;s give you the gift of
-                ease and convenience during this special time in motherhood. Get
-                started today by shopping our selection of covered breast pumps!
+              <p style={{ textAlign: "justify" }}>
+                {props?.categories?.category_content.replace(/<\/?p>/g, "")}
               </p>
             </div>
           </div>
@@ -256,7 +171,16 @@ export default function Subcategory(props) {
             {props?.categories?.subcategory?.map((item, index) => (
               <div className="col my-2" key={index}>
                 <div className="card-box">
-                  <Image width={296} height={300} src={subCateg1} alt="..." />
+                  <Image
+                    width={296}
+                    height={300}
+                    src={
+                      item?.category_image
+                        ? `${process.env.NEXT_PUBLIC_MEDIA}${item?.category_image}`
+                        : no_image
+                    }
+                    alt="..."
+                  />
                   <h5>{item?.category_name}</h5>
                   <Link
                     href={`/category/${categoryId}/${sub_categoryId}/${item?.category_slug}`}

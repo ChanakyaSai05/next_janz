@@ -24,7 +24,7 @@ import { useEffect } from "react";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Product(props) {
-  // console.log(props, "props");
+  console.log(props, "props accessory products");
   const context = useContext(UserContext);
   const { getCartItemsFn, cartItems, setcartItems } = context;
   const router = useRouter();
@@ -68,9 +68,10 @@ export default function Product(props) {
 
   // add to cart button
   const addToCartButton = async (item) => {
+    console.log(item, "item");
     try {
       let user = JSON.parse(localStorage.getItem("janz_medical_user"));
-      let product = item;
+      let product = item?.product_variants[0];
       const response = await axios({
         url: `${process.env.NEXT_PUBLIC_URL}product/addtocart`,
         method: "POST",

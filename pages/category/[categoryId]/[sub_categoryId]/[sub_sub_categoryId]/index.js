@@ -8,6 +8,7 @@ import Headerlanding from "../../../../../components/headerlanding";
 import Footer from "../../../../../components/footer";
 // import product from "../public/images/product.svg";
 import cardImg2 from "../../../../../public/images/card-img2.svg";
+import no_image from "../../../../../public/images/no_image.jpg";
 import { useRouter } from "next/router";
 import axios from "axios";
 import Link from "next/link";
@@ -135,7 +136,7 @@ export default function Categoryfilter(props) {
                         src={
                           props?.categories?.category_image
                             ? `${process.env.NEXT_PUBLIC_MEDIA}${props?.categories?.category_image}`
-                            : cardImg2
+                            : no_image
                         }
                         alt="..."
                       />
@@ -258,9 +259,6 @@ export default function Categoryfilter(props) {
                           type = "HSA/FSA";
                         }
 
-                        {
-                          console.log(type, "type");
-                        }
                         if (type === "") {
                           return sub_product;
                         } else {
@@ -319,31 +317,54 @@ export default function Categoryfilter(props) {
                           <p>
                             {sub_product?.product_short_description?.slice(
                               0,
-                              77
+                              89
                             )}
-                            ........
+                            .....
                           </p>
                           <div className="row">
                             <div className="col-lg-4 col-sm-12 d-flex justify-content-center">
                               <Image
                                 width={180}
                                 height={180}
-                                src={`${process.env.NEXT_PUBLIC_MEDIA}${sub_product?.product_image[0]?.image_file}`}
+                                src={
+                                  sub_product?.product_image[0]?.image_file
+                                    ? `${process.env.NEXT_PUBLIC_MEDIA}${sub_product?.product_image[0]?.image_file}`
+                                    : no_image
+                                }
                                 alt="..."
                               />
                             </div>
-                            <div className="col-lg-4 col-sm-12 d-flex align-items-center">
+                            <div className="col-lg-8 col-sm-12 d-flex align-items-center">
                               <ul>
-                                <li>Feature list 01</li>
+                                <li>
+                                  Feature list 01 Feature list 01 Feature list
+                                  01 Feature list 01
+                                </li>
                                 <li>Feature list 02</li>
                                 <li>Feature list 03</li>
                               </ul>
                             </div>
-                            <div className="col-lg-4 col-sm-12 d-flex align-items-center ">
-                              <div className="text-center text-md-start w-100">
+                          </div>
+                          <div className="row d-flex align-items-center">
+                            <div className="form-check py-2 col-lg-6 col-sm-12 my-3 ">
+                              <input
+                                className="form-check-input rounded-0 "
+                                type="checkbox"
+                                value=""
+                                id="flexCheckDefault"
+                              />
+                              <label
+                                className="form-check-label text-secondary"
+                                for="flexCheckDefault"
+                              >
+                                Add to compare
+                              </label>
+                            </div>
+                            <div className="col-lg-6 d-flex  align-items-center col-sm-12 mb-2 ">
+                              <div className="text-center text-md-end w-100 ">
                                 <button
                                   type="button"
-                                  className="btn btn-primary"
+                                  className="btn btn-primary px-4 py-2"
                                   onClick={() => {
                                     if (
                                       sub_product?.product_variants?.length > 0
@@ -358,20 +379,6 @@ export default function Categoryfilter(props) {
                                 </button>
                               </div>
                             </div>
-                          </div>
-                          <div className="form-check py-2">
-                            <input
-                              className="form-check-input rounded-0"
-                              type="checkbox"
-                              value=""
-                              id="flexCheckDefault"
-                            />
-                            <label
-                              className="form-check-label text-secondary"
-                              for="flexCheckDefault"
-                            >
-                              Add to compare
-                            </label>
                           </div>
                         </div>
                       </div>

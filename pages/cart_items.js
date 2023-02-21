@@ -213,6 +213,16 @@ export default function Cart() {
   }, []);
   // console.log(cartItems, "cart items");
 
+  // proceed to checkout button
+  const proceedToCheckOutBtn = () => {
+    let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+    if (!user) {
+      closeRefRegisterModalandOpenLogin.current.click();
+    } else {
+      router.push("/checkout");
+    }
+  };
+
   return (
     <>
       <Headerlanding></Headerlanding>
@@ -408,7 +418,7 @@ export default function Cart() {
               <button
                 type="button"
                 className="btn btn-primary w-100 my-4"
-                onClick={() => router.push("/checkout")}
+                onClick={proceedToCheckOutBtn}
               >
                 PROCEED TO CHECKOUT
               </button>

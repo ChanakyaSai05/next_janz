@@ -66,7 +66,7 @@ export default function Home(props) {
     dots: true,
     infinite: true,
     speed: 500,
-    slidesToShow: 3,
+    slidesToShow: 4,
     slidesToScroll: 1,
     initialSlide: 0,
     autoplay: true,
