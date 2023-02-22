@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useState } from "react";
+import Greeting from "./Greeting";
 
 export default function Asidebar() {
   const router = useRouter();
@@ -13,21 +14,10 @@ export default function Asidebar() {
     localStorage.removeItem("janz_medical_user");
     router.push("/");
   };
-  // useEffect(() => {
-  //   const date = new Date();
-  //   const hour = date.getHours();
-
-  //   if (hour < 12) {
-  //     setTimeOfDay("Good Morning");
-  //   } else if (hour >= 12 && hour < 17) {
-  //     setTimeOfDay("Good Afternoon");
-  //   } else {
-  //     setTimeOfDay("Good Evening");
-  //   }
-
-  //   let userParsed = JSON.parse(localStorage.getItem("janz_medical_user"));
-  //   setUser(userParsed?.customer_name);
-  // }, []);
+  useEffect(() => {
+    let userParsed = JSON.parse(localStorage.getItem("janz_medical_user"));
+    setUser(userParsed?.customer_name);
+  }, []);
   return (
     <>
       <aside className="left-aside">
@@ -36,14 +26,15 @@ export default function Asidebar() {
             <div
               style={{
                 display: "flex",
+                flexDirection: "column",
                 flexWrap: "wrap",
                 justifyContent: "center",
                 alignItems: "center",
+                // fontSize: "5px",
               }}
             >
-              Good Evening Janz
-              {/* <div>{timeOfDay} </div> */}
-              {/* <div>{user}</div> */}
+              <Greeting />
+              <div style={{ marginLeft: "5px" }}> {user}</div>
             </div>
           </h2>
         </div>

@@ -106,7 +106,7 @@ export default function Subcategory(props) {
       <div className="slider-box-category">
         <Slider {...hero}>
           {props?.categories?.category_banner?.map((item, index) => (
-            <div className="slider-content">
+            <div className="slider-content" key={index}>
               <Image
                 width={4320}
                 height={1890}
@@ -158,7 +158,7 @@ export default function Subcategory(props) {
           <div className="row">
             <div className="col-12 py-4">
               <p style={{ textAlign: "justify" }}>
-                {props?.categories?.category_content.replace(/<\/?p>/g, "")}
+                {props?.categories?.category_content?.replace(/<\/?p>/g, "")}
               </p>
             </div>
           </div>
@@ -256,38 +256,53 @@ export default function Subcategory(props) {
           <div className="row">
             <div className="12">
               <Slider {...settings}>
-                <div className="card">
-                  <div className="card-bodys">
-                    <div className="d-flex justify-content-between">
-                      <div className="like-down-box">
-                        <svg className="icon">
-                          <use href="#icon_like-dull"></use>
-                        </svg>
-                      </div>
-                      <div className="download-box">
-                        <svg className="icon">
-                          <use href="#icon_loader-dull"></use>
-                        </svg>
-                      </div>
-                    </div>
-                    <div className="d-flex my-2 py-2 justify-content-center">
-                      <div className="card-img">
-                        <Image
-                          width={180}
-                          height={180}
-                          src={cardImg1}
-                          alt="..."
-                        />
-                      </div>
-                    </div>
-                    <p className="card-text">5 OZ Breast Milk Bottle Set</p>
-                    <span className="badge text-bg-primary p-2 px-3 me-2">
-                      4.2 &#9733;
-                    </span>
-                    <span>(166)</span>
+                {props?.products?.map((product, product_index) => (
+                  <div key={product_index}>
+                    {product?.products?.map(
+                      (sub_product, sub_product_index) => (
+                        <div className="card" key={sub_product_index}>
+                          <div className="card-bodys">
+                            <div className="d-flex justify-content-between">
+                              <div className="like-down-box">
+                                <svg className="icon">
+                                  <use href="#icon_like-dull"></use>
+                                </svg>
+                              </div>
+                              <div className="download-box">
+                                <svg className="icon">
+                                  <use href="#icon_loader-dull"></use>
+                                </svg>
+                              </div>
+                            </div>
+                            <div className="d-flex my-2 py-2 justify-content-center">
+                              <div className="card-img">
+                                <Image
+                                  width={180}
+                                  height={180}
+                                  src={
+                                    sub_product?.product_image[0]?.image_file
+                                      ? `${process.env.NEXT_PUBLIC_MEDIA}${sub_product?.product_image[0]?.image_file}`
+                                      : no_image
+                                  }
+                                  alt="..."
+                                />
+                              </div>
+                            </div>
+                            <p className="card-text">
+                              {sub_product?.product_name}
+                            </p>
+                            <span className="badge text-bg-primary p-2 px-3 me-2">
+                              4.2 &#9733;
+                            </span>
+                            <span>(166)</span>
+                          </div>
+                        </div>
+                      )
+                    )}
                   </div>
-                </div>
-                <div className="card">
+                ))}
+                {/* <>
+               <div className="card">
                   <div className="card-bodys">
                     <div className="d-flex justify-content-between">
                       <div className="like-down-box">
@@ -333,7 +348,7 @@ export default function Subcategory(props) {
                         <svg className="icon">
                           <use href="#icon_loader-dull"></use>
                         </svg>
-                        {/* <span>1</span> */}
+                        <span>1</span>
                       </div>
                     </div>
                     <div className="d-flex my-2 py-2 justify-content-center">
@@ -365,7 +380,7 @@ export default function Subcategory(props) {
                         <svg className="icon">
                           <use href="#icon_loader-dull"></use>
                         </svg>
-                        {/* <span>1</span> */}
+                        <span>1</span>
                       </div>
                     </div>
                     <div className="d-flex my-2 py-2 justify-content-center">
@@ -419,6 +434,7 @@ export default function Subcategory(props) {
                     <span>(176)</span>
                   </div>
                 </div>
+               </> */}
               </Slider>
             </div>
           </div>

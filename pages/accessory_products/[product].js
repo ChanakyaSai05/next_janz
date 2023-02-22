@@ -16,6 +16,7 @@ import cardImg3 from "../../public/images/card-img3.svg";
 import cardImg4 from "../../public/images/card-img4.svg";
 import airminiImg from "../../public/images/air-mini.svg";
 import fullmask2 from "../../public/images/fullmask2.svg";
+import no_image from "../../public/images/no_image.jpg";
 import { useRouter } from "next/router";
 import axios from "axios";
 import UserContext from "../../context/UserContext";
@@ -136,7 +137,11 @@ export default function Product(props) {
                         <Image
                           width={130}
                           height={120}
-                          src={`${process.env.NEXT_PUBLIC_MEDIA}${item?.mproduct?.product_image[0]?.image_file}`}
+                          src={
+                            item?.mproduct?.product_image[0]?.image_file
+                              ? `${process.env.NEXT_PUBLIC_MEDIA}${item?.mproduct?.product_image[0]?.image_file}`
+                              : no_image
+                          }
                           alt="..."
                         />
                       </div>
@@ -164,7 +169,11 @@ export default function Product(props) {
                     <Image
                       width={120}
                       height={120}
-                      src={`${process.env.NEXT_PUBLIC_MEDIA}${item?.product_image[0]?.image_file}`}
+                      src={
+                        item?.product_image[0]?.image_file
+                          ? `${process.env.NEXT_PUBLIC_MEDIA}${item?.product_image[0]?.image_file}`
+                          : no_image
+                      }
                       alt="..."
                     />
                   </div>

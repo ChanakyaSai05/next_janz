@@ -21,6 +21,7 @@ import cardImg1 from "../../../public/images/card-img1.svg";
 import cardImg2 from "../../../public/images/card-img2.svg";
 import cardImg3 from "../../../public/images/card-img3.svg";
 import cardImg4 from "../../../public/images/card-img4.svg";
+import no_image from "../../../public/images/no_image.jpg";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import axios from "axios";
@@ -31,7 +32,7 @@ export default function Category(props) {
   const router = useRouter();
   const params = router.query;
   const { categoryId } = params;
-  // console.log(props, "props");
+  console.log(props, "props");
   const hero = {
     dots: true,
     infinite: true,
@@ -92,20 +93,19 @@ export default function Category(props) {
               <Image
                 width={4320}
                 height={1890}
-                src={`${process.env.NEXT_PUBLIC_MEDIA}${banner?.banner_image}`}
+                src={
+                  banner?.banner_image
+                    ? `${process.env.NEXT_PUBLIC_MEDIA}${banner?.banner_image}`
+                    : no_image
+                }
                 className="carousel-img opacity-50"
                 alt="..."
               />
               <Container className="h-100">
                 <div className="row h-100 d-flex align-items-center">
                   <div className="col-md-6 col-sm-12 text-white">
-                    <h1>Maternity Care </h1>
-                    <p>
-                      We carry a wide range of maternity care products, so you
-                      have one less thing to worry about as your family grows.
-                      From breast pumps, refill bags and accessories, we have
-                      you covered.
-                    </p>
+                    <h1>{banner?.banner_title}</h1>
+                    <p>{banner?.banner_description}</p>
                   </div>
                 </div>
               </Container>
@@ -133,24 +133,7 @@ export default function Category(props) {
           <div className="row">
             <div className="col-12 py-4">
               <p>
-                <strong>JANZ Medical Supply</strong> is dedicated to helping
-                mothers during each step of their motherhood journey. Our
-                knowledgeable staff can help you select the perfect breast pump;
-                whether it be a convenience-oriented portable style, or one with
-                higher suction capabilities for more intensive needs. Best yet –
-                most insurance providers cover these products and accessories up
-                to 100%, meaning no money out of pocket when obtaining them!
-                Equip yourself with everything necessary while on your
-                pregnancy, postnatal, and postpartum journeys – JANZ has got you
-                covered.
-              </p>
-              <p>
-                <strong>
-                  We provide our military members and families with breast pumps
-                  and refills at no cost. We direct bill insurance so you
-                  don&apos;t have to. We currently accept Tricare, Aetna, VA and
-                  AFSPA plans.
-                </strong>
+                {props?.categories?.category_content?.replace(/<\/?p>/g, "")}
               </p>
             </div>
           </div>
@@ -163,7 +146,16 @@ export default function Category(props) {
             {props?.categories?.subcategory?.map((item, index) => (
               <div className="col my-2" key={index}>
                 <div className="card-box">
-                  <Image width={296} height={300} src={category1} alt="..." />
+                  <Image
+                    width={296}
+                    height={300}
+                    src={
+                      item?.category_image
+                        ? `${process.env.NEXT_PUBLIC_MEDIA}${item?.category_image}`
+                        : no_image
+                    }
+                    alt="..."
+                  />
                   <h5>{item?.category_name}</h5>
                   <Link href={`/category/${categoryId}/${item?.category_slug}`}>
                     <button type="button">Show more</button>

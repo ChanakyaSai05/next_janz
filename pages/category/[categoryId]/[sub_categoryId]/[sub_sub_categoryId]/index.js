@@ -300,7 +300,15 @@ export default function Categoryfilter(props) {
                           </div>
                           <div className="d-flex py-2">
                             <span className="fs-6 fw-bold me-2">by</span>
-                            <span className="fs-6 fw-bold text-primary">
+                            <span
+                              className="fs-6 fw-bold text-primary"
+                              onClick={() =>
+                                router.push(
+                                  `/shop_by_brand/${sub_product?.brand?.brand_slug}`
+                                )
+                              }
+                              style={{ cursor: "pointer" }}
+                            >
                               {sub_product?.brand?.brand_name}
                             </span>
                           </div>
@@ -317,9 +325,10 @@ export default function Categoryfilter(props) {
                           <p>
                             {sub_product?.product_short_description?.slice(
                               0,
-                              89
+                              91
                             )}
-                            .....
+                            {sub_product?.product_short_description?.length >
+                              91 && <>.....</>}
                           </p>
                           <div className="row">
                             <div className="col-lg-4 col-sm-12 d-flex justify-content-center">
@@ -334,15 +343,14 @@ export default function Categoryfilter(props) {
                                 alt="..."
                               />
                             </div>
-                            <div className="col-lg-8 col-sm-12 d-flex align-items-center">
-                              <ul>
-                                <li>
-                                  Feature list 01 Feature list 01 Feature list
-                                  01 Feature list 01
-                                </li>
-                                <li>Feature list 02</li>
-                                <li>Feature list 03</li>
-                              </ul>
+                            <div
+                              className="col-lg-8 col-sm-12 d-flex align-items-center"
+                              style={{ textAlign: "justify" }}
+                            >
+                              {
+                                sub_product?.product_variants[0]
+                                  ?.product_feature
+                              }
                             </div>
                           </div>
                           <div className="row d-flex align-items-center">

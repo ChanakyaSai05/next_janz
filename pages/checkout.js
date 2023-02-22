@@ -94,6 +94,7 @@ export default function Checkout() {
     us_states: "",
   });
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const formRef = useRef(null);
 
   const handleProfileDetails = (e) => {
     setprofileDetails({ ...profileDetails, [e.target.id]: e.target.value });
@@ -207,6 +208,15 @@ export default function Checkout() {
     setusStates(states);
   }, []);
 
+  const handleCancelClick = (e) => {
+    // console.log("hii");
+    setEditCancel(false);
+    // setTimeout(() => {
+    //   e.preventDefault();
+    // }, 0);
+    // formRef.current.reset();
+  };
+
   const getAddressList = async () => {
     try {
       let user = JSON.parse(localStorage.getItem("janz_medical_user"));
@@ -244,6 +254,10 @@ export default function Checkout() {
   // address edit button
   const editButtonClickedFn = (item) => {
     setEditCancel(true);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
   };
 
   // console.log(addressList, "address list");
@@ -342,7 +356,7 @@ export default function Checkout() {
                           <h6>Edit address</h6>
                           <div className="row">
                             <div className="col">
-                              <Form>
+                              <Form ref={formRef} onSubmit={handleSubmit}>
                                 <div className="mb-3">
                                   <Form.Check
                                     inline
@@ -623,7 +637,7 @@ export default function Checkout() {
                                 <div className="d-flex justify-content-between ms-0">
                                   <button
                                     className="button button-default same-btn delete ml-10"
-                                    onClick={() => setFormEdit(!formedit)}
+                                    onClick={handleCancelClick}
                                   >
                                     Cancel
                                   </button>

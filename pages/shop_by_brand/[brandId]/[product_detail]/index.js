@@ -5,26 +5,25 @@ import Slider from "react-slick";
 import { Inter } from "@next/font/google";
 // import styles from "../styles/Home.module.css";
 import { Container, Nav, Tab, Col, Row, Dropdown } from "react-bootstrap";
-import Headerlanding from "../../../../../../components/headerlanding";
-import Footer from "../../../../../../components/footer";
+import Headerlanding from "../../../../components/headerlanding";
+import Footer from "../../../../components/footer";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import product from "../../../../../../public/images/product.svg";
-import cardImg1 from "../../../../../../public/images/card-img1.svg";
-import cardImg2 from "../../../../../../public/images/card-img2.svg";
-import cardImg3 from "../../../../../../public/images/card-img3.svg";
-import cardImg4 from "../../../../../../public/images/card-img4.svg";
-import fullmask1 from "../../../../../../public/images/fullmask1.svg";
-import fullmask2 from "../../../../../../public/images/fullmask2.svg";
-import fullmask3 from "../../../../../../public/images/fullmask3.svg";
-import fullmask4 from "../../../../../../public/images/fullmask4.svg";
-import checkImg from "../../../../../../public/images/check-img.svg";
-import no_image from "../../../../../../public/images/no_image.jpg";
+import cardImg1 from "../../../../public/images/card-img1.svg";
+import cardImg2 from "../../../../public/images/card-img2.svg";
+import cardImg3 from "../../../../public/images/card-img3.svg";
+import cardImg4 from "../../../../public/images/card-img4.svg";
+import fullmask1 from "../../../../public/images/fullmask1.svg";
+import fullmask2 from "../../../../public/images/fullmask2.svg";
+import fullmask3 from "../../../../public/images/fullmask3.svg";
+import fullmask4 from "../../../../public/images/fullmask4.svg";
+import checkImg from "../../../../public/images/check-img.svg";
+import no_image from "../../../../public/images/no_image.jpg";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import axios from "axios";
 import { useContext } from "react";
-import UserContext from "../../../../../../context/UserContext";
+import UserContext from "../../../../context/UserContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,13 +33,8 @@ export default function Productdetail(props) {
   console.log(props, "props");
   const router = useRouter();
   const params = router.query;
-  const {
-    categoryId,
-    sub_categoryId,
-    sub_sub_categoryId,
-    sub_sub_sub_categoryId,
-  } = params;
-  // console.log(params);
+  const { brandId, product_detail } = params;
+  console.log(params);
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   // quantity
@@ -277,7 +271,7 @@ export default function Productdetail(props) {
         getCartItemsFromProductsDetail();
         getCartItemsFn();
         if (props?.accessory_products?.length > 0) {
-          router.push(`/accessory_products/${sub_sub_sub_categoryId}`);
+          router.push(`/accessory_products/${product_detail}`);
           return;
         }
       }
@@ -365,22 +359,11 @@ export default function Productdetail(props) {
                     <Link href="/">Home</Link>
                   </li>
                   <li className="breadcrumb-item">
-                    <Link href={`/category/${categoryId}`}>{categoryId}</Link>
+                    <Link href={`/shop_by_brand/${brandId}`}>{brandId}</Link>
                   </li>
-                  <li className="breadcrumb-item">
-                    <Link href={`/category/${categoryId}/${sub_categoryId}`}>
-                      {sub_categoryId}
-                    </Link>
-                  </li>
-                  <li className="breadcrumb-item">
-                    <Link
-                      href={`/category/${categoryId}/${sub_categoryId}/${sub_sub_categoryId}`}
-                    >
-                      {sub_sub_categoryId}
-                    </Link>
-                  </li>
+
                   <li className="breadcrumb-item active" aria-current="page">
-                    {sub_sub_sub_categoryId}
+                    {product_detail}
                   </li>
                 </ol>
               </nav>
@@ -2208,7 +2191,7 @@ export async function getServerSideProps({ params }) {
   // console.log(params, "params");
   try {
     const response = await axios({
-      url: `${process.env.NEXT_PUBLIC_URL}product/${params.sub_sub_sub_categoryId}`,
+      url: `${process.env.NEXT_PUBLIC_URL}product/${params.product_detail}`,
       method: "GET",
       headers: {
         "Content-Type": "application/json",

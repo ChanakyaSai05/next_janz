@@ -26,6 +26,7 @@ export default function Product(props) {
   const params = router.query;
   const { insuranceId } = params;
   const { insurance } = props.data;
+  console.log(insurance);
 
   const [editCancel, setEditCancel] = useState(false);
   let array = [
@@ -91,29 +92,9 @@ export default function Product(props) {
               <h3>{insurance.insurance_name}</h3>
             </div>
             <div className="col-12 pt-4">
-              <h4 className="pb-3">Lorem ipsum dolor sit amet, consectetur </h4>
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
-                elementum accumsan interdum. Sed tempus, dolor vel interdum
-                tempor, justo ligula molestie lorem, quis luctus purus lorem ac
-                sapien. Donec sit amet consequat enim, ac finibus sem. Quisque
-                facilisis ex a ante pretium, eget fermentum mauris mollis.
-                Suspendisse potenti. Ut pharetra lorem ligula, nec tempus ante
-                faucibus a. Suspendisse faucibus placerat faucibus. Donec erat
-                ipsum, semper non dapibus in, placerat ac massa. Etiam
-                scelerisque rhoncus lectus sit amet malesuada. Vivamus mollis
-                leo et lectus finibus vestibulum. Nam id lectus nibh.
-              </p>
-              <p>
-                Duis ut auctor nulla. Suspendisse potenti. In varius, felis ut
-                tristique egestas, urna erat vestibulum velit, ut auctor metus
-                ante a urna. Donec justo quam, tincidunt ac dui id, vehicula
-                commodo lorem. Nam accumsan ultrices purus, vitae molestie
-                mauris aliquet nec. Suspendisse gravida nec orci non tincidunt.
-                Vivamus et tristique felis.
-              </p>
+              <p>{insurance?.insurance_content}</p>
             </div>
-            <div className="col-12 pt-4">
+            {/* <div className="col-12 pt-4">
               <h4 className="pb-3">Lorem ipsum dolor sit amet, consectetur </h4>
               <p>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
@@ -185,7 +166,7 @@ export default function Product(props) {
                 scelerisque rhoncus lectus sit amet malesuada. Vivamus mollis
                 leo et lectus finibus vestibulum. Nam id lectus nibh.
               </p>
-            </div>
+            </div> */}
           </div>
           <div className="row">
             <div className="col-12">

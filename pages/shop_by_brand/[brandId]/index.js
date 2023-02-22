@@ -4,17 +4,18 @@ import Slider from "react-slick";
 import { Inter } from "@next/font/google";
 // import styles from "../styles/Home.module.css";
 import { Container, Nav, Tab, Col, Row, Dropdown } from "react-bootstrap";
-import Headerlanding from "../../components/headerlanding";
-import Footer from "../../components/footer";
+import Headerlanding from "../../../components/headerlanding";
+import Footer from "../../../components/footer";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 // import product from "../public/images/product.svg";
-import cardImg1 from "../../public/images/card-img1.svg";
-import cardImg2 from "../../public/images/card-img2.svg";
-import cardImg3 from "../../public/images/card-img3.svg";
-import cardImg4 from "../../public/images/card-img4.svg";
+// import cardImg1 from "../../public/images/card-img1.svg";
+// import cardImg2 from "../../public/images/card-img2.svg";
+// import cardImg3 from "../../public/images/card-img3.svg";
+// import cardImg4 from "../../public/images/card-img4.svg";
 // import airminiImg from "../public/images/air-mini.svg";
 // import fullmask2 from "../public/images/fullmask2.svg";
+import no_image from "../../../public/images/no_image.jpg";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import axios from "axios";
@@ -130,9 +131,9 @@ export default function Product(props) {
                             width={180}
                             height={180}
                             src={
-                              pro?.product_image?.length == 0
-                                ? cardImg1
-                                : `${process.env.NEXT_PUBLIC_MEDIA}${pro?.product_image[0]?.image_file}`
+                              pro?.product_image[0]?.image_file
+                                ? `${process.env.NEXT_PUBLIC_MEDIA}${pro?.product_image[0]?.image_file}`
+                                : no_image
                             }
                             alt="..."
                           />
@@ -163,95 +164,84 @@ export default function Product(props) {
               <p className="fw-bold">Total Items: {products?.data.length}</p>
             </div>
           </div>
-          <div className="row d-flex justify-content-center pb-5">
-            {products?.data.map((pro, pro_index) => (
-              <div className="col-sm-12 col-lg-9 mb-3" key={pro_index}>
-                <div className="d-flex justify-content-center">
-                  <div className="card-shadow rounded-2 p-4 sm-w-100 lg-w-75">
-                    <div className="d-flex align-items-center justify-content-between">
-                      <p className="fw-bold fs-18 p-0 m-0 me-2">
-                        SPECTRA S1 PLUS ELECTRIC BREAST PUMP DUAL VOLTAGE
-                      </p>
-                      {editCancel ? (
-                        <div
-                          className="like-down-box"
-                          onClick={() => setEditCancel(!editCancel)}
-                        >
-                          <svg className="icon">
-                            <use href="#icon_like-dull"></use>
-                          </svg>
-                        </div>
-                      ) : (
-                        <div
-                          className="like-down-box"
-                          onClick={() => setEditCancel(!editCancel)}
-                        >
-                          <svg className="icon">
-                            <use href="#icon_like"></use>
-                          </svg>
-                        </div>
-                      )}
-                    </div>
-                    <div className="d-flex py-2">
-                      <span className="fs-6 fw-bold me-2">by</span>
-                      <span className="fs-6 fw-bold text-primary">
-                        {brand.brand_name}
-                      </span>
-                    </div>
-                    <div className="d-flex pb-3">
-                      <div>
-                        <span className="badge text-bg-primary p-2 px-3 me-2">
-                          4.3 &#9733;
-                        </span>
-                        <span className="fw-bold">
-                          257 Ratings & 30 Reviews{" "}
-                        </span>
-                      </div>
-                    </div>
-                    <p>
-                      {pro?.product_short_description.slice(0, 80)}{" "}
-                      {pro?.product_short_description.length > 80 && <>...</>}
-                    </p>
 
-                    <div className="row">
-                      <div className="col-lg-4 col-sm-12 d-flex justify-content-center">
-                        <Image
-                          width={180}
-                          height={180}
-                          src={
-                            pro?.product_image?.length == 0
-                              ? cardImg1
-                              : `${process.env.NEXT_PUBLIC_MEDIA}${pro?.product_image[0]?.image_file}`
-                          }
-                          alt="..."
-                        />
+          {products?.data.map((pro, pro_index) => (
+            <div className="d-flex justify-content-center pb-5" key={pro_index}>
+              <div className="col-sm-12 col-lg-9 mb-3">
+                <div className="card-shadow rounded-2 p-4 sm-w-100 lg-w-75 w-100">
+                  <div className="d-flex align-items-center justify-content-between">
+                    <p className="fw-bold fs-18 p-0 m-0 me-2">
+                      {pro?.product_name}
+                    </p>
+                    {editCancel ? (
+                      <div
+                        className="like-down-box"
+                        onClick={() => setEditCancel(!editCancel)}
+                      >
+                        <svg className="icon">
+                          <use href="#icon_like-dull"></use>
+                        </svg>
                       </div>
-                      <div className="col-lg-4 col-sm-12 d-flex align-items-center">
-                        <ul>
-                          <li>Feature list 01</li>
-                          <li>Feature list 02</li>
-                          <li>Feature list 03</li>
-                        </ul>
+                    ) : (
+                      <div
+                        className="like-down-box"
+                        onClick={() => setEditCancel(!editCancel)}
+                      >
+                        <svg className="icon">
+                          <use href="#icon_like"></use>
+                        </svg>
                       </div>
-                      <div className="col-lg-4 col-sm-12 d-flex align-items-center ">
-                        <div className="text-center text-md-start w-100">
-                          <button
-                            type="button"
-                            className="btn btn-primary"
-                            onClick={() =>
-                              router.push(
-                                `/category/${categoryId}/${sub_categoryId}/${sub_sub_categoryId}/product_detail`
-                              )
-                            }
-                          >
-                            View Details
-                          </button>
-                        </div>
-                      </div>
+                    )}
+                  </div>
+                  <div className="d-flex py-2">
+                    <span className="fs-6 fw-bold me-2">by</span>
+                    <span
+                      className="fs-6 fw-bold text-primary"
+                      style={{ cursor: "pointer" }}
+                      onClick={() =>
+                        router.push(`/shop_by_brand/${brand?.brand_slug}`)
+                      }
+                    >
+                      {brand.brand_name}
+                    </span>
+                  </div>
+                  <div className="d-flex pb-3">
+                    <div>
+                      <span className="badge text-bg-primary p-2 px-3 me-2">
+                        4.3 &#9733;
+                      </span>
+                      <span className="fw-bold">257 Ratings & 30 Reviews </span>
                     </div>
-                    <div className="form-check py-2">
+                  </div>
+                  <p>
+                    {pro?.product_short_description.slice(0, 125)}{" "}
+                    {pro?.product_short_description.length > 125 && <>...</>}
+                  </p>
+
+                  <div className="row">
+                    <div className="col-lg-4 col-sm-12 d-flex justify-content-center">
+                      <Image
+                        width={180}
+                        height={180}
+                        src={
+                          pro?.product_image[0]?.image_file
+                            ? `${process.env.NEXT_PUBLIC_MEDIA}${pro?.product_image[0]?.image_file}`
+                            : no_image
+                        }
+                        alt="..."
+                      />
+                    </div>
+                    <div
+                      className="col-lg-8 col-sm-12 d-flex align-items-center"
+                      style={{ textAlign: "justify" }}
+                    >
+                      {pro?.product_variant?.product_feature}
+                    </div>
+                  </div>
+                  <div className="row d-flex align-items-center">
+                    <div className="form-check py-2 col-lg-6 col-sm-12 my-3 ">
                       <input
-                        className="form-check-input rounded-0"
+                        className="form-check-input rounded-0 "
                         type="checkbox"
                         value=""
                         id="flexCheckDefault"
@@ -263,11 +253,29 @@ export default function Product(props) {
                         Add to compare
                       </label>
                     </div>
+                    <div className="col-lg-6 d-flex  align-items-center col-sm-12 mb-2 ">
+                      <div className="text-center text-md-end w-100 ">
+                        <button
+                          type="button"
+                          className="btn btn-primary px-4 py-2"
+                          onClick={() => {
+                            if (pro?.product_variant) {
+                              router.push(
+                                `/shop_by_brand/${brandId}/${pro?.product_variant?.variant_permlink}`
+                              );
+                            }
+                          }}
+                        >
+                          View Details
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
+
           {/* <div className="row d-flex justify-content-center pb-5">
             <div className="d-flex justify-content-center">
               <div className="card-shadow rounded-2 p-4 sm-w-100 lg-w-75">

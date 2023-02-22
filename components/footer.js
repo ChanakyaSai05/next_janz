@@ -2,7 +2,13 @@ import Link from "next/link";
 // import { useState } from "react";
 import Image from "next/image";
 import footer from "../public/images/footer-img.svg";
+export function GetYear() {
+  const date = new Date();
+  const hour = date.getHours();
+  const year = date.getFullYear();
 
+  return <span>{year}</span>;
+}
 export default function Footer() {
   // const [publicPath] = useState(process.env.NEXT_PUBLIC_URL);
 
@@ -110,7 +116,10 @@ export default function Footer() {
         <hr />
       </div>
       <div className="text-center p-4">
-        <p className="m-0">Copyright © JANZ Medical Supply 1999-2022</p>
+        <p className="m-0">
+          Copyright © JANZ Medical Supply 1999-
+          <GetYear />
+        </p>
       </div>
     </footer>
   );

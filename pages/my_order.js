@@ -306,7 +306,11 @@ export default function Myorder() {
                         <svg className="icon me-2">
                           <use href="#icon_review"></use>
                         </svg>
-                        <span className="text-decoration-underline">
+                        <span
+                          className="text-decoration-underline"
+                          data-bs-toggle="modal"
+                          data-bs-target="#exampleModalCenter"
+                        >
                           Rate & Review
                         </span>
                       </a>
@@ -570,6 +574,113 @@ export default function Myorder() {
                 <button className="button button-default same-btn delete ml-10">
                   Delete
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          className="modal fade"
+          id="exampleModalCenter"
+          tabIndex="-2"
+          aria-labelledby="exampleModalCenterTitle"
+          aria-hidden="true"
+        >
+          <div className="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-md-down">
+            <div className="modal-content border-0 rounded-md-4 overflow-hidden">
+              <div className="modal-body p-0">
+                <div className="bg-primary py-2 px-4 d-block text-center d-md-none position-relative">
+                  <button
+                    type="button"
+                    className="position-absolute top-50 end-0 translate-middle-y ms-3 close-btn"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <svg className="icon">
+                      <use href="#icon_loginclose"></use>
+                    </svg>
+                  </button>
+                  <h5 className="text-white">Rating & Review</h5>
+                </div>
+                <button
+                  type="button"
+                  className="btn-close position-absolute d-none d-md-block end-0 top-0 me-3 mt-3"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+                <div className="row p-4" style={{ color: "#4D5059" }}>
+                  <div className="col-12 text-center py-4 d-none d-sm-block">
+                    <h3>Rate & Review The Product</h3>
+                  </div>
+                  <div className="d-flex col-md-12">
+                    <div
+                      className="d-flex rounded-3 align-items-center justify-content-center shadow"
+                      style={{ width: "160px", height: "160px" }}
+                    >
+                      <Image
+                        width={140}
+                        height={140}
+                        src={breastPump}
+                        alt="Breast Pump"
+                      />
+                    </div>
+                    <div className="d-block align-self-center ps-3 ps-sm-4">
+                      <h5 className="">Elive Stride Electic Breast Pump</h5>
+                      <p className="fs-18 fw-normal pt-3">Rate this product</p>
+                      <div className="pb-3">
+                        <svg className="icon text-primary me-3">
+                          <use href="#icon_review"></use>
+                        </svg>
+                        <svg className="icon text-primary me-3">
+                          <use href="#icon_review"></use>
+                        </svg>
+                        <svg className="icon text-primary me-3">
+                          <use href="#icon_review"></use>
+                        </svg>
+                        <svg className="icon text-primary me-3">
+                          <use href="#icon_review"></use>
+                        </svg>
+                        <svg className="icon text-primary me-3">
+                          <use href="#icon_review"></use>
+                        </svg>
+                      </div>
+                      <p className="fs-18 fw-normal">Rate this product</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="row py-2 px-4">
+                  <div className="col-lg-3 d-none d-sm-block">
+                    <span className="py-1 px-2 border border-secondary rounded-1 me-2">
+                      4.4
+                      <svg className="icon text-primary ms-2">
+                        <use href="#icon_review"></use>
+                      </svg>
+                    </span>
+                    <span>152 Ratings</span>
+                  </div>
+                  <div className="col-lg-9 col-sm-12">
+                    <div className="w-100">
+                      <div class="input-group">
+                        <textarea
+                          class="form-control"
+                          placeholder="Enter your review"
+                          aria-label="With textarea"
+                          style={{ height: "100px" }}
+                        />
+                      </div>
+                      <div className="py-3 text-center text-md-end">
+                        <button
+                          type="button"
+                          className="btn btn-outline-secondary me-3"
+                        >
+                          Cancel
+                        </button>
+                        <button type="button" className="btn btn-primary">
+                          Submit
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
