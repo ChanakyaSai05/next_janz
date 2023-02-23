@@ -21,6 +21,7 @@ const inter = Inter({ subsets: ["latin"] });
 import cartImg2 from "../public/images/card-img2.svg";
 import airMini from "../public/images/air-mini.svg";
 import uploader from "../public/images/uploader.svg";
+import no_image from "../public/images/no_image.jpg";
 import { useRouter } from "next/router";
 import axios from "axios";
 import UserContext from "../context/UserContext";
@@ -324,7 +325,7 @@ export default function Cart() {
                     </tr>
                   </thead>
                   <tbody>
-                    {cartItems.map((item, index) => (
+                    {cartItems?.map((item, index) => (
                       <tr key={index}>
                         <td>
                           <div>
@@ -344,7 +345,12 @@ export default function Cart() {
                                     className="img-fluid rounded-start"
                                     width={150}
                                     height={150}
-                                    src={`${process.env.NEXT_PUBLIC_MEDIA}${item?.mproduct?.product_image[0]?.image_file}`}
+                                    src={
+                                      item?.mproduct?.product_image[0]
+                                        ?.image_file
+                                        ? `${process.env.NEXT_PUBLIC_MEDIA}${item?.mproduct?.product_image[0]?.image_file}`
+                                        : no_image
+                                    }
                                     alt="..."
                                   />
                                 </div>

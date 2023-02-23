@@ -2783,5 +2783,10 @@ tbody {
     --bs-modal-width: 600px;
   }
 }
+@media (min-width: 992px) {
+  .modal-400 {
+    --bs-modal-width: 400px;
+  }
+}
 
 /* ============ mobile view .end// ============ */

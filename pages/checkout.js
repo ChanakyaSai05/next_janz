@@ -14,6 +14,7 @@ import {
 import Headerlanding from "../components/headerlanding";
 import Form from "react-bootstrap/Form";
 import uploader from "../public/images/uploader.svg";
+import no_image from "../public/images/no_image.jpg";
 import { useRouter } from "next/router";
 import UserContext from "../context/UserContext";
 // import csc from "country-state-city";
@@ -23,7 +24,14 @@ const inter = Inter({ subsets: ["latin"] });
 
 export default function Checkout() {
   const context = useContext(UserContext);
-  const { closeRefRegisterModalandOpenLogin } = context;
+  const {
+    closeRefRegisterModalandOpenLogin,
+    getCartItemsFn,
+    cartItems,
+    setcartItems,
+    totalPrice,
+    settotalPrice,
+  } = context;
 
   // us states
   const [usStates, setusStates] = useState([]);
@@ -92,20 +100,150 @@ export default function Checkout() {
     zipCode: "",
     unitBox: "",
     us_states: "",
+    address_id: "0",
+    primary: "",
   });
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [selectedInsurance, setselectedInsurance] = useState(null);
   const formRef = useRef(null);
-
-  const handleProfileDetails = (e) => {
-    setprofileDetails({ ...profileDetails, [e.target.id]: e.target.value });
-  };
-  // console.log(profileDetails, "PROFILE DETAILS type address no");
 
   const [num, setNum] = useState(1);
   const [rawFile, setrawFile] = useState(null);
+  const [rawFileOne, setrawFileOne] = useState(null);
   const [rawFileTwo, setrawFileTwo] = useState(null);
   const [previewUrl, setpreviewUrl] = useState(null);
+  const [previewUrlOne, setpreviewUrlOne] = useState(null);
   const [previewUrlTwo, setpreviewUrlTwo] = useState(null);
+  const [discountApplied, setdiscountApplied] = useState(false);
+  const [rawFileRx, setrawFileRx] = useState(null);
+  const [previewUrlRx, setpreviewUrlRx] = useState(null);
+  const [rawFileSignature, setrawFileSignature] = useState(null);
+  const [previewUrlSignature, setpreviewUrlSignature] = useState(null);
+  const [rxSeclectedItem, setrxSeclectedItem] = useState({});
+
+  // billing address checkbox
+  const [billingAddressCheckBox, setbillingAddressCheckBox] = useState(false);
+  // rx title
+  const [rx_title, setrx_title] = useState(
+    "I will send my prescription to JANZ"
+  );
+  //insurance details
+  const [insuranceDetails, setinsuranceDetails] = useState({
+    customer_insruance_id: "0",
+    insurance_default: "",
+    insurnace_id: "",
+    birth_date: "",
+    subscriber_id: "",
+    policy_number: "",
+    group_number: "",
+    sponsor_first_name: "",
+    sponsor_last_name: "",
+    sponsor_ssn: "",
+    sponsor_dbn: "",
+    insurance_name: "",
+  });
+  const [insuranceList, setinsuranceList] = useState({});
+  // upload rx ref
+  const uploadRfRef = useRef();
+  const handleProfileDetails = (e) => {
+    setprofileDetails({ ...profileDetails, [e.target.id]: e.target.value });
+  };
+
+  //
+  const addressSaveButton = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const token = localStorage.getItem("janz_medical_login_token");
+
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/address/update`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        data: {
+          address_id: parseInt(profileDetails.address_id),
+          address_default: profileDetails.primary === "on" ? 1 : 0,
+          contact_name: profileDetails.name,
+          address1: profileDetails.address1,
+          address2: profileDetails.address2,
+          address_type: profileDetails.addressType,
+          unit_box: profileDetails.unitBox,
+          state: profileDetails.state,
+          country: profileDetails.country,
+          city: profileDetails.city,
+          zip_code: profileDetails.zipCode,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        // alert("Error");
+        console.log("Error");
+      } else {
+        // console.log(response.data);
+        setEditCancel(false);
+        setprofileDetails({
+          name: "",
+          address1: "",
+          address2: "",
+          apoFpo: "yes",
+          addressType: "",
+          city: "",
+          state: "",
+          country: "",
+          zipCode: "",
+          unitBox: "",
+          us_states: "",
+          address_id: "0",
+          primary: "",
+        });
+        getAddressList();
+        // alert("Success");
+      }
+    } catch (error) {
+      console.log(error);
+      // alert("Error");
+    }
+  };
+  //get address list
+  const getAddressList = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const token = localStorage.getItem("janz_medical_login_token");
+
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/address`,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        // alert("Error");
+        console.log("Error");
+      } else {
+        // console.log(response.data);
+        let addressList = response.data.address;
+        for (let i = 0; i < addressList.length; i++) {
+          const element = addressList[i];
+          if (element.address_default == 1) {
+            setSelectedAddress(element);
+            break;
+          }
+        }
+        setaddressList(response.data.address);
+      }
+    } catch (error) {
+      console.log(error);
+      // alert("Error");
+    }
+  };
+  console.log(profileDetails, "PROFILE DETAILS type address no");
 
   const incNum = () => {
     if (num < 10) {
@@ -130,9 +268,21 @@ export default function Checkout() {
     let file = e.target.files[0];
     setrawFile(file);
   };
+  const handleChangeFileFunOne = (e) => {
+    let file = e.target.files[0];
+    setrawFileOne(file);
+  };
   const handleChangeFileFunTwo = (e) => {
     let file = e.target.files[0];
     setrawFileTwo(file);
+  };
+  const handleChangeFileFunRx = (e) => {
+    let file = e.target.files[0];
+    setrawFileRx(file);
+  };
+  const handleChangeFileFunSignature = (e) => {
+    let file = e.target.files[0];
+    setrawFileSignature(file);
   };
   // console.log(rawFile, "RAW");
   // console.log(previewUrl, "PREVIEW");
@@ -145,6 +295,14 @@ export default function Checkout() {
     const objectURL = URL.createObjectURL(rawFile);
     setpreviewUrl(objectURL);
   }, [rawFile]);
+  useEffect(() => {
+    if (!rawFileOne) {
+      setpreviewUrlOne(null);
+      return;
+    }
+    const objectURL = URL.createObjectURL(rawFileOne);
+    setpreviewUrlOne(objectURL);
+  }, [rawFileOne]);
 
   useEffect(() => {
     if (!rawFileTwo) {
@@ -154,6 +312,22 @@ export default function Checkout() {
     const objectURL = URL.createObjectURL(rawFileTwo);
     setpreviewUrlTwo(objectURL);
   }, [rawFileTwo]);
+  useEffect(() => {
+    if (!rawFileRx) {
+      setpreviewUrlRx(null);
+      return;
+    }
+    const objectURL = URL.createObjectURL(rawFileRx);
+    setpreviewUrlRx(objectURL);
+  }, [rawFileRx]);
+  useEffect(() => {
+    if (!rawFileSignature) {
+      setpreviewUrlSignature(null);
+      return;
+    }
+    const objectURL = URL.createObjectURL(rawFileSignature);
+    setpreviewUrlSignature(objectURL);
+  }, [rawFileSignature]);
 
   // Deliver here button
   const deliverHereBtn = () => {
@@ -199,14 +373,6 @@ export default function Checkout() {
       payment: false,
     });
   };
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("janz_medical_user"));
-    setloginUser(user);
-  }, []);
-  useEffect(() => {
-    let states = State.getStatesOfCountry("US");
-    setusStates(states);
-  }, []);
 
   const handleCancelClick = (e) => {
     // console.log("hii");
@@ -217,13 +383,53 @@ export default function Checkout() {
     // formRef.current.reset();
   };
 
-  const getAddressList = async () => {
+  //address button checked
+  const addressListHandleChange = (e, item) => {
+    // console.log(e.target.checked);
+    setSelectedAddress(item);
+  };
+
+  // address edit button
+  const editButtonClickedFn = (item) => {
+    setprofileDetails({
+      ...profileDetails,
+      address_id: item?.address_id,
+      address1: item?.address1 ? item?.address1 : "",
+      address2: item?.address2 ? item?.address2 : "",
+      addressType: item?.address_type ? item?.address_type : "",
+      city: item?.city ? item?.city : "",
+      name: item?.contact_name ? item?.contact_name : "",
+      country: item?.country ? item?.country : "",
+      phone: item?.phone ? item?.phone : "",
+      state: item?.state ? item?.state : "",
+      unitBox: item?.unit_box ? item?.unit_box : "",
+      zipCode: item?.zip_code ? item?.zip_code : "",
+      primary: item?.address_default === "1" ? "on" : "",
+      apoFpo:
+        item?.state === "AE" || item?.state === "AP" || item?.state === "AA"
+          ? "no"
+          : "yes",
+    });
+    setEditCancel(true);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+  };
+
+  // handle insurance details
+  const handleInsuranceDetails = (e) => {
+    setinsuranceDetails({ ...insuranceDetails, [e.target.id]: e.target.value });
+  };
+
+  // Insurance details
+  const getInsuranceList = async () => {
     try {
       let user = JSON.parse(localStorage.getItem("janz_medical_user"));
       const token = localStorage.getItem("janz_medical_login_token");
 
       const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}customer/address`,
+        url: `${process.env.NEXT_PUBLIC_URL}customer/insurance`,
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -236,37 +442,301 @@ export default function Checkout() {
         // alert("Error");
         console.log("Error");
       } else {
+        let listAddedInsuranceName = response?.data?.customer_insurance?.map(
+          (customer_insurance) => {
+            let insurance_name = response?.data?.insurance?.find(
+              (insurance_item) =>
+                insurance_item?.insurance_id == customer_insurance?.insurnace_id
+            )?.insurance_name;
+            return { ...customer_insurance, insurance_name };
+          }
+        );
+        let modifiedObj = {
+          customer_insurance: listAddedInsuranceName,
+          insurance: response?.data?.insurance,
+        };
+        let selectedInsurance = {};
+        for (let i = 0; i < listAddedInsuranceName.length; i++) {
+          if (listAddedInsuranceName[i]?.insurance_default == 1) {
+            selectedInsurance = listAddedInsuranceName[i];
+            break;
+          }
+        }
+        if (Object.keys(selectedInsurance).length == 0) {
+          setselectedInsurance(listAddedInsuranceName[0]);
+        } else {
+          setselectedInsurance(selectedInsurance);
+        }
+        setinsuranceList(modifiedObj);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const editForm = () => {
+    let item = selectedInsurance;
+    setinsuranceDetails({
+      customer_insruance_id: item.customer_insruance_id,
+      insurance_default: item.insurance_default == "1" ? "on" : "",
+      insurnace_id: item.insurnace_id,
+      birth_date: item.birth_date,
+      subscriber_id: item.subscriber_id,
+      policy_number: item.policy_number,
+      group_number: item.group_number,
+      sponsor_first_name: item.sponsor_first_name,
+      sponsor_last_name: item.sponsor_last_name,
+      sponsor_ssn: item.sponsor_ssn,
+      sponsor_dbn: item.sponsor_dbn,
+      insurance_name: item.insurance_name,
+    });
+    setEditUserprofile(false);
+  };
+  // console.log(addressList, "address list");
+  // console.log(selectedAddress, "selected address");
+  // console.log(insuranceDetails, "insurance list");
+  console.log(selectedInsurance, "selected insurance");
+  // add insurance detials
+  const addInsuranceDetails = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const token = localStorage.getItem("janz_medical_login_token");
+      let insurnace_id = selectedInsurance.insurnace_id;
+
+      // console.log(insurnace_id);
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/insurance/update`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        data: {
+          customer_insurance_id: insuranceDetails.customer_insruance_id,
+          insurance_default:
+            insuranceDetails.insurance_default === "on" ? 1 : 0,
+          insurnace_id: insurnace_id,
+          birth_date: insuranceDetails.birth_date,
+          subscriber_id: insuranceDetails.subscriber_id,
+          policy_number: insuranceDetails.policy_number,
+          group_number: insuranceDetails.group_number,
+          sponsor_first_name: insuranceDetails.sponsor_first_name,
+          sponsor_last_name: insuranceDetails.sponsor_last_name,
+          sponsor_ssn: insuranceDetails.sponsor_ssn,
+          sponsor_dbn: insuranceDetails.sponsor_dbn,
+          // insurance_name: insuranceDetails.insurance_name,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        // alert("Error");
+        console.log("Error");
+      } else {
         // console.log(response.data);
-        setaddressList(response.data.address);
+        setEditUserprofile(true);
+        setinsuranceDetails({
+          customer_insruance_id: "",
+          insurance_default: "",
+          insurnace_id: "",
+          birth_date: "",
+          subscriber_id: "",
+          policy_number: "",
+          group_number: "",
+          sponsor_first_name: "",
+          sponsor_last_name: "",
+          sponsor_ssn: "",
+          sponsor_dbn: "",
+          insurance_name: "",
+        });
+        getInsuranceList();
+        // alert("Success");
       }
     } catch (error) {
       console.log(error);
       // alert("Error");
     }
   };
-
-  //address button checked
-  const addressListHandleChange = (e, item) => {
-    // console.log(e.target.checked);
-    setSelectedAddress(item);
+  // calculate item price
+  const calculateItemPrice = (item) => {
+    // console.log(item?.variant_sale_price)
+    let price = item?.variant_sale_price ? item?.variant_sale_price : 0;
+    let qty = item?.qty;
+    return price * qty;
   };
-
-  // address edit button
-  const editButtonClickedFn = (item) => {
-    setEditCancel(true);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  };
-
-  // console.log(addressList, "address list");
-  console.log(selectedAddress, "selected address");
-  useEffect(() => {
+  // upload rx button
+  const uploadRxButton = (item) => {
     let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+    if (!user) {
+      closeRefRegisterModalandOpenLogin.current.click();
+    } else {
+      // router.push("/checkout");
+      // console.log("yes starting uploading process");
+      // uploadRfRef.current.click();
+      const modal = uploadRfRef.current;
+      modal.setAttribute("aria-hidden", "false");
+      modal.classList.add("show");
+      document.body.classList.add("modal-open");
+      setrxSeclectedItem(item);
+    }
+  };
+  const uploadRxButtonToApi = async () => {
+    // console.log(rxSeclectedItem);
+    if (!rawFileRx) {
+      return;
+    }
+    try {
+      let formdata = new FormData();
+      formdata.append(
+        "product_variant_id",
+        rxSeclectedItem?.product_variant_id
+      );
+      formdata.append("rx_file", rawFileRx);
+      formdata.append("rx_title", rx_title);
 
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      let token = localStorage.getItem("janz_medical_login_token");
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/rxupload`,
+        method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+        data: formdata,
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        getCartItemsFn();
+        const modal = uploadRfRef.current;
+        modal.classList.remove("show");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("modal-open");
+        setrawFileRx(null);
+        setpreviewUrlRx(null);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // counter increment
+  const handleChangeIncrement = (index, item) => {
+    // setNum(e.target.value);
+    setcartItems((previous) => {
+      return previous.map((prev, prev_index) => {
+        if (prev_index === index) {
+          let qtyIncreased = parseInt(prev.qty) + 1;
+          updateCartFn(item, qtyIncreased);
+          return { ...prev, qty: parseInt(prev.qty) + 1 };
+        } else {
+          return prev;
+        }
+      });
+    });
+  };
+  // counter decrement
+  const handleChangeDecrement = (index, item) => {
+    // setNum(e.target.value);
+    setcartItems((previous) => {
+      return previous.map((prev, prev_index) => {
+        if (prev_index === index) {
+          if (parseInt(prev.qty) == 1) {
+            return prev;
+          } else {
+            let qtyDecreased = parseInt(prev.qty) - 1;
+            updateCartFn(item, qtyDecreased);
+            return { ...prev, qty: parseInt(prev.qty) - 1 };
+          }
+        } else {
+          return prev;
+        }
+      });
+    });
+  };
+
+  // update function from the cart
+  const updateCartFn = async (item, qty) => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      let product = item;
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}product/addtocart`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          product_id: product?.product_id,
+          product_variant_id: product?.product_variant_id,
+          customer_id: user ? user.customer_id : "",
+          variant_msrp: product?.variant_msrp ? product?.variant_msrp : "",
+          variant_store_price: product?.variant_store_price
+            ? product?.variant_store_price
+            : "",
+          variant_sale_price: product?.variant_sale_price
+            ? product?.variant_sale_price
+            : "",
+          variant_weight: product?.variant_weight
+            ? product?.variant_weight
+            : "",
+          variant_unit: product?.variant_unit ? product?.variant_unit : "",
+          qty: qty,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        getCartItemsFn();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // remove item from cart
+  const removeItemFromCart = async (item) => {
+    // console.log(item);
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      let product = item;
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}product/cartproduct/delete`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          product_variant_id: product?.product_variant_id,
+          customer_id: user ? user.customer_id : "",
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        getCartItemsFn();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("janz_medical_user"));
+    setloginUser(user);
     getAddressList();
+    getInsuranceList();
+    getCartItemsFn();
   }, []);
+  useEffect(() => {
+    let states = State.getStatesOfCountry("US");
+    setusStates(states);
+  }, []);
+
   return (
     <>
       <Headerlanding></Headerlanding>
@@ -310,9 +780,14 @@ export default function Checkout() {
                       </div>
                       <div className="">
                         <p className="fw-bold p-0 m-0">User Profile</p>
-                        <span>
-                          JANZ Corp, 9876543210 Address 1, Address 2, City,
-                          State, Zip code{" "}
+                        <span style={{ textAlign: "justify" }}>
+                          {selectedAddress?.contact_name},&nbsp;
+                          {loginUser?.phone},&nbsp;{selectedAddress?.address1}
+                          ,&nbsp;
+                          {selectedAddress?.address2},&nbsp;
+                          {selectedAddress?.city},&nbsp;
+                          {selectedAddress?.state},&nbsp;
+                          {selectedAddress?.zip_code}
                         </span>
                       </div>
                     </div>
@@ -345,7 +820,10 @@ export default function Checkout() {
                     <div className="">
                       <p className="fw-bold p-0 m-0">User Profile</p>
                     </div>
-                    <button className="border-btn ms-auto text-primary">
+                    <button
+                      className="border-btn ms-auto text-primary"
+                      onClick={() => setEditCancel(true)}
+                    >
                       Add Address
                     </button>
                   </div>
@@ -364,7 +842,16 @@ export default function Checkout() {
                                     name="primary"
                                     type="radio"
                                     id="primary"
-                                    onChange={handleProfileDetails}
+                                    checked={profileDetails?.primary === "on"}
+                                    onClick={() => {
+                                      setprofileDetails({
+                                        ...profileDetails,
+                                        primary:
+                                          profileDetails.primary === "on"
+                                            ? ""
+                                            : "on",
+                                      });
+                                    }}
                                   />
                                 </div>
                                 <div className="mb-3 w-100">
@@ -431,6 +918,8 @@ export default function Checkout() {
                                           setprofileDetails({
                                             ...profileDetails,
                                             apoFpo: "yes",
+                                            state: "",
+                                            country: "",
                                           });
                                         }}
                                         checked={
@@ -447,6 +936,8 @@ export default function Checkout() {
                                           setprofileDetails({
                                             ...profileDetails,
                                             apoFpo: "no",
+                                            state: "AE",
+                                            unitBox: "",
                                           });
                                         }}
                                         checked={profileDetails.apoFpo === "no"}
@@ -475,6 +966,10 @@ export default function Checkout() {
                                                 addressType: "APO",
                                               })
                                             }
+                                            checked={
+                                              profileDetails.addressType ===
+                                              "APO"
+                                            }
                                           />
                                           <Form.Check
                                             inline
@@ -488,6 +983,10 @@ export default function Checkout() {
                                                 addressType: "FPO",
                                               })
                                             }
+                                            checked={
+                                              profileDetails.addressType ===
+                                              "FPO"
+                                            }
                                           />
                                           <Form.Check
                                             inline
@@ -500,6 +999,10 @@ export default function Checkout() {
                                                 ...profileDetails,
                                                 addressType: "DPO",
                                               })
+                                            }
+                                            checked={
+                                              profileDetails.addressType ===
+                                              "DPO"
                                             }
                                           />
                                         </div>
@@ -592,13 +1095,15 @@ export default function Checkout() {
                                       <select
                                         className="form-control"
                                         id="us_states"
-                                        value={profileDetails.us_states}
+                                        value={profileDetails.state}
                                         onChange={handleProfileDetails}
                                       >
+                                        <option value="">Select state</option>
                                         {usStates?.map((item, index) => (
                                           <>
-                                            <option>Select state</option>
-                                            <option>{item?.name}</option>
+                                            <option value={item?.name}>
+                                              {item?.name}
+                                            </option>
                                           </>
                                         ))}
                                       </select>
@@ -637,13 +1142,37 @@ export default function Checkout() {
                                 <div className="d-flex justify-content-between ms-0">
                                   <button
                                     className="button button-default same-btn delete ml-10"
-                                    onClick={handleCancelClick}
+                                    onClick={() => {
+                                      setprofileDetails({
+                                        name: "",
+                                        address1: "",
+                                        address2: "",
+                                        apoFpo: "yes",
+                                        addressType: "",
+                                        city: "",
+                                        state: "",
+                                        country: "",
+                                        zipCode: "",
+                                        unitBox: "",
+                                        us_states: "",
+                                        address_id: "0",
+                                        primary: "",
+                                      });
+                                      setEditCancel(false);
+                                    }}
                                   >
                                     Cancel
                                   </button>
                                   <button
                                     type="button"
                                     className="button button-blue same-btn mr-10"
+                                    onClick={() => {
+                                      setprofileDetails({
+                                        ...profileDetails,
+                                        address_id: "0",
+                                      });
+                                      addressSaveButton();
+                                    }}
                                   >
                                     Save
                                   </button>
@@ -668,23 +1197,35 @@ export default function Checkout() {
                                     Cancel
                                   </button>
                                 ) : (
-                                  <button
-                                    className="border-btn text-primary"
-                                    onClick={() => {
-                                      editButtonClickedFn(item);
-                                    }}
-                                  >
-                                    Edit
-                                  </button>
+                                  <>
+                                    {selectedAddress &&
+                                      selectedAddress?.address_id ===
+                                        item?.address_id && (
+                                        <button
+                                          className="border-btn text-primary"
+                                          onClick={() => {
+                                            editButtonClickedFn(item);
+                                          }}
+                                        >
+                                          Edit
+                                        </button>
+                                      )}
+                                  </>
                                 )}
                               </div>
-                              <div class="form-check">
+                              <div class="form-check ">
                                 <input
                                   class="form-check-input"
                                   type="radio"
                                   name="flexRadioDefault"
                                   id="flexRadioDefault1"
-                                  // checked={true}
+                                  checked={
+                                    selectedAddress &&
+                                    selectedAddress?.address_id ===
+                                      item?.address_id
+                                      ? true
+                                      : false
+                                  }
                                   onChange={(e) =>
                                     addressListHandleChange(e, item)
                                   }
@@ -696,7 +1237,7 @@ export default function Checkout() {
                                   >
                                     {item?.contact_name}
                                     <br />
-                                    {item?.phone ? item.phone : "phone num"}
+                                    {loginUser?.phone}
                                     <br />
                                     <div
                                       style={{
@@ -704,24 +1245,69 @@ export default function Checkout() {
                                         flexWrap: "wrap",
                                       }}
                                     >
-                                      {item?.address1},{item?.address2}
+                                      <div>{item?.address1}</div>,
+                                      <div>{item?.address2}</div>,
+                                      <div>{item?.city}</div>,
+                                      <div>{item?.state}</div>,
+                                      <div>{item?.zip_code}</div>
                                     </div>
                                     {/* JANZ Corp <br /> 9876543210 <br /> Address
                                     1, Address 2, City, State, Zip code */}
-                                    <div>{item?.zip_code}</div>
                                   </label>
                                   <br />
-                                  <button
-                                    type="button"
-                                    className="btn btn-primary px-4 mt-3"
-                                    onClick={deliverHereBtn}
-                                  >
-                                    Deliver Here
-                                  </button>
+
+                                  {selectedAddress &&
+                                    selectedAddress?.address_id ===
+                                      item?.address_id && (
+                                      <button
+                                        type="button"
+                                        className="btn btn-primary px-4 mt-3"
+                                        onClick={deliverHereBtn}
+                                      >
+                                        Deliver Here
+                                      </button>
+                                    )}
                                 </div>
                               </div>
+                              {selectedAddress &&
+                                selectedAddress?.address_id ===
+                                  item?.address_id && (
+                                  <div className="d-flex  align-items-center pt-3 ">
+                                    <span>
+                                      <input
+                                        class="form-check-input me-2"
+                                        type="checkbox"
+                                        id="inlineCheckbox1"
+                                        onClick={() =>
+                                          setbillingAddressCheckBox(
+                                            !billingAddressCheckBox
+                                          )
+                                        }
+                                      ></input>
+                                    </span>
+                                    <span>
+                                      Billing address is different than shipping
+                                      address
+                                    </span>{" "}
+                                    {billingAddressCheckBox && (
+                                      <span
+                                        style={{
+                                          color: "#1A8CD1",
+                                          cursor: "pointer",
+                                          textDecoration: "underline",
+                                        }}
+                                        className="ms-3 fw-bold"
+                                        data-bs-target="#exampleModalToggleBillingAddress"
+                                        data-bs-toggle="modal"
+                                      >
+                                        Choose Billing Address
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
                               <hr
                                 style={{
+                                  width: "815px",
                                   display:
                                     index === addressList.length - 1 && "none",
                                 }}
@@ -809,11 +1395,30 @@ export default function Checkout() {
                         <select
                           className="form-select"
                           aria-label="Default select example"
+                          value={selectedInsurance?.insurance_name}
+                          onChange={(e) => {
+                            for (
+                              let i = 0;
+                              i < insuranceList?.customer_insurance?.length;
+                              i++
+                            ) {
+                              if (
+                                insuranceList?.customer_insurance[i]
+                                  ?.insurance_name == e.target.value
+                              ) {
+                                setselectedInsurance(
+                                  insuranceList?.customer_insurance[i]
+                                );
+                                break;
+                              }
+                            }
+                          }}
                         >
-                          <option selected>Tricare</option>
-                          <option value="1">Tricare</option>
-                          <option value="2">Tricare</option>
-                          <option value="3">Tricare</option>
+                          {insuranceList?.insurance?.map((item, index) => (
+                            <option value={item?.insurance_name} key={index}>
+                              {item?.insurance_name}
+                            </option>
+                          ))}
                         </select>
                       </div>
                       <hr />
@@ -822,32 +1427,46 @@ export default function Checkout() {
                           <div>
                             <p>
                               <strong>Sponsor Name: </strong>{" "}
-                              <span>Vineet</span>
+                              <span>
+                                {selectedInsurance?.sponsor_first_name}&nbsp;{" "}
+                                {selectedInsurance?.sponsor_last_name}
+                              </span>
                             </p>
                             <p>
                               <strong>Policy Number: </strong>{" "}
-                              <span>98765</span>
+                              <span>{selectedInsurance?.policy_number}</span>
                             </p>
                           </div>
                         ) : (
                           <div className="edit-form-box">
                             <div className="row">
                               <div className="col-md-6">
-                                <Form>
-                                  {["radio"].map((type) => (
-                                    <div
-                                      key={`inline-${type}`}
-                                      className="mb-3"
-                                    >
-                                      <Form.Check
-                                        inline
-                                        label="Primary"
-                                        name="primary"
-                                        type={type}
-                                        id={`inline-${type}-3`}
-                                      />
-                                    </div>
-                                  ))}
+                                <Form onSubmit={handleSubmit}>
+                                  <div className="mb-3">
+                                    <Form.Check
+                                      inline
+                                      label="Primary"
+                                      name="primary"
+                                      type="radio"
+                                      id="insurance_default"
+                                      checked={
+                                        insuranceDetails.insurance_default ===
+                                        "on"
+                                          ? true
+                                          : false
+                                      }
+                                      onClick={() =>
+                                        setinsuranceDetails({
+                                          ...insuranceDetails,
+                                          insurance_default:
+                                            insuranceDetails.insurance_default ===
+                                            "on"
+                                              ? ""
+                                              : "on",
+                                        })
+                                      }
+                                    />
+                                  </div>
                                   <div className="mb-3">
                                     <label
                                       htmlFor="exampleInputName"
@@ -857,18 +1476,21 @@ export default function Checkout() {
                                     </label>
                                     <select
                                       name="insurance"
-                                      id="insurance"
+                                      id="insurance_name"
                                       className="form-select"
+                                      value={insuranceDetails.insurance_name}
+                                      onChange={handleInsuranceDetails}
                                     >
-                                      <option defaultValue="Tricare">
-                                        Tricare
-                                      </option>
-                                      <option defaultValue="Tricare">
-                                        Tricare
-                                      </option>
-                                      <option defaultValue="Tricare">
-                                        Tricare
-                                      </option>
+                                      {insuranceList?.insurance?.map(
+                                        (item, index) => (
+                                          <option
+                                            value={item?.insurance_name}
+                                            key={index}
+                                          >
+                                            {item?.insurance_name}
+                                          </option>
+                                        )
+                                      )}
                                     </select>
                                   </div>
                                   <div className="mb-3">
@@ -880,9 +1502,10 @@ export default function Checkout() {
                                     </label>
                                     <input
                                       type="text"
-                                      defaultValue="01-18-1958"
+                                      value={insuranceDetails.birth_date}
                                       className="form-control"
-                                      id="exampleInputAddress"
+                                      id="birth_date"
+                                      onChange={handleInsuranceDetails}
                                     />
                                   </div>
                                   <div className="mb-3">
@@ -894,9 +1517,10 @@ export default function Checkout() {
                                     </label>
                                     <input
                                       type="text"
-                                      defaultValue="989-924-2016"
+                                      value={insuranceDetails.subscriber_id}
                                       className="form-control"
-                                      id="exampleInputId"
+                                      id="subscriber_id"
+                                      onChange={handleInsuranceDetails}
                                     />
                                   </div>
                                   <div className="mb-3">
@@ -908,9 +1532,10 @@ export default function Checkout() {
                                     </label>
                                     <input
                                       type="text"
-                                      defaultValue="989-924-2016"
+                                      value={insuranceDetails.policy_number}
                                       className="form-control"
-                                      id="exampleInputMedicalNumber"
+                                      id="policy_number"
+                                      onChange={handleInsuranceDetails}
                                     />
                                   </div>
                                   <div className="mb-3">
@@ -922,9 +1547,10 @@ export default function Checkout() {
                                     </label>
                                     <input
                                       type="text"
-                                      defaultValue="9876543210"
+                                      value={insuranceDetails.group_number}
                                       className="form-control"
-                                      id="exampleInputAddress"
+                                      id="group_number"
+                                      onChange={handleInsuranceDetails}
                                     />
                                   </div>
                                   <div className="mb-3">
@@ -936,9 +1562,12 @@ export default function Checkout() {
                                     </label>
                                     <input
                                       type="text"
-                                      defaultValue="Abc"
+                                      value={
+                                        insuranceDetails.sponsor_first_name
+                                      }
                                       className="form-control"
-                                      id="exampleInputAddress"
+                                      id="sponsor_first_name"
+                                      onChange={handleInsuranceDetails}
                                     />
                                   </div>
                                   <div className="mb-3">
@@ -950,9 +1579,10 @@ export default function Checkout() {
                                     </label>
                                     <input
                                       type="text"
-                                      defaultValue="Def"
+                                      value={insuranceDetails.sponsor_last_name}
                                       className="form-control"
-                                      id="exampleInputAddress"
+                                      id="sponsor_last_name"
+                                      onChange={handleInsuranceDetails}
                                     />
                                   </div>
                                   <div className="mb-3">
@@ -964,9 +1594,10 @@ export default function Checkout() {
                                     </label>
                                     <input
                                       type="text"
-                                      defaultValue="00233"
+                                      value={insuranceDetails.sponsor_ssn}
                                       className="form-control"
-                                      id="exampleInputAddress"
+                                      id="sponsor_ssn"
+                                      onChange={handleInsuranceDetails}
                                     />
                                   </div>
                                   <div className="mb-3">
@@ -978,23 +1609,39 @@ export default function Checkout() {
                                     </label>
                                     <input
                                       type="text"
-                                      defaultValue="00233"
+                                      value={insuranceDetails.sponsor_dbn}
                                       className="form-control"
-                                      id="exampleInputAddress"
+                                      id="sponsor_dbn"
+                                      onChange={handleInsuranceDetails}
                                     />
                                   </div>
                                   <div className="d-flex justify-content-between ms-0">
                                     <button
                                       className="button button-default same-btn delete ml-10"
-                                      onClick={() =>
-                                        setEditUserprofile(!editUserprofile)
-                                      }
+                                      onClick={() => {
+                                        setinsuranceDetails({
+                                          customer_insruance_id: "",
+                                          insurance_default: "",
+                                          insurnace_id: "",
+                                          birth_date: "",
+                                          subscriber_id: "",
+                                          policy_number: "",
+                                          group_number: "",
+                                          sponsor_first_name: "",
+                                          sponsor_last_name: "",
+                                          sponsor_ssn: "",
+                                          sponsor_dbn: "",
+                                          insurance_name: "",
+                                        });
+                                        setEditUserprofile(true);
+                                      }}
                                     >
                                       Cancel
                                     </button>
                                     <button
                                       type="button"
                                       className="button button-blue same-btn mr-10"
+                                      onClick={addInsuranceDetails}
                                     >
                                       Save
                                     </button>
@@ -1011,18 +1658,14 @@ export default function Checkout() {
                           {editUserprofile ? (
                             <button
                               className="border-btn text-primary"
-                              onClick={() =>
-                                setEditUserprofile(!editUserprofile)
-                              }
+                              onClick={editForm}
                             >
                               Edit
                             </button>
                           ) : (
                             <button
                               className="border-btn text-primary"
-                              onClick={() =>
-                                setEditUserprofile(!editUserprofile)
-                              }
+                              onClick={() => setEditUserprofile(true)}
                             >
                               Cancel
                             </button>
@@ -1052,9 +1695,14 @@ export default function Checkout() {
                           Please upload/add your signature, so JANZ can submit
                           insurance claim form on your behalf
                         </p>
-                        <butto type="button" class="btn btn-primary px-3 mb-2">
+                        <button
+                          type="button"
+                          class="btn btn-primary px-3 mb-2"
+                          data-bs-target="#exampleModalToggleUploadIdSignature"
+                          data-bs-toggle="modal"
+                        >
                           Upload signature
-                        </butto>
+                        </button>
                       </div>
                       <div className="or-line">
                         <strong>or</strong>
@@ -1117,7 +1765,12 @@ export default function Checkout() {
                     </div>
                     <div className="">
                       <p className="fw-bold p-0 m-0"> User Insurance</p>
-                      <span>Tricare, Vineet, 98765</span>
+                      <span>
+                        {selectedInsurance?.insurance_name},{" "}
+                        {selectedInsurance?.sponsor_first_name} &nbsp;{" "}
+                        {selectedInsurance?.sponsor_last_name},{" "}
+                        {selectedInsurance?.policy_number}
+                      </span>
                     </div>
                   </div>
                   <div className="ms-auto">
@@ -1339,6 +1992,214 @@ export default function Checkout() {
                         <p className="fw-bold p-0 m-0">Order Summary</p>
                       </div>
                     </div>
+                    <div>
+                      {" "}
+                      <Table className="table-cartitems">
+                        <colgroup>
+                          <col width="60%" />
+                          <col />
+                        </colgroup>
+                        <thead className="">
+                          <tr className="px-3">
+                            <th scope="col">Product</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Price</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {cartItems?.map((item, index) => (
+                            <tr key={index}>
+                              <td>
+                                <div>
+                                  <div
+                                    className="card mb-3 px-2 "
+                                    style={{ maxWidth: "540px" }}
+                                  >
+                                    <div className="g-0 d-flex">
+                                      <div
+                                        className=""
+                                        style={{
+                                          maxWidth: "140px",
+                                          minWidth: "140px",
+                                        }}
+                                      >
+                                        <Image
+                                          className="img-fluid rounded-start"
+                                          width={150}
+                                          height={150}
+                                          src={
+                                            item?.mproduct?.product_image[0]
+                                              ?.image_file
+                                              ? `${process.env.NEXT_PUBLIC_MEDIA}${item?.mproduct?.product_image[0]?.image_file}`
+                                              : no_image
+                                          }
+                                          alt="..."
+                                        />
+                                      </div>
+                                      <div className="ms-3">
+                                        <div className="">
+                                          <h5 className="card-title">
+                                            {item?.mproduct?.product_name}
+                                          </h5>
+                                          <p>
+                                            {item?.mproduct?.brand?.brand_name}
+                                          </p>
+                                          {/* <p>Color: White</p> */}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    {item?.mproduct?.rx_required?.toLowerCase() ==
+                                      "y" && (
+                                      <>
+                                        {item?.product_variant?.rxdetails ? (
+                                          <div className="file-import d-flex ai-center mt-10">
+                                            <img
+                                              src={`${process.env.NEXT_PUBLIC_MEDIA}${item?.product_variant?.rxdetails?.rx_file}`}
+                                              style={{
+                                                width: "40px",
+                                                height: "30px",
+                                                margin: "5px",
+                                                marginRight: "10px",
+                                              }}
+                                              alt="doc"
+                                            />
+                                            <span
+                                              style={{ marginRight: "auto" }}
+                                            >
+                                              {
+                                                item?.product_variant?.rxdetails
+                                                  ?.rx_title
+                                              }
+                                            </span>
+
+                                            <button
+                                              onClick={() => {
+                                                setpreviewUrl(null);
+                                                setrawFile(null);
+                                              }}
+                                            >
+                                              <svg
+                                                className="icon"
+                                                style={{
+                                                  width: "20px",
+                                                  height: "20px",
+                                                }}
+                                              >
+                                                <use href="#icon_fileclose"></use>
+                                              </svg>
+                                            </button>
+                                          </div>
+                                        ) : (
+                                          <div className="d-flex flex-wrap justify-content-between align-items-center mt-3">
+                                            <div>
+                                              <span className="text-danger fw-bold">
+                                                Missing RX
+                                              </span>
+                                            </div>
+                                            <div
+                                              className="w-auto"
+                                              style={{ maxWidth: "140px" }}
+                                            >
+                                              <select
+                                                className="form-select"
+                                                aria-label="Default select example"
+                                                id="rx_title"
+                                                value={rx_title}
+                                                onChange={(e) =>
+                                                  setrx_title(e.target.value)
+                                                }
+                                              >
+                                                <option value="I will send my prescription to JANZ">
+                                                  I will send my prescription to
+                                                  JANZ
+                                                </option>
+                                                <option value="My prescription is on file">
+                                                  My prescription is on file
+                                                </option>
+                                                <option value="Upload my RX now">
+                                                  Upload my RX now
+                                                </option>
+                                              </select>
+                                            </div>
+                                            <div>
+                                              <button
+                                                type="button"
+                                                className="btn btn-primary"
+                                                // data-bs-target="#exampleModalToggleUpload"
+                                                // data-bs-toggle="modal"
+                                                onClick={() =>
+                                                  uploadRxButton(item)
+                                                }
+                                              >
+                                                Upload Rx
+                                              </button>
+                                            </div>
+                                          </div>
+                                        )}
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+                              </td>
+                              <td>Covered with Insurance</td>
+                              <td>
+                                <div className="d-inline-flex shadow-allside mb-3">
+                                  <button
+                                    className="btn p-0 bg-grey rounded-0 mmwh-28"
+                                    type="button"
+                                    onClick={() =>
+                                      handleChangeDecrement(index, item)
+                                    }
+                                    title="Minus"
+                                  >
+                                    <svg className="icon">
+                                      <use href="#icon_dash"></use>
+                                    </svg>
+                                  </button>
+                                  <input
+                                    type="text"
+                                    className="form-control rounded-0 mmw-36px p-0 text-center border-0"
+                                    aria-label=""
+                                    value={item?.qty}
+                                  />
+                                  <button
+                                    className="btn p-0 bg-grey rounded-0 mmwh-28"
+                                    type="button"
+                                    id="button-addon2"
+                                    onClick={() =>
+                                      handleChangeIncrement(index, item)
+                                    }
+                                    title="Plus"
+                                  >
+                                    <svg className="icon">
+                                      <use href="#icon_plus"></use>
+                                    </svg>
+                                  </button>
+                                </div>
+                                <span
+                                  className="text-primary fs-12 d-block"
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() => removeItemFromCart(item)}
+                                >
+                                  Remove item
+                                </span>
+                                {/* <div>
+                            <button
+                              type="button"
+                              className="btn btn-primary mt-2"
+                              onClick={() => updateCartFn(item)}
+                            >
+                              Update
+                            </button>
+                          </div> */}
+                              </td>
+                              <td>${calculateItemPrice(item)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </Table>
+                    </div>
                     <div className="row">
                       <div className="col-12 text-center text-md-end">
                         <button
@@ -1364,39 +2225,50 @@ export default function Checkout() {
                 <div className="d-flex">
                   <input
                     type="text"
-                    className="form-control bg-light me-3 w-50"
+                    className="form-control bg-light me-3 w-75 r"
                   />
-                  <button
-                    type="button"
-                    className="btn btn-green px-4 w-50 d-flex align-items-center"
-                  >
-                    <svg className="icon fs-22 me-2">
-                      <use href="#icon_checkcoupan"></use>
-                    </svg>
-                    Applied
-                  </button>
+                  {discountApplied ? (
+                    <button
+                      type="button"
+                      className="btn btn-green px-4 w-50 d-flex justify-content-center align-items-center"
+                      onClick={() => setdiscountApplied(!discountApplied)}
+                    >
+                      <svg className="icon fs-22 me-2">
+                        <use href="#icon_checkcoupan"></use>
+                      </svg>
+                      Applied
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="btn btn-green px-4 w-50 d-flex justify-content-center align-items-center"
+                      onClick={() => setdiscountApplied(!discountApplied)}
+                    >
+                      Apply
+                    </button>
+                  )}
                 </div>
                 <hr />
                 <div className="d-flex pb-2">
-                  <span>Subtotal (2 Items)</span>
-                  <span className="ms-auto">$400.00</span>
+                  <span>Subtotal ({cartItems?.length} Items)</span>
+                  <span className="ms-auto">${totalPrice}</span>
                 </div>
-                <div className="d-flex pb-2">
+                {/* <div className="d-flex pb-2">
                   <span>Delivery Fees</span>
                   <span className="ms-auto">$40.00</span>
-                </div>
-                <div className="d-flex text-green pb-2">
+                </div> */}
+                {/* <div className="d-flex text-green pb-2">
                   <span>Discount</span>
                   <span className="ms-auto">$40.00</span>
-                </div>
+                </div> */}
                 <div className="d-flex pb-2">
                   <span>Tax</span>
                   <span className="ms-auto">$40.00</span>
                 </div>
-                <div className="d-flex pb-2">
+                {/* <div className="d-flex pb-2">
                   <span>Shipping Cost</span>
                   <span className="ms-auto">$20.00</span>
-                </div>
+                </div> */}
                 <hr />
                 <div className="d-flex pb-2">
                   <span>Order Total</span>
@@ -1407,7 +2279,116 @@ export default function Checkout() {
           </div>
         </Container>
       </div>
-
+      <div
+        className="modal fade"
+        id="exampleModalToggleUpload"
+        aria-hidden="true"
+        aria-labelledby="exampleModalToggleLabel"
+        tabindex="-1"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+        ref={uploadRfRef}
+      >
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content p-3">
+            <div className="modal-header pb-0 border-0">
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                onClick={() => {
+                  const modal = uploadRfRef.current;
+                  modal.classList.remove("show");
+                  modal.setAttribute("aria-hidden", "true");
+                  document.body.classList.remove("modal-open");
+                  setrawFileRx(null);
+                  setpreviewUrlRx(null);
+                }}
+              ></button>
+            </div>
+            <div className="modal-body">
+              <h4 className="text-center pb-3 fs-22">Upload Rx</h4>
+              <div className="upload-box p-3">
+                <label className="drag-box input-file">
+                  {/* <img src={uploader}></img> */}
+                  <Image
+                    className="img-fluid rounded-start"
+                    width={80}
+                    height={55}
+                    src={uploader}
+                    alt="..."
+                  />
+                  <input
+                    type="file"
+                    accept="image/jpeg,application/pdf"
+                    id="fileUpload2"
+                    onChange={handleChangeFileFunRx}
+                  />
+                  <span>
+                    Drag and drop your image or <a href="">browse file</a> on
+                    your computer
+                  </span>
+                </label>
+              </div>
+              <div className="d-block rounded-2 p-1 my-2">
+                {previewUrlRx ? (
+                  <div
+                    className="file-import d-flex ai-center mt-10"
+                    id="remove_${inputid}"
+                  >
+                    <img
+                      src={previewUrlRx}
+                      style={{
+                        width: "40px",
+                        height: "30px",
+                        margin: "5px",
+                        marginRight: "10px",
+                      }}
+                      alt="doc"
+                    />
+                    <span style={{ marginRight: "auto" }}>
+                      {rawFileRx?.name}
+                    </span>
+                    <label htmlFor="fileUpload2" className="mr-10">
+                      <svg
+                        className="icon"
+                        style={{ width: "18px", height: "18px" }}
+                      >
+                        <use href="#icon_edit"></use>
+                      </svg>
+                    </label>
+                    <button
+                      onClick={() => {
+                        setpreviewUrlRx(null);
+                        setrawFileRx(null);
+                      }}
+                    >
+                      <svg
+                        className="icon"
+                        style={{ width: "20px", height: "20px" }}
+                      >
+                        <use href="#icon_fileclose"></use>
+                      </svg>
+                    </button>
+                  </div>
+                ) : (
+                  ""
+                )}
+              </div>
+              <div className="mt-1">
+                <label
+                  // htmlFor="fileUpload2"
+                  className="button button-blue upload-btn w-100 py-2 fs-20"
+                  onClick={() => uploadRxButtonToApi()}
+                >
+                  Upload
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div
         className="modal fade"
         id="exampleModalToggleUpload"
@@ -1469,7 +2450,12 @@ export default function Checkout() {
                         <use href="#icon_edit"></use>
                       </svg>
                     </label>
-                    <button onClick={() => setpreviewUrl(null)}>
+                    <button
+                      onClick={() => {
+                        setrawFile(null);
+                        setpreviewUrl(null);
+                      }}
+                    >
                       <svg
                         className="icon"
                         style={{ width: "20px", height: "20px" }}
@@ -1528,20 +2514,25 @@ export default function Checkout() {
                         type="file"
                         accept="image/*"
                         id="fileUpload1"
-                        onChange={handleChangeFileFun}
+                        onChange={handleChangeFileFunOne}
                       />
                       <span>
                         Drag and drop your image or <a href="">browse file</a>{" "}
                         on your computer
                       </span>
                     </label>
-                    {previewUrl ? (
+                    {previewUrlOne ? (
                       <div
                         className="file-import full-view"
                         id="remove_${inputid}"
                       >
-                        <img src={previewUrl} alt={rawFile?.name} />
-                        <button onClick={() => setpreviewUrl(null)}>
+                        <img src={previewUrlOne} alt={rawFileOne?.name} />
+                        <button
+                          onClick={() => {
+                            setrawFileOne(null);
+                            setpreviewUrlOne(null);
+                          }}
+                        >
                           <svg
                             className="icon"
                             style={{ width: "20px", height: "20px" }}
@@ -1577,7 +2568,12 @@ export default function Checkout() {
                         id="remove_${inputid}"
                       >
                         <img src={previewUrlTwo} alt={rawFileTwo?.name} />
-                        <button onClick={() => setpreviewUrlTwo(null)}>
+                        <button
+                          onClick={() => {
+                            setrawFileTwo(null);
+                            setpreviewUrlTwo(null);
+                          }}
+                        >
                           <svg
                             className="icon"
                             style={{ width: "20px", height: "20px" }}
@@ -1594,11 +2590,332 @@ export default function Checkout() {
               </div>
               <div className="mt-1">
                 <label
-                  htmlFor="fileUpload2"
+                  // htmlFor="fileUpload2"
                   className="btn btn-primary upload-btn w-100 py-2 fs-20"
                 >
                   Upload
                 </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="modal fade"
+        id="exampleModalToggleUploadIdSignature"
+        aria-hidden="true"
+        aria-labelledby="exampleModalToggleLabel"
+        tabIndex="-1"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+      >
+        <div className="modal-dialog modal-400 modal-dialog-centered">
+          <div className="modal-content p-3">
+            <div className="modal-header pb-0 border-0">
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body">
+              <h4 className="text-center pb-3 fs-22">Upload Signature</h4>
+              {/* <p className="text-center">You have to upload signature</p> */}
+              <div className="row">
+                <div className="col-md-12 pb-4">
+                  {/* <p className="fw-bold">Front Side</p> */}
+                  <div className="upload-box position-relative p-4">
+                    <label className="drag-box input-file p-3">
+                      <Image width={80} height={30} src={uploader} alt="..." />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        id="fileUpload1"
+                        onChange={handleChangeFileFunSignature}
+                      />
+                      <span>
+                        Drag and drop your image or <a href="">browse file</a>{" "}
+                        on your computer
+                      </span>
+                    </label>
+                    {previewUrlSignature ? (
+                      <div
+                        className="file-import full-view"
+                        id="remove_${inputid}"
+                      >
+                        <img
+                          src={previewUrlSignature}
+                          alt={rawFileSignature?.name}
+                        />
+                        <button
+                          onClick={() => {
+                            setrawFileSignature(null);
+                            setpreviewUrlSignature(null);
+                          }}
+                        >
+                          <svg
+                            className="icon"
+                            style={{ width: "20px", height: "20px" }}
+                          >
+                            <use href="#icon_fileclose"></use>
+                          </svg>
+                        </button>
+                      </div>
+                    ) : (
+                      ""
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="mt-1">
+                <label
+                  // htmlFor="fileUpload2"
+                  className="btn btn-primary upload-btn w-100 py-2 fs-20"
+                >
+                  Upload
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* add billing address */}
+      <div
+        className="modal fade"
+        id="exampleModalToggleAddBillingAddress"
+        aria-hidden="true"
+        aria-labelledby="exampleModalToggleLabel"
+        tabIndex="-1"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+      >
+        <div className="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+          <div className="modal-content p-3">
+            <div className="modal-header pb-0 border-0">
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body">
+              <div className="row">
+                <h5 className="pb-3">Add Billing Address</h5>
+                <div className="col-md-12">
+                  <div class="form-check mb-2">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="flexRadioDefault"
+                      id="flexRadioDefault5"
+                    />
+                    <label class="form-check-label">Primary</label>
+                  </div>
+                  <div className="mb-2">
+                    <label className="form-label">Name</label>
+                    <input
+                      type="text"
+                      value="Janz Corp"
+                      className="form-control"
+                      placeholder="Enter Your Name"
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <label className="form-label">Address 01</label>
+                    <input
+                      type="text"
+                      value="Address 01"
+                      className="form-control"
+                      placeholder="Enter Your Address 01"
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <label className="form-label">Address 02</label>
+                    <input
+                      type="text"
+                      value="Address 02"
+                      className="form-control"
+                      placeholder="Enter Your Address 02"
+                    />
+                  </div>
+                  <div className="mb-2 d-flex justify-content-between">
+                    <span className="me-2">Do you use APO/FPO Address?</span>
+                    <div>
+                      <input
+                        className="me-4"
+                        type="radio"
+                        name="flexRadioDefault"
+                        id="flexRadioDefault4"
+                      ></input>
+                      <input
+                        type="radio"
+                        name="flexRadioDefault"
+                        id="flexRadioDefault5"
+                      ></input>
+                    </div>
+                  </div>
+                  <div className="mb-2">
+                    <label className="form-label">City</label>
+                    <input
+                      type="text"
+                      value="New York"
+                      className="form-control"
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <label>State</label>
+                    <select className="form-control">
+                      <option>New York</option>
+                      <option>United State</option>
+                      <option>India</option>
+                      <option>Nepal</option>
+                    </select>
+                  </div>
+                  <div className="mb-2">
+                    <label className="form-label">Country</label>
+                    <input type="text" value="abc" className="form-control" />
+                  </div>
+                  <div className="mb-2">
+                    <label className="form-label">ZIP Code</label>
+                    <input type="text" value="00033" className="form-control" />
+                  </div>
+                  <div className="d-flex justify-content-between pt-3">
+                    <button
+                      type="button"
+                      className="btn btn-outline-primary px-5"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-outline-primary px-5"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Billing address popup */}
+      <div
+        className="modal fade"
+        id="exampleModalToggleBillingAddress"
+        aria-hidden="true"
+        aria-labelledby="exampleModalToggleLabel"
+        tabIndex="-1"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+      >
+        <div className="modal-dialog modal-lg modal-dialog-centered">
+          <div className="modal-content p-3">
+            <div className="modal-header pb-0 border-0">
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body">
+              <div className="row">
+                <div className="col-6">
+                  <p className="fw-bold fs-20">Choose Billing Address</p>
+                </div>
+                <div className="col-6 text-end">
+                  <div className="mb-2">
+                    <button className="border-btn text-primary">
+                      Add Address
+                    </button>
+                  </div>
+                  <div>
+                    <button
+                      className="border-btn text-primary"
+                      data-bs-target="#exampleModalToggleAddBillingAddress"
+                      data-bs-toggle="modal"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-12">
+                  {addressList
+                    ?.filter(
+                      (address) =>
+                        address.address_id != selectedAddress.address_id
+                    )
+                    .map((item, index, arr) => (
+                      <>
+                        <div class="form-check">
+                          <input
+                            class="form-check-input"
+                            type="radio"
+                            name="flexRadioDefault"
+                            id="flexRadioDefault1"
+                          />
+                          <label
+                            class="form-check-label"
+                            style={{ maxWidth: "400px" }}
+                          >
+                            <p className="p-0 m-0"> {item?.contact_name}</p>
+                            <p className="p-0 m-0">{loginUser?.phone}</p>
+                            <p
+                              className="p-0 m-0"
+                              style={{
+                                display: "flex",
+                                flexWrap: "wrap",
+                              }}
+                            >
+                              <div>{item?.address1}</div>,
+                              <div>{item?.address2}</div>,
+                              <div>{item?.city}</div>,<div>{item?.state}</div>,
+                              <div>{item?.zip_code}</div>
+                            </p>
+                          </label>
+                        </div>
+                        <hr
+                          style={{
+                            display:
+                              index === arr.length - 1 ? "none" : "block",
+                          }}
+                        />
+                      </>
+                    ))}
+
+                  {/* <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="flexRadioDefault"
+                      id="flexRadioDefault2"
+                    />
+                    <label
+                      class="form-check-label"
+                      style={{ maxWidth: "400px" }}
+                    >
+                      <p className="p-0 m-0">JANZ Corp</p>
+                      <p className="p-0 m-0">9876543210</p>
+                      <p className="p-0 m-0">
+                        Address 1, Address 2, City, State, Zip code
+                      </p>
+                    </label>
+                  </div> */}
+                  <div className="text-center text-md-end pt-4">
+                    <button
+                      type="button"
+                      className="btn btn-primary px-5"
+                      disabled
+                    >
+                      Continue
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

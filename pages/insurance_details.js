@@ -28,8 +28,12 @@ export default function Insurancedetails() {
     sponsor_dbn: "",
     insurance_name: "",
   });
+  // selected delete item
+  const [selectedDeleteInsurance, setselectedDeleteInsurance] = useState({});
   // console.log(insuranceDetails, "Insurance details");
   const [insuranceList, setinsuranceList] = useState({});
+  // items in the insurance list
+  const [insuranceListItems, setinsuranceListItems] = useState([]);
   // handle insurance details
   const handleInsuranceDetails = (e) => {
     setinsuranceDetails({ ...insuranceDetails, [e.target.id]: e.target.value });
@@ -37,7 +41,7 @@ export default function Insurancedetails() {
 
   const editForm = (item) => {
     setinsuranceDetails({
-      customer_insruance_id: item.customer_insruance_id,
+      customer_insruance_id: item.customer_insurance_id,
       insurance_default: item.insurance_default == "1" ? "on" : "",
       insurnace_id: item.insurnace_id,
       birth_date: item.birth_date,
@@ -48,7 +52,7 @@ export default function Insurancedetails() {
       sponsor_last_name: item.sponsor_last_name,
       sponsor_ssn: item.sponsor_ssn,
       sponsor_dbn: item.sponsor_dbn,
-      insurance_name: "",
+      insurance_name: item.insurance_name,
     });
     setEditForm(true);
   };
@@ -60,10 +64,12 @@ export default function Insurancedetails() {
     { id: 4, isShown: false },
   ]);
   const [tableDelete, setTableDelete] = useState(false);
-  function handleClickOpen() {
-    setTableDelete((tableDelete) => !tableDelete);
+  function handleClickOpen(item) {
+    setTableDelete(true);
+    setselectedDeleteInsurance(item);
   }
   let toggleClassOpen = tableDelete ? " show" : "";
+  // console.log(selectedDeleteInsurance, "delete insurance");
 
   const [btnState, setBtnState] = useState(false);
   function handleClick() {
@@ -123,7 +129,7 @@ export default function Insurancedetails() {
           Authorization: "Bearer " + token,
         },
         data: {
-          customer_insruance_id: insuranceDetails.customer_insruance_id,
+          customer_insurance_id: insuranceDetails.customer_insruance_id,
           insurance_default:
             insuranceDetails.insurance_default === "on" ? 1 : 0,
           insurnace_id: insurnace_id,
@@ -189,17 +195,25 @@ export default function Insurancedetails() {
         // alert("Error");
         console.log("Error");
       } else {
-        setinsuranceList(response?.data);
-        setinsuranceDetails({
-          ...insuranceDetails,
-          insurance_name: response?.data?.insurance[0]?.insurance_name
-            ? response?.data?.insurance[0]?.insurance_name
-            : "",
-          insurnace_id: response?.data?.insurance[0].insurance_id
-            ? response?.data?.insurance[0].insurance_id
-            : "",
-        });
-        // setinsuranceList();
+        let listAddedInsuranceName = response?.data?.customer_insurance?.map(
+          (customer_insurance) => {
+            let insurance_name = response?.data?.insurance?.find(
+              (insurance_item) =>
+                insurance_item?.insurance_id == customer_insurance?.insurnace_id
+            )?.insurance_name;
+            return { ...customer_insurance, insurance_name };
+          }
+        );
+        let modifiedObj = {
+          customer_insurance: listAddedInsuranceName,
+          insurance: response?.data?.insurance,
+        };
+        // let insuranceListItems=[];
+        // for(let i=0;i<listAddedInsuranceName?.length;i++){
+        //   insuranceListItems.push(listAddedInsuranceName[i]?.)
+        // }
+
+        setinsuranceList(modifiedObj);
       }
     } catch (error) {
       console.log(error);
@@ -219,6 +233,40 @@ export default function Insurancedetails() {
     }
     // console.log(item);
     return name;
+  };
+
+  // delete item from the table
+  const deleteItemFromTable = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const token = localStorage.getItem("janz_medical_login_token");
+      // console.log(insurnace_id);
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/insurance/delete`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        data: {
+          customer_insurance_id: selectedDeleteInsurance.customer_insurance_id,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        // alert("Error");
+        console.log("Error");
+      } else {
+        // console.log(response.data);
+        setTableDelete(false);
+        getInsuranceList();
+        // alert("Success");
+      }
+    } catch (error) {
+      console.log(error);
+      // alert("Error");
+    }
   };
   useEffect(() => {
     getInsuranceList();
@@ -449,8 +497,14 @@ export default function Insurancedetails() {
                       {insuranceList?.customer_insurance?.map((item, index) => (
                         <tr key={index}>
                           <td>
-                            <a style={{ textDecorationLine: "underline" }}>
-                              {checkName(item)}
+                            <a>
+                              <span style={{ textDecorationLine: "underline" }}>
+                                {checkName(item)}&nbsp;{" "}
+                              </span>
+
+                              {item?.insurance_default == "1" && (
+                                <span>{"( Primary )"}</span>
+                              )}
                             </a>
                             <br />
                             <span>
@@ -475,7 +529,7 @@ export default function Insurancedetails() {
                                 </Dropdown.Item>
                                 <Dropdown.Item
                                   as="button"
-                                  onClick={handleClickOpen}
+                                  onClick={() => handleClickOpen(item)}
                                 >
                                   Delete
                                 </Dropdown.Item>
@@ -512,11 +566,17 @@ export default function Insurancedetails() {
                 <button
                   type="button"
                   className="button button-blue same-btn mr-10"
-                  onClick={handleClickOpen}
+                  onClick={() => {
+                    setTableDelete(false);
+                    setselectedDeleteInsurance({});
+                  }}
                 >
                   Cancel
                 </button>
-                <button className="button button-default same-btn delete ml-10">
+                <button
+                  className="button button-default same-btn delete ml-10"
+                  onClick={deleteItemFromTable}
+                >
                   Delete
                 </button>
               </div>

@@ -585,7 +585,7 @@ export default function Myorder() {
           aria-labelledby="exampleModalCenterTitle"
           aria-hidden="true"
         >
-          <div className="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-md-down">
+          <div className="modal-dialog modal-dialog-centered modal-lg ">
             <div className="modal-content border-0 rounded-md-4 overflow-hidden">
               <div className="modal-body p-0">
                 <div className="bg-primary py-2 px-4 d-block text-center d-md-none position-relative">

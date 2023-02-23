@@ -61,6 +61,8 @@ export default function Profiledetails() {
   });
   // Address list
   const [addressList, setaddressList] = useState([]);
+  // selected delete item
+  const [selectedDeleteAddress, setselectedDeleteAddress] = useState({});
 
   const handleProfileDetails = (e) => {
     setprofileDetails({ ...profileDetails, [e.target.id]: e.target.value });
@@ -97,9 +99,13 @@ export default function Profiledetails() {
     { id: 4, isShown: false },
   ]);
   const [tableDelete, setTableDelete] = useState(false);
-  async function handleClickOpen() {
-    setTableDelete((tableDelete) => !tableDelete);
+  function handleClickOpen(item) {
+    setselectedDeleteAddress(item);
+    setTimeout(() => {
+      setTableDelete(true);
+    }, 100);
   }
+  console.log(selectedDeleteAddress, "selected delte address");
   let toggleClassOpen = tableDelete ? " show" : "";
 
   const [btnState, setBtnState] = useState(false);
@@ -446,7 +452,39 @@ export default function Profiledetails() {
       console.log(error);
     }
   };
+  // delete item from the table
+  const deleteItemFromTable = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const token = localStorage.getItem("janz_medical_login_token");
+      // console.log(insurnace_id);
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/address/delete`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        data: {
+          address_id: selectedDeleteAddress.address_id,
+        },
+      });
 
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        // alert("Error");
+        console.log("Error");
+      } else {
+        // console.log(response.data);
+        setTableDelete(false);
+        getAddressList();
+        // alert("Success");
+      }
+    } catch (error) {
+      console.log(error);
+      // alert("Error");
+    }
+  };
   // // Use effect
   // useEffect(() => {
 
@@ -988,7 +1026,7 @@ export default function Profiledetails() {
                                 </Dropdown.Item>
                                 <Dropdown.Item
                                   as="button"
-                                  onClick={handleClickOpen}
+                                  onClick={() => handleClickOpen(item)}
                                 >
                                   Delete
                                 </Dropdown.Item>
@@ -1218,11 +1256,17 @@ export default function Profiledetails() {
                 <button
                   type="button"
                   className="button button-blue same-btn mr-10"
-                  onClick={handleClickOpen}
+                  onClick={() => {
+                    setTableDelete(false);
+                    setselectedDeleteAddress({});
+                  }}
                 >
                   Cancel
                 </button>
-                <button className="button button-default same-btn delete ml-10">
+                <button
+                  className="button button-default same-btn delete ml-10"
+                  onClick={deleteItemFromTable}
+                >
                   Delete
                 </button>
               </div>
