@@ -68,7 +68,11 @@ export default function Header() {
             <div className="d-flex justify-content-center pt-4">
               <h2>Good Evening Janz</h2>
             </div>
-            <button typeof="button" className="button button-blue w-100">
+            <button
+              typeof="button"
+              className="button button-blue w-100 l"
+              // onClick={() => router.push("/index")}
+            >
               Continue Shopping
             </button>
             <ul>
@@ -159,7 +163,7 @@ export default function Header() {
             <div className="col align-self-center">
               <div className="col-md-12 d-flex justify-content-end">
                 <div className="nav-btn">
-                  <Link href={"#"}>
+                  <Link href={"/"}>
                     <button type="button" className="button button-blue fs-20">
                       Continue Shopping
                     </button>
