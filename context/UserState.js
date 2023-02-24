@@ -6,7 +6,7 @@ import axios from "axios";
 const UserState = (props) => {
   const router = useRouter();
   const closeRefRegisterModalandOpenLogin = useRef();
-  const [productsData, setProductsData] = useState(null);
+  const [productsData, setProductsData] = useState({});
   const [loginUserAvalilable, setloginUserAvalilable] = useState(false);
   // cart items
   const [cartItems, setcartItems] = useState([]);
@@ -71,11 +71,22 @@ const UserState = (props) => {
 
   // menu content
   async function fetchData() {
-    const res = await axios.get(`${process.env.NEXT_PUBLIC_URL}menu/content`);
-    // setProductsData(res.data);
-    if (res.data.status != false) {
-      // console.log(res.data, "RES DATA");
-      setProductsData(res.data);
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_URL}menu/content`,
+        { timeout: 5000 }
+      );
+      if (res.data.status !== false) {
+        setProductsData(res.data);
+      }
+    } catch (error) {
+      console.error(error);
+      if (error.code === "ECONNABORTED") {
+        // handle timeout error
+        setProductsData(null); // set data to null or an empty array, depending on your use case
+        return;
+      }
+      // handle other types of errors
     }
   }
 
