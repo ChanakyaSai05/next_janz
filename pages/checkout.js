@@ -446,7 +446,8 @@ export default function Checkout() {
       } else {
         console.log(response, "order details");
         alert("Order successful");
-        // router.push("/");
+        getCartItemsFn();
+        router.push("/");
       }
     } catch (error) {
       console.log(error);
