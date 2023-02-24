@@ -48,7 +48,7 @@ const UserState = (props) => {
       if (response.data.status == false) {
         console.log("Error");
       } else {
-        console.log(response?.data);
+        console.log(response?.data, "cart items");
         calculateTotalCartPrice(response?.data?.cart_products);
         setcartItems(response?.data?.cart_products);
       }

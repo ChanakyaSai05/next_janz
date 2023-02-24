@@ -11,6 +11,7 @@ import {
   Dropdown,
   Table,
 } from "react-bootstrap";
+import dayjs from "dayjs";
 import Headerlanding from "../components/headerlanding";
 import Form from "react-bootstrap/Form";
 import uploader from "../public/images/uploader.svg";
@@ -41,6 +42,8 @@ export default function Checkout() {
 
   // address list
   const [addressList, setaddressList] = useState([]);
+  // tax details
+  const [taxDetails, settaxDetails] = useState({});
 
   // Router
   const router = useRouter();
@@ -104,6 +107,7 @@ export default function Checkout() {
     primary: "",
   });
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [selectedAddressBilling, setSelectedAddressBilling] = useState(null);
   const [selectedInsurance, setselectedInsurance] = useState(null);
   const formRef = useRef(null);
 
@@ -120,6 +124,7 @@ export default function Checkout() {
   const [rawFileSignature, setrawFileSignature] = useState(null);
   const [previewUrlSignature, setpreviewUrlSignature] = useState(null);
   const [rxSeclectedItem, setrxSeclectedItem] = useState({});
+  const [documentsList, setdocumentsList] = useState({});
 
   // billing address checkbox
   const [billingAddressCheckBox, setbillingAddressCheckBox] = useState(false);
@@ -145,12 +150,20 @@ export default function Checkout() {
   const [insuranceList, setinsuranceList] = useState({});
   // upload rx ref
   const uploadRfRef = useRef();
+
+  // close modal
+  const billingModalRef = useRef();
+
+  // close documents modal
+  const closeDocumentsModal = useRef();
+  // close signature modal
+  const closeSignatureModal = useRef();
   const handleProfileDetails = (e) => {
     setprofileDetails({ ...profileDetails, [e.target.id]: e.target.value });
   };
 
   //
-  const addressSaveButton = async () => {
+  const addressSaveButton = async (type) => {
     try {
       let user = JSON.parse(localStorage.getItem("janz_medical_user"));
       const token = localStorage.getItem("janz_medical_login_token");
@@ -183,7 +196,11 @@ export default function Checkout() {
         console.log("Error");
       } else {
         // console.log(response.data);
-        setEditCancel(false);
+        if (type === "normalAddress") {
+          setEditCancel(false);
+        } else if (type === "billingAddress") {
+          billingModalRef.current.click();
+        }
         setprofileDetails({
           name: "",
           address1: "",
@@ -355,8 +372,85 @@ export default function Checkout() {
     setprofileStates({ ...profileStates, order_summary: true });
   };
   // Onclick submit continue button
-  const SubmitContinueButton = () => {
+  const getIndividualTax = (item) => {
+    let tax = taxDetails?.lines?.find(
+      (tax_detail) => tax_detail?.description == item?.mproduct?.product_name
+    )?.taxableAmount;
+
+    if (tax) {
+      return tax;
+    } else {
+      return 0;
+    }
+  };
+  const SubmitContinueButton = async () => {
     // Pending
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      let token = localStorage.getItem("janz_medical_login_token");
+
+      let cart_items_sendToBackend = [];
+      for (let i = 0; i < cartItems.length; i++) {
+        let item = cartItems[i];
+        let obj = {};
+        obj["product_id"] = item?.product_id;
+        obj["product_variant_id"] = item?.product_variant_id;
+        obj["qty"] = item?.qty;
+        obj["variant_msrp"] = item?.variant_msrp;
+        obj["variant_store_price"] = item?.variant_store_price;
+        obj["variant_sale_price"] = item?.variant_sale_price;
+        obj["variant_weight"] = item?.variant_weight;
+        obj["variant_unit"] = item?.variant_unit;
+        obj["tax_code"] = "";
+        obj["total_amount"] =
+          parseInt(item?.qty) + parseInt(item?.variant_sale_price);
+        obj["tax_amount"] = getIndividualTax(item);
+        obj["cash_amount"] = "0";
+        obj["insurance_amount"] =
+          parseInt(item?.qty) + parseInt(item?.variant_sale_price);
+        cart_items_sendToBackend.push(obj);
+      }
+      console.log(
+        cart_items_sendToBackend,
+        "cart items need to send to backend"
+      );
+      let data = {
+        bill_address_id: selectedAddress?.address_id,
+        ship_address_id: selectedAddressBilling
+          ? selectedAddressBilling?.address_id
+          : selectedAddress?.address_id,
+        total_qty: "5",
+        coupon_code: "",
+        total_amount: totalPrice,
+        delivery_amount: totalPrice,
+        discount_amount: "",
+        tax_amount: taxDetails?.totalTax,
+        cash_amount: "0",
+        insurance_amount: totalPrice,
+        remark: "this is test order",
+        products: cart_items_sendToBackend,
+      };
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/documentlist`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        data: data,
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        console.log(response, "order details");
+        alert("Order successful");
+        router.push("/");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // user insurance change button
@@ -388,9 +482,14 @@ export default function Checkout() {
     // console.log(e.target.checked);
     setSelectedAddress(item);
   };
+  //address button checked
+  const addressListHandleChangeBillingAddress = (e, item) => {
+    // console.log(e.target.checked);
+    setSelectedAddressBilling(item);
+  };
 
   // address edit button
-  const editButtonClickedFn = (item) => {
+  const editButtonClickedFn = (item, type) => {
     setprofileDetails({
       ...profileDetails,
       address_id: item?.address_id,
@@ -410,7 +509,9 @@ export default function Checkout() {
           ? "no"
           : "yes",
     });
-    setEditCancel(true);
+    if (type === "normalAddress") {
+      setEditCancel(true);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -492,7 +593,7 @@ export default function Checkout() {
     setEditUserprofile(false);
   };
   // console.log(addressList, "address list");
-  // console.log(selectedAddress, "selected address");
+  console.log(selectedAddress, "selected address");
   // console.log(insuranceDetails, "insurance list");
   console.log(selectedInsurance, "selected insurance");
   // add insurance detials
@@ -656,6 +757,128 @@ export default function Checkout() {
       });
     });
   };
+  // uploadSignature button
+  const uploadSignatureBtnFn = async (type) => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      let token = localStorage.getItem("janz_medical_login_token");
+      let formdata = new FormData();
+      formdata.append("insurance_id", selectedInsurance?.insurnace_id);
+      if (type === "normalUpload") {
+        formdata.append("customer_signature", rawFileSignature);
+        const response = await axios({
+          url: `${process.env.NEXT_PUBLIC_URL}customer/documentupload`,
+          method: "POST",
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+          data: formdata,
+        });
+
+        // console.log(response, "result");
+        if (response.data.status == false) {
+          console.log("Error");
+        } else {
+          closeSignatureModal.current.click();
+          sigPad.current.clear();
+          getDocumentsList();
+        }
+      } else {
+        let signature = sigPad.current.toDataURL();
+        // console.log("I'm in else block", signature);
+
+        fetch(signature)
+          .then((res) => res.blob())
+          .then(async (blob) => {
+            const file = new File([blob], "signature.png", {
+              type: "image/png",
+            });
+            // console.log(file); // This is your file object
+            // Now you can do something with the file, like upload it to your server
+            formdata.append("customer_signature", file);
+            const response = await axios({
+              url: `${process.env.NEXT_PUBLIC_URL}customer/documentupload`,
+              method: "POST",
+              headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
+              },
+              data: formdata,
+            });
+
+            // console.log(response, "result");
+            if (response.data.status == false) {
+              console.log("Error");
+            } else {
+              closeSignatureModal.current.click();
+              sigPad.current.clear();
+              getDocumentsList();
+            }
+          })
+          .catch((error) => console.error(error));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const uploadDocumentsBtnFn = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      let token = localStorage.getItem("janz_medical_login_token");
+      let formdata = new FormData();
+      formdata.append("insurance_id", selectedInsurance?.insurnace_id);
+      formdata.append("customer_document_front", rawFileOne);
+      formdata.append("customer_document_back", rawFileTwo);
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/documentupload`,
+        method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+        data: formdata,
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        closeDocumentsModal.current.click();
+        getDocumentsList();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // get documents list
+  const getDocumentsList = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      let token = localStorage.getItem("janz_medical_login_token");
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/documentlist`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        data: {
+          insurance_id: selectedInsurance?.insurnace_id,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        console.log(response, "documents list");
+        setdocumentsList(response?.data?.document);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   // update function from the cart
   const updateCartFn = async (item, qty) => {
@@ -725,12 +948,186 @@ export default function Checkout() {
       console.log(error);
     }
   };
+  // const getTaxapi = async () => {
+  //   try {
+  //     let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+  //     let linesNeedToSend = [];
+  //     const today = dayjs().format("YYYY-MM-DD");
+  //     for (let i = 0; i < cartItems?.length; i++) {
+  //       let item = cartItems[i];
+  //       let obj = {};
+  //       obj["number"] = i + 1;
+  //       obj["quantity"] = item?.qty;
+  //       obj["amount"] =
+  //         parseInt(item?.qty) * parseInt(item?.variant_sale_price);
+  //       obj["taxCode"] = "PS081282";
+  //       obj["itemCode"] = item?.product_variant_id;
+  //       obj["description"] = item?.mproduct?.product_name;
+  //       linesNeedToSend.push(obj);
+  //     }
+  //     const newRandomNumber = Math.floor(Math.random() * 900) + 100;
+  //     // const auth = btoa("milan@infiniticube.com:Jazn@268");
+  //     const auth = Buffer.from("milan@infiniticube.com:Jazn@268").toString(
+  //       "base64"
+  //     );
+  //     // headers
+  //     var myHeaders = new Headers();
+  //     myHeaders.append("Authorization", `Authorization: Basic ${auth}`);
+  //     myHeaders.append("Content-Type", "application/json");
+  //     // raw
+
+  //     // var raw = JSON.stringify({
+  //     //   lines: linesNeedToSend,
+  //     //   type: "SalesInvoice",
+  //     //   companyCode: "DEFAULT",
+  //     //   date: today, //todays date
+  //     //   customerCode: "10297", //p id //custumer detail
+  //     //   purchaseOrderNo: `${today}-${newRandomNumber}`,
+  //     //   addresses: {
+  //     //     singleLocation: {
+  //     // line1: selectedAddress?.address1 + " " + selectedAddress?.address2,
+  //     // city:
+  //     //   selectedAddress?.state == "AA" ||
+  //     //   selectedAddress?.state == "AP" ||
+  //     //   selectedAddress?.state == "AE"
+  //     //     ? ""
+  //     //     : selectedAddress?.city,
+  //     // region: selectedAddress?.state,
+  //     // country: selectedAddress?.country ? selectedAddress?.country : "",
+  //     // postalCode: selectedAddress?.zip_code,
+  //     //     },
+  //     //   },
+  //     //   commit: true,
+  //     //   currencyCode: "USD",
+  //     //   description: "Yarn",
+  //     // });
+  //     var raw = JSON.stringify({
+  //       tax_request: {
+  //         lines: linesNeedToSend,
+  //         type: "SalesInvoice",
+  //         companyCode: "DEFAULT",
+  //         date: today,
+  //         customerCode: "10297",
+  //         purchaseOrderNo: `${today}-${newRandomNumber}`,
+  //         addresses: {
+  //           singleLocation: {
+  //             line1:
+  //               selectedAddress?.address1 + " " + selectedAddress?.address2,
+  //             city:
+  //               selectedAddress?.state == "AA" ||
+  //               selectedAddress?.state == "AP" ||
+  //               selectedAddress?.state == "AE"
+  //                 ? ""
+  //                 : selectedAddress?.city,
+  //             region: selectedAddress?.state,
+  //             country: selectedAddress?.country ? selectedAddress?.country : "",
+  //             postalCode: selectedAddress?.zip_code,
+  //           },
+  //         },
+  //         commit: true,
+  //         currencyCode: "USD",
+  //         description: "Yarn",
+  //       },
+  //     });
+
+  //     var requestOptions = {
+  //       method: "POST",
+  //       headers: myHeaders,
+  //       body: raw,
+  //       redirect: "manual",
+  //     };
+
+  //     fetch(`${process.env.NEXT_PUBLIC_URL}product/check/tax`, requestOptions)
+  //       .then((response) => response.text())
+  //       .then((result) => console.log(result, "tax result"))
+  //       .catch((error) => console.log("error", error));
+  //   } catch (error) {
+  //     console.log(error, "error");
+  //   }
+  // };
+  const getTaxapi = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      let linesNeedToSend = [];
+      const today = dayjs().format("YYYY-MM-DD");
+      for (let i = 0; i < cartItems?.length; i++) {
+        let item = cartItems[i];
+        let obj = {};
+        obj["number"] = i + 1;
+        obj["quantity"] = item?.qty;
+        obj["amount"] =
+          parseInt(item?.qty) * parseInt(item?.variant_sale_price);
+        obj["taxCode"] = "PS081282";
+        obj["itemCode"] = item?.product_variant_id;
+        obj["description"] = item?.mproduct?.product_name;
+        linesNeedToSend.push(obj);
+      }
+      const newRandomNumber = Math.floor(Math.random() * 900) + 100;
+      // const auth = btoa("milan@infiniticube.com:Jazn@268");
+      const auth = Buffer.from("milan@infiniticube.com:Jazn@268").toString(
+        "base64"
+      );
+      //       var myHeaders = new Headers();
+      // myHeaders.append("Authorization", "Authorization: Basic aHR0cHdhdGNoOmY=");
+      // myHeaders.append("Content-Type", "application/json");
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}product/check/tax`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${auth}`,
+          "Access-Control-Allow-Origin": "*",
+        },
+        data: {
+          tax_request: {
+            lines: linesNeedToSend,
+            type: "SalesInvoice",
+            companyCode: "DEFAULT",
+            date: today,
+            customerCode: "10297",
+            purchaseOrderNo: `${today}-${newRandomNumber}`,
+            addresses: {
+              singleLocation: {
+                line1:
+                  selectedAddress?.address1 + " " + selectedAddress?.address2,
+                city:
+                  selectedAddress?.state == "AA" ||
+                  selectedAddress?.state == "AP" ||
+                  selectedAddress?.state == "AE"
+                    ? ""
+                    : selectedAddress?.city,
+                region: selectedAddress?.state,
+                country: selectedAddress?.country
+                  ? selectedAddress?.country
+                  : "",
+                postalCode: selectedAddress?.zip_code,
+              },
+            },
+            commit: true,
+            currencyCode: "USD",
+            description: "Yarn",
+          },
+        },
+      });
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        console.log(response, "tax response");
+        settaxDetails(response?.data?.tax_details);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("janz_medical_user"));
     setloginUser(user);
     getAddressList();
     getInsuranceList();
     getCartItemsFn();
+    getDocumentsList();
   }, []);
   useEffect(() => {
     let states = State.getStatesOfCountry("US");
@@ -822,7 +1219,24 @@ export default function Checkout() {
                     </div>
                     <button
                       className="border-btn ms-auto text-primary"
-                      onClick={() => setEditCancel(true)}
+                      onClick={() => {
+                        setprofileDetails({
+                          name: "",
+                          address1: "",
+                          address2: "",
+                          apoFpo: "yes",
+                          addressType: "",
+                          city: "",
+                          state: "",
+                          country: "",
+                          zipCode: "",
+                          unitBox: "",
+                          us_states: "",
+                          address_id: "0",
+                          primary: "",
+                        });
+                        setEditCancel(true);
+                      }}
                     >
                       Add Address
                     </button>
@@ -1094,7 +1508,7 @@ export default function Checkout() {
                                       </label>
                                       <select
                                         className="form-control"
-                                        id="us_states"
+                                        id="state"
                                         value={profileDetails.state}
                                         onChange={handleProfileDetails}
                                       >
@@ -1171,7 +1585,7 @@ export default function Checkout() {
                                         ...profileDetails,
                                         address_id: "0",
                                       });
-                                      addressSaveButton();
+                                      addressSaveButton("normalAddress");
                                     }}
                                   >
                                     Save
@@ -1204,7 +1618,10 @@ export default function Checkout() {
                                         <button
                                           className="border-btn text-primary"
                                           onClick={() => {
-                                            editButtonClickedFn(item);
+                                            editButtonClickedFn(
+                                              item,
+                                              "normalAddress"
+                                            );
                                           }}
                                         >
                                           Edit
@@ -1262,7 +1679,10 @@ export default function Checkout() {
                                       <button
                                         type="button"
                                         className="btn btn-primary px-4 mt-3"
-                                        onClick={deliverHereBtn}
+                                        onClick={() => {
+                                          getTaxapi();
+                                          deliverHereBtn();
+                                        }}
                                       >
                                         Deliver Here
                                       </button>
@@ -1676,17 +2096,42 @@ export default function Checkout() {
                       <hr />
                       <div>
                         <p className="fw-bold m-0">Upload ID:</p>
+                        {Object.keys(documentsList).length == 0}
                         <p>
                           We would be needing your ID to process the insurance
                         </p>
-                        <butto
+                        <button
                           type="button"
                           class="btn btn-primary px-3 mb-2"
                           data-bs-target="#exampleModalToggleUploadId"
                           data-bs-toggle="modal"
                         >
                           Upload ID
-                        </butto>
+                        </button>
+                        {Object.keys(documentsList).length != 0 && (
+                          <div className="d-flex">
+                            <div>
+                              {documentsList?.customer_document_front && (
+                                <img
+                                  width="150"
+                                  height="140"
+                                  src={`${process.env.NEXT_PUBLIC_MEDIA}${documentsList?.customer_document_front}`}
+                                  alt="Document Front Page"
+                                />
+                              )}
+                            </div>
+                            <div>
+                              {documentsList?.customer_document_back && (
+                                <img
+                                  width="150"
+                                  height="140"
+                                  src={`${process.env.NEXT_PUBLIC_MEDIA}${documentsList?.customer_document_back}`}
+                                  alt="Document Back Page"
+                                />
+                              )}
+                            </div>
+                          </div>
+                        )}
                       </div>
                       <hr />
                       <div>
@@ -1734,12 +2179,27 @@ export default function Checkout() {
                               <button
                                 type="button"
                                 className="btn btn-primary px-3"
-                                onClick={save}
+                                // onClick={save}
+                                onClick={() =>
+                                  uploadSignatureBtnFn("signaturePadUpload")
+                                }
                               >
                                 use this signature
                               </button>
                             </div>
                           </div>
+                          {Object.keys(documentsList).length != 0 && (
+                            <div>
+                              {documentsList?.customer_signature && (
+                                <img
+                                  width="320"
+                                  height="140"
+                                  src={`${process.env.NEXT_PUBLIC_MEDIA}${documentsList?.customer_signature}`}
+                                  alt="=Signature"
+                                />
+                              )}
+                            </div>
+                          )}
                         </div>
                         <div className="col-12 text-center text-md-end">
                           <button
@@ -2261,10 +2721,12 @@ export default function Checkout() {
                   <span>Discount</span>
                   <span className="ms-auto">$40.00</span>
                 </div> */}
-                <div className="d-flex pb-2">
-                  <span>Tax</span>
-                  <span className="ms-auto">$40.00</span>
-                </div>
+                {taxDetails?.totalTax != null && (
+                  <div className="d-flex pb-2">
+                    <span>Tax</span>
+                    <span className="ms-auto">${taxDetails?.totalTax}</span>
+                  </div>
+                )}
                 {/* <div className="d-flex pb-2">
                   <span>Shipping Cost</span>
                   <span className="ms-auto">$20.00</span>
@@ -2272,7 +2734,12 @@ export default function Checkout() {
                 <hr />
                 <div className="d-flex pb-2">
                   <span>Order Total</span>
-                  <span className="ms-auto">$420.00</span>
+                  <span className="ms-auto">
+                    $
+                    {totalPrice + taxDetails?.totalTax
+                      ? taxDetails?.totalTax
+                      : 0}
+                  </span>
                 </div>
               </div>
             </div>
@@ -2497,6 +2964,7 @@ export default function Checkout() {
                 className="btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                ref={closeDocumentsModal}
               ></button>
             </div>
             <div className="modal-body">
@@ -2591,6 +3059,7 @@ export default function Checkout() {
               <div className="mt-1">
                 <label
                   // htmlFor="fileUpload2"
+                  onClick={uploadDocumentsBtnFn}
                   className="btn btn-primary upload-btn w-100 py-2 fs-20"
                 >
                   Upload
@@ -2617,6 +3086,7 @@ export default function Checkout() {
                 className="btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                ref={closeSignatureModal}
               ></button>
             </div>
             <div className="modal-body">
@@ -2672,6 +3142,7 @@ export default function Checkout() {
                 <label
                   // htmlFor="fileUpload2"
                   className="btn btn-primary upload-btn w-100 py-2 fs-20"
+                  onClick={() => uploadSignatureBtnFn("normalUpload")}
                 >
                   Upload
                 </label>
@@ -2698,6 +3169,7 @@ export default function Checkout() {
                 className="btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                ref={billingModalRef}
               ></button>
             </div>
             <div className="modal-body">
@@ -2708,8 +3180,15 @@ export default function Checkout() {
                     <input
                       class="form-check-input"
                       type="radio"
-                      name="flexRadioDefault"
-                      id="flexRadioDefault5"
+                      // name="flexRadioDefault"
+                      // id="flexRadioDefault5"
+                      checked={profileDetails?.primary === "on"}
+                      onClick={() => {
+                        setprofileDetails({
+                          ...profileDetails,
+                          primary: profileDetails.primary === "on" ? "" : "on",
+                        });
+                      }}
                     />
                     <label class="form-check-label">Primary</label>
                   </div>
@@ -2717,80 +3196,260 @@ export default function Checkout() {
                     <label className="form-label">Name</label>
                     <input
                       type="text"
-                      value="Janz Corp"
+                      value={profileDetails.name}
                       className="form-control"
-                      placeholder="Enter Your Name"
+                      id="name"
+                      onChange={handleProfileDetails}
                     />
                   </div>
                   <div className="mb-2">
                     <label className="form-label">Address 01</label>
                     <input
                       type="text"
-                      value="Address 01"
+                      value={profileDetails.address1}
                       className="form-control"
-                      placeholder="Enter Your Address 01"
+                      id="address1"
+                      onChange={handleProfileDetails}
                     />
                   </div>
                   <div className="mb-2">
                     <label className="form-label">Address 02</label>
                     <input
                       type="text"
-                      value="Address 02"
+                      value={profileDetails.address2}
                       className="form-control"
-                      placeholder="Enter Your Address 02"
+                      id="address2"
+                      onChange={handleProfileDetails}
                     />
                   </div>
                   <div className="mb-2 d-flex justify-content-between">
                     <span className="me-2">Do you use APO/FPO Address?</span>
-                    <div>
-                      <input
-                        className="me-4"
-                        type="radio"
-                        name="flexRadioDefault"
-                        id="flexRadioDefault4"
-                      ></input>
-                      <input
-                        type="radio"
-                        name="flexRadioDefault"
-                        id="flexRadioDefault5"
-                      ></input>
+                    <div className="d-flex">
+                      <div class="form-check me-3">
+                        <input
+                          className=" form-check-input"
+                          type="radio"
+                          id="inline-radio-4"
+                          onClick={() => {
+                            setprofileDetails({
+                              ...profileDetails,
+                              apoFpo: "yes",
+                              state: "",
+                              country: "",
+                            });
+                          }}
+                          checked={profileDetails.apoFpo === "yes"}
+                        />
+                        <label class="form-check-label" for="inline-radio-4">
+                          Yes
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input
+                          className=" form-check-input"
+                          type="radio"
+                          id="inline-radio-5"
+                          onClick={() => {
+                            setprofileDetails({
+                              ...profileDetails,
+                              apoFpo: "no",
+                              state: "AE",
+                              unitBox: "",
+                            });
+                          }}
+                          checked={profileDetails.apoFpo === "no"}
+                        />
+                        <label class="form-check-label" for="inline-radio-5">
+                          No
+                        </label>
+                      </div>
                     </div>
                   </div>
-                  <div className="mb-2">
-                    <label className="form-label">City</label>
-                    <input
-                      type="text"
-                      value="New York"
-                      className="form-control"
-                    />
-                  </div>
-                  <div className="mb-2">
-                    <label>State</label>
-                    <select className="form-control">
-                      <option>New York</option>
-                      <option>United State</option>
-                      <option>India</option>
-                      <option>Nepal</option>
-                    </select>
-                  </div>
-                  <div className="mb-2">
-                    <label className="form-label">Country</label>
-                    <input type="text" value="abc" className="form-control" />
-                  </div>
-                  <div className="mb-2">
-                    <label className="form-label">ZIP Code</label>
-                    <input type="text" value="00033" className="form-control" />
-                  </div>
+                  {profileDetails.apoFpo === "no" ? (
+                    <div className="yes-btn-show">
+                      <div className="mb-3 d-flex justify-content-between">
+                        <span>Address Type</span>
+                        {["radio"].map((type) => (
+                          <div key={`inline-${type}`} className="mb-3">
+                            <Form.Check
+                              inline
+                              label="APO"
+                              name="group5"
+                              type={type}
+                              id="addressType"
+                              onClick={() =>
+                                setprofileDetails({
+                                  ...profileDetails,
+                                  addressType: "APO",
+                                })
+                              }
+                              checked={profileDetails.addressType === "APO"}
+                            />
+                            <Form.Check
+                              inline
+                              label="FPO"
+                              name="group5"
+                              type={type}
+                              id="addressType"
+                              onClick={() =>
+                                setprofileDetails({
+                                  ...profileDetails,
+                                  addressType: "FPO",
+                                })
+                              }
+                              checked={profileDetails.addressType === "FPO"}
+                            />
+                            <Form.Check
+                              inline
+                              label="DPO"
+                              name="group5"
+                              type={type}
+                              id="addressType"
+                              onClick={() =>
+                                setprofileDetails({
+                                  ...profileDetails,
+                                  addressType: "DPO",
+                                })
+                              }
+                              checked={profileDetails.addressType === "DPO"}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mb-3">
+                        <label htmlFor="exampleInputBox" className="form-label">
+                          Unit/Box #
+                        </label>
+                        <input
+                          type="text"
+                          value={profileDetails.unitBox}
+                          className="form-control"
+                          id="unitBox"
+                          onChange={handleProfileDetails}
+                        />
+                      </div>
+                      <div className="mb-3 form-group">
+                        <label for="exampleFormControlSelect1">State</label>
+                        <select
+                          className="form-control"
+                          id="state"
+                          value={profileDetails.state}
+                          onChange={handleProfileDetails}
+                        >
+                          {["AE", "AP", "AA"].map((item, index) => (
+                            <option key={index}>{item}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="mb-3">
+                        <label
+                          htmlFor="exampleInputCountry"
+                          className="form-label"
+                        >
+                          Country
+                        </label>
+                        <input
+                          type="text"
+                          value={profileDetails.country}
+                          className="form-control"
+                          id="country"
+                          onChange={handleProfileDetails}
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label
+                          htmlFor="exampleInputZipcode"
+                          className="form-label"
+                        >
+                          ZIP Code
+                        </label>
+                        <input
+                          type="text"
+                          value={profileDetails.zipCode}
+                          className="form-control"
+                          id="zipCode"
+                          onChange={handleProfileDetails}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="no-btn-show">
+                      <div className="mb-2">
+                        <label className="form-label">City</label>
+                        <input
+                          type="text"
+                          value={profileDetails.city}
+                          className="form-control"
+                          id="city"
+                          onChange={handleProfileDetails}
+                        />
+                      </div>
+                      <div className="mb-2">
+                        <label>State</label>
+                        <select
+                          className="form-control"
+                          id="state"
+                          value={profileDetails.state}
+                          onChange={handleProfileDetails}
+                        >
+                          <option value="">Select state</option>
+                          {usStates?.map((item, index) => (
+                            <>
+                              <option value={item?.name}>{item?.name}</option>
+                            </>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="mb-2">
+                        <label className="form-label">ZIP Code</label>
+                        <input
+                          type="text"
+                          value={profileDetails.zipCode}
+                          className="form-control"
+                          id="zipCode"
+                          onChange={handleProfileDetails}
+                        />
+                      </div>
+                    </div>
+                  )}
+
                   <div className="d-flex justify-content-between pt-3">
                     <button
                       type="button"
                       className="btn btn-outline-primary px-5"
+                      onClick={() => {
+                        setprofileDetails({
+                          name: "",
+                          address1: "",
+                          address2: "",
+                          apoFpo: "yes",
+                          addressType: "",
+                          city: "",
+                          state: "",
+                          country: "",
+                          zipCode: "",
+                          unitBox: "",
+                          us_states: "",
+                          address_id: "0",
+                          primary: "",
+                        });
+                        setSelectedAddressBilling(null);
+                      }}
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
                     >
                       Cancel
                     </button>
                     <button
                       type="button"
                       className="btn btn-outline-primary px-5"
+                      onClick={() => {
+                        setprofileDetails({
+                          ...profileDetails,
+                          address_id: "0",
+                        });
+                        addressSaveButton("billingAddress");
+                      }}
                     >
                       Save
                     </button>
@@ -2819,6 +3478,9 @@ export default function Checkout() {
                 className="btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                onClick={() => {
+                  setSelectedAddressBilling(null);
+                }}
               ></button>
             </div>
             <div className="modal-body">
@@ -2828,18 +3490,40 @@ export default function Checkout() {
                 </div>
                 <div className="col-6 text-end">
                   <div className="mb-2">
-                    <button className="border-btn text-primary">
+                    <button
+                      className="border-btn text-primary"
+                      data-bs-target="#exampleModalToggleAddBillingAddress"
+                      data-bs-toggle="modal"
+                      onClick={() => {
+                        setprofileDetails({
+                          name: "",
+                          address1: "",
+                          address2: "",
+                          apoFpo: "yes",
+                          addressType: "",
+                          city: "",
+                          state: "",
+                          country: "",
+                          zipCode: "",
+                          unitBox: "",
+                          us_states: "",
+                          address_id: "0",
+                          primary: "",
+                        });
+                        setSelectedAddressBilling(null);
+                      }}
+                    >
                       Add Address
                     </button>
                   </div>
                   <div>
-                    <button
+                    {/* <button
                       className="border-btn text-primary"
                       data-bs-target="#exampleModalToggleAddBillingAddress"
                       data-bs-toggle="modal"
                     >
                       Edit
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               </div>
@@ -2852,12 +3536,22 @@ export default function Checkout() {
                     )
                     .map((item, index, arr) => (
                       <>
-                        <div class="form-check">
+                        <div class="form-check  position-relative">
                           <input
                             class="form-check-input"
                             type="radio"
-                            name="flexRadioDefault"
-                            id="flexRadioDefault1"
+                            // name="flexRadioDefault"
+                            // id="flexRadioDefaultBillingAddress"
+                            checked={
+                              selectedAddressBilling &&
+                              selectedAddressBilling?.address_id ===
+                                item?.address_id
+                                ? true
+                                : false
+                            }
+                            onChange={(e) =>
+                              addressListHandleChangeBillingAddress(e, item)
+                            }
                           />
                           <label
                             class="form-check-label"
@@ -2878,6 +3572,21 @@ export default function Checkout() {
                               <div>{item?.zip_code}</div>
                             </p>
                           </label>
+                          {selectedAddressBilling &&
+                            selectedAddressBilling?.address_id ===
+                              item?.address_id && (
+                              <button
+                                className="border-btn text-primary position-absolute"
+                                style={{ right: "0px", top: "0px" }}
+                                data-bs-target="#exampleModalToggleAddBillingAddress"
+                                data-bs-toggle="modal"
+                                onClick={() => {
+                                  editButtonClickedFn(item, "billingAddress");
+                                }}
+                              >
+                                Edit
+                              </button>
+                            )}
                         </div>
                         <hr
                           style={{
@@ -2910,7 +3619,9 @@ export default function Checkout() {
                     <button
                       type="button"
                       className="btn btn-primary px-5"
-                      disabled
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                      disabled={selectedAddressBilling ? false : true}
                     >
                       Continue
                     </button>
