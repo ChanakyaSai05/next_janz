@@ -431,7 +431,7 @@ export default function Checkout() {
         products: cart_items_sendToBackend,
       };
       const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}customer/documentlist`,
+        url: `${process.env.NEXT_PUBLIC_URL}customer/orderconfirm`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -446,7 +446,7 @@ export default function Checkout() {
       } else {
         console.log(response, "order details");
         alert("Order successful");
-        router.push("/");
+        // router.push("/");
       }
     } catch (error) {
       console.log(error);
