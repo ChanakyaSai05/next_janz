@@ -29,6 +29,7 @@ export default function Categoryfilter(props) {
   const [checkedTypeOfProductItems, setcheckedTypeOfProductItems] = useState(
     []
   );
+  const [product_wishlist, setproduct_wishlist] = useState([]);
 
   const handleCheckboxChange = (e) => {
     const brandName = e.target.value;
@@ -79,10 +80,110 @@ export default function Categoryfilter(props) {
   }
   let toggleClassCheck = btnState ? " filter-show" : "";
 
-  console.log(productsData, "products data");
+  // console.log(productsData, "products data");
+  // wishlist delete
+  const deleteWishListItem = async (sub_product) => {
+    // console.log(sub_product, "sub_product");
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/wishlist/delete`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          product_id: sub_product?.product_id,
+          customer_id: user?.customer_id,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        // console.log(response?.data, "product wishlist");
+        getWishListButton();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // wishlist add
+  const submitWishListButton = async (sub_product) => {
+    console.log(sub_product, "subproduct");
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/wishlist/add`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          product_id: sub_product?.product_id,
+          product_variant_id: sub_product?.product_variants[0]
+            ?.product_variant_id
+            ? sub_product?.product_variants[0]?.product_variant_id
+            : null,
+          customer_id: user?.customer_id,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        // console.log(response?.data, "product wishlist");
+        getWishListButton();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // get wishlist
+  const getWishListButton = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/wishlist`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          customer_id: user?.customer_id,
+          wishlist: false,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        // console.log(response?.data);
+        setproduct_wishlist(response?.data?.product_wishlist);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const findInWishlist = (sub_product) => {
+    for (let i = 0; i < product_wishlist?.length; i++) {
+      const element = product_wishlist[i];
+      if (element?.product_id == sub_product?.product_id) {
+        return true;
+      }
+    }
+
+    return false;
+  };
 
   useEffect(() => {
     getCartItemsFn();
+    getWishListButton();
   }, []);
 
   return (
@@ -278,10 +379,12 @@ export default function Categoryfilter(props) {
                             <p className="fw-bold fs-18 p-0 m-0 me-2">
                               {sub_product?.product_name}
                             </p>
-                            {editCancel ? (
+                            {!findInWishlist(sub_product) ? (
                               <div
                                 className="like-down-box"
-                                onClick={() => setEditCancel(!editCancel)}
+                                onClick={() => {
+                                  submitWishListButton(sub_product);
+                                }}
                               >
                                 <svg className="icon">
                                   <use href="#icon_like-dull"></use>
@@ -290,7 +393,9 @@ export default function Categoryfilter(props) {
                             ) : (
                               <div
                                 className="like-down-box"
-                                onClick={() => setEditCancel(!editCancel)}
+                                onClick={() => {
+                                  deleteWishListItem(sub_product);
+                                }}
                               >
                                 <svg className="icon">
                                   <use href="#icon_like"></use>
@@ -315,10 +420,12 @@ export default function Categoryfilter(props) {
                           <div className="d-flex pb-3">
                             <div>
                               <span className="badge text-bg-primary p-2 px-3 me-2">
-                                4.3 &#9733;
+                                {sub_product?.avg_ratting} &#9733;
                               </span>
                               <span className="fw-bold">
-                                257 Ratings & 30 Reviews{" "}
+                                {sub_product?.total_ratting} Ratings &{" "}
+                                {sub_product?.total_review}
+                                Reviews{" "}
                               </span>
                             </div>
                           </div>
@@ -380,6 +487,9 @@ export default function Categoryfilter(props) {
                                       router.push(
                                         `/category/${categoryId}/${sub_categoryId}/${sub_sub_categoryId}/${sub_product?.product_variants[0]?.variant_permlink}`
                                       );
+                                      // router.push(
+                                      //   `/product_detail/${categoryId}/${sub_categoryId}/${sub_sub_categoryId}/${sub_product?.product_variants[0]?.variant_permlink}`
+                                      // );
                                     }
                                   }}
                                 >

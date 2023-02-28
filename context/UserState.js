@@ -83,7 +83,7 @@ const UserState = (props) => {
       console.error(error);
       if (error.code === "ECONNABORTED") {
         // handle timeout error
-        setProductsData(null); // set data to null or an empty array, depending on your use case
+        setProductsData({}); // set data to null or an empty array, depending on your use case
         return;
       }
       // handle other types of errors

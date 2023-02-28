@@ -73,6 +73,18 @@ function MyAccountDropdown({ headerlanding }) {
             Subscription
           </Dropdown.Item>
           <Dropdown.Divider />
+          <Dropdown.Item
+            className="droplistitem"
+            onClick={() => router.push("/wishlist")}
+          >
+            <span>
+              <svg className="icon">
+                <use href="#icon_like_asidebar"></use>
+              </svg>
+            </span>
+            Wishlist
+          </Dropdown.Item>
+          <Dropdown.Divider />
           <Dropdown.Item className="droplistitem" onClick={logoutBtn}>
             <span>
               <svg className="icon">

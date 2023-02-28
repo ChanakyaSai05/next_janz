@@ -62,6 +62,17 @@ export default function Asidebar() {
           </li>
           <hr />
           <li>
+            <Link href={"/wishlist"} className="nav-link">
+              <span>
+                <svg className="icon">
+                  <use href="#icon_like_asidebar"></use>
+                </svg>
+              </span>
+              <strong>Wishlist</strong>
+            </Link>
+          </li>
+          <hr />
+          <li>
             <Link href={""} className="nav-link">
               <span>
                 <svg className="icon">
@@ -72,12 +83,12 @@ export default function Asidebar() {
             </Link>
           </li>
           <li>
-            <Link href={"profile_details"} className="nav-link">
+            <Link href={"/profile_details"} className="nav-link">
               <strong className="small">Profile Details</strong>
             </Link>
           </li>
           <li>
-            <Link href={"insurance_details"} className="nav-link">
+            <Link href={"/insurance_details"} className="nav-link">
               <strong className="small">Insurance Details</strong>
             </Link>
           </li>

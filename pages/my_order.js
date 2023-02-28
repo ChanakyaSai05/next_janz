@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "../components/header";
 import Asidebar from "../components/asidebar";
 import Image from "next/image";
@@ -40,30 +40,33 @@ export default function Myorder() {
     setFormShow((formShow) => !btnState);
   }
   let toggleClassForm = btnState ? " show-form" : "";
+  const getAllOrderedItems = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      let token = localStorage.getItem("janz_medical_login_token");
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}product/cartproduct/delete`,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-  const mouseEnterFn = (show) => {
-    setTable((cate) =>
-      cate.map((item, index) => {
-        if (item.id === show.id) {
-          return { ...item, isShown: true };
-        } else {
-          return item;
-        }
-      })
-    );
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        console.log(response?.data, "all ordered items");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const mouseLeaveFn = (show) => {
-    setTable((cate) =>
-      cate.map((item, index) => {
-        if (item.id === show.id) {
-          return { ...item, isShown: false };
-        } else {
-          return item;
-        }
-      })
-    );
-  };
+  useEffect(() => {
+    getAllOrderedItems();
+  }, []);
 
   return (
     <>

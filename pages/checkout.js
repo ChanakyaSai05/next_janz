@@ -404,7 +404,8 @@ export default function Checkout() {
         obj["tax_code"] = "";
         obj["total_amount"] =
           parseInt(item?.qty) + parseInt(item?.variant_sale_price);
-        obj["tax_amount"] = getIndividualTax(item);
+        // obj["tax_amount"] = getIndividualTax(item);
+        obj["tax_amount"] = taxDetails?.lines[i]?.taxableAmount;
         obj["cash_amount"] = "0";
         obj["insurance_amount"] =
           parseInt(item?.qty) + parseInt(item?.variant_sale_price);
@@ -1121,6 +1122,14 @@ export default function Checkout() {
       console.log(error);
     }
   };
+  const calculateTotalPrice = () => {
+    let price = totalPrice;
+    if (taxDetails?.totalTax != null) {
+      price += parseInt(taxDetails?.totalTax);
+    }
+
+    return price;
+  };
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("janz_medical_user"));
@@ -1176,17 +1185,19 @@ export default function Checkout() {
                           <use href="#icon_greencheck"></use>
                         </svg>
                       </div>
-                      <div className="">
+                      <div className=" ">
                         <p className="fw-bold p-0 m-0">User Profile</p>
-                        <span style={{ textAlign: "justify" }}>
-                          {selectedAddress?.contact_name},&nbsp;
-                          {loginUser?.phone},&nbsp;{selectedAddress?.address1}
-                          ,&nbsp;
-                          {selectedAddress?.address2},&nbsp;
-                          {selectedAddress?.city},&nbsp;
-                          {selectedAddress?.state},&nbsp;
-                          {selectedAddress?.zip_code}
-                        </span>
+                        <div style={{ display: "flex", flexWrap: "wrap" }}>
+                          <div>{selectedAddress?.contact_name},</div>
+                          <div>
+                            {loginUser?.phone},&nbsp;{selectedAddress?.address1}
+                            ,&nbsp;
+                          </div>
+                          <div>{selectedAddress?.address2},&nbsp;</div>
+                          <div>{selectedAddress?.city},&nbsp;</div>
+                          <div>{selectedAddress?.state},&nbsp;</div>
+                          <div>{selectedAddress?.zip_code}</div>
+                        </div>
                       </div>
                     </div>
                     <div className="ms-auto">
@@ -1648,7 +1659,7 @@ export default function Checkout() {
                                     addressListHandleChange(e, item)
                                   }
                                 />
-                                <div className="ms-4">
+                                <div className="ms-4 ">
                                   <label
                                     class="form-check-label"
                                     for="flexRadioDefault1"
@@ -2500,7 +2511,17 @@ export default function Checkout() {
                                       </div>
                                       <div className="ms-3">
                                         <div className="">
-                                          <h5 className="card-title">
+                                          <h5
+                                            className="card-title"
+                                            style={{ cursor: "pointer" }}
+                                            onClick={() => {
+                                              if (item?.product_variant) {
+                                                router.push(
+                                                  `/product_detail/checkout/${item?.product_variant?.variant_permlink}`
+                                                );
+                                              }
+                                            }}
+                                          >
                                             {item?.mproduct?.product_name}
                                           </h5>
                                           <p>
@@ -2735,12 +2756,7 @@ export default function Checkout() {
                 <hr />
                 <div className="d-flex pb-2">
                   <span>Order Total</span>
-                  <span className="ms-auto">
-                    $
-                    {totalPrice + taxDetails?.totalTax
-                      ? taxDetails?.totalTax
-                      : 0}
-                  </span>
+                  <span className="ms-auto">${calculateTotalPrice()}</span>
                 </div>
               </div>
             </div>

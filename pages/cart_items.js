@@ -356,7 +356,17 @@ export default function Cart() {
                                 </div>
                                 <div className="ms-3">
                                   <div className="">
-                                    <h5 className="card-title">
+                                    <h5
+                                      className="card-title"
+                                      style={{ cursor: "pointer" }}
+                                      onClick={() => {
+                                        if (item?.product_variant) {
+                                          router.push(
+                                            `/product_detail/cart_items/${item?.product_variant?.variant_permlink}`
+                                          );
+                                        }
+                                      }}
+                                    >
                                       {item?.mproduct?.product_name}
                                     </h5>
                                     <p>{item?.mproduct?.brand?.brand_name}</p>

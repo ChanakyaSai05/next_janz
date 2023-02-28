@@ -25,6 +25,8 @@ import no_image from "../../../public/images/no_image.jpg";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import axios from "axios";
+import { useContext, useEffect, useState } from "react";
+import UserContext from "../../../context/UserContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,6 +34,9 @@ export default function Category(props) {
   const router = useRouter();
   const params = router.query;
   const { categoryId } = params;
+  const context = useContext(UserContext);
+  const { getCartItemsFn } = context;
+  const [product_wishlist, setproduct_wishlist] = useState([]);
   console.log(props, "props");
   const hero = {
     dots: true,
@@ -78,7 +83,106 @@ export default function Category(props) {
       },
     ],
   };
+  // wishlist add
+  const submitWishListButton = async (sub_product) => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/wishlist/add`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          product_id: sub_product?.product_id,
+          product_variant_id: sub_product?.product_variants[0]
+            ?.product_variant_id
+            ? sub_product?.product_variants[0]?.product_variant_id
+            : null,
+          customer_id: user?.customer_id,
+        },
+      });
 
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        // console.log(response?.data, "product wishlist");
+        getWishListButton();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // get wishlist
+  const getWishListButton = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/wishlist`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          customer_id: user?.customer_id,
+          wishlist: false,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        // console.log(response?.data);
+        setproduct_wishlist(response?.data?.product_wishlist);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // wishlist delete
+  const deleteWishListItem = async (sub_product) => {
+    // console.log(sub_product, "sub_product");
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/wishlist/delete`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          product_id: sub_product?.product_id,
+          customer_id: user?.customer_id,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        // console.log(response?.data, "product wishlist");
+        getWishListButton();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const findInWishlist = (sub_product) => {
+    for (let i = 0; i < product_wishlist?.length; i++) {
+      const element = product_wishlist[i];
+      if (element?.product_id == sub_product?.product_id) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+  useEffect(() => {
+    getCartItemsFn();
+    getWishListButton();
+  }, []);
   // add to cart button
   const cartIconBtn = () => {
     // need to sent to local storage
@@ -259,11 +363,29 @@ export default function Category(props) {
                                   >
                                     <div className="card-bodys">
                                       <div className="d-flex justify-content-between">
-                                        <div className="like-down-box">
-                                          <svg className="icon">
-                                            <use href="#icon_like"></use>
-                                          </svg>
-                                        </div>
+                                        {!findInWishlist(sub_product) ? (
+                                          <div
+                                            className="like-down-box"
+                                            onClick={() => {
+                                              submitWishListButton(sub_product);
+                                            }}
+                                          >
+                                            <svg className="icon">
+                                              <use href="#icon_like-dull"></use>
+                                            </svg>
+                                          </div>
+                                        ) : (
+                                          <div
+                                            className="like-down-box"
+                                            onClick={() => {
+                                              deleteWishListItem(sub_product);
+                                            }}
+                                          >
+                                            <svg className="icon">
+                                              <use href="#icon_like"></use>
+                                            </svg>
+                                          </div>
+                                        )}
                                         <div
                                           className="download-box"
                                           onClick={() =>
@@ -290,9 +412,11 @@ export default function Category(props) {
                                         {sub_product?.product_name}
                                       </p>
                                       <span className="badge text-bg-primary p-2 px-3 me-2">
-                                        4.1 &#9733;
+                                        {sub_product?.avg_ratting} &#9733;
                                       </span>
-                                      <span>(176)</span>
+                                      <span>
+                                        ({sub_product?.total_ratting})
+                                      </span>
                                     </div>
                                   </div>
                                 )

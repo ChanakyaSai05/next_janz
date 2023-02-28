@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import Slider from "react-slick";
@@ -30,11 +30,11 @@ const inter = Inter({ subsets: ["latin"] });
 export default function Productdetail(props) {
   const context = useContext(UserContext);
   const { getCartItemsFromProductsDetail } = context;
-  console.log(props, "props");
+  // console.log(props, "props");
   const router = useRouter();
   const params = router.query;
-  const { brandId, product_detail } = params;
-  console.log(params);
+  const { dynamic_page, product_detail } = params;
+  // console.log(params);
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   // quantity
@@ -51,7 +51,17 @@ export default function Productdetail(props) {
     choose_insurance: "",
     subscriber_id: "",
   });
+  // get rating details
+  const [productRatingDetails, setproductRatingDetails] = useState({});
+  // all orders details
+  const [allOrderDetails, setallOrderDetails] = useState([]);
 
+  // review
+  const [product_review, setproduct_review] = useState("");
+  // stars
+  const [starRating, setstarRating] = useState(0);
+  //close review modal ref
+  const closeReviewModalRef = useRef();
   // insurance avaibily details change
   const handleInsuranceAvalibilityChange = (e) => {
     setinsuranceAvalilability({
@@ -59,6 +69,7 @@ export default function Productdetail(props) {
       [e.target.id]: e.target.value,
     });
   };
+  const [product_wishlist, setproduct_wishlist] = useState([]);
 
   // console.log(insuranceAvalilability, "insurance availability");
 
@@ -185,12 +196,36 @@ export default function Productdetail(props) {
   });
 
   const [editCancel, setEditCancel] = useState(false);
-
+  const [loggedInUser, setloggedInUser] = useState({});
   // add to cart from machine only
   const machineOnlyBtn = () => {
     // logic to add to cart
   };
+  // get rating details
+  const getRatingDetails = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/review/details`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          product_variant_id: props?.product?.product_variant_id,
+        },
+      });
 
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        setproductRatingDetails(response?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   // insurance availability submit button
   const insuranceAvalilabilitySubmitButton = async () => {
     try {
@@ -330,8 +365,202 @@ export default function Productdetail(props) {
   // useEffect(() => {
   //   getCartItemsFromProductsDetail();
   // });
+  const getAllOrderedItems = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      let token = localStorage.getItem("janz_medical_login_token");
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/order/history`,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        // console.log(response?.data, "all ordered items");
+        setallOrderDetails(response?.data?.orders);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // check the item exists in orders
+  const checkWhetherItExistsInOrders = () => {
+    for (let i = 0; i < allOrderDetails?.length; i++) {
+      let order_product = allOrderDetails[i]?.order_product;
+      for (let j = 0; j < order_product.length; j++) {
+        let each_product = order_product[j];
+        if (
+          each_product?.product_variant_id == props?.product?.product_variant_id
+        ) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }
+
+    return false;
+  };
+
+  //  review add
+  const submitReviewButton = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      let token = localStorage.getItem("janz_medical_login_token");
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/review/save`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        data: {
+          product_variant_id: props?.product?.product_variant_id,
+          product_ratting: starRating,
+          product_review: product_review,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        closeReviewModalRef.current.click();
+        getRatingDetails();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // console.log(allOrderDetails, "all orders");
+  useEffect(() => {
+    var rng = document.querySelectorAll(".star input");
+    rng.forEach((ele) => {
+      ele.addEventListener(
+        "input",
+        function (e) {
+          let get_value = e.target.value;
+          let pt_element = e.target.parentElement;
+          let get_all_class = pt_element.className;
+          pt_element.className = "star star-" + get_value;
+        },
+        false
+      );
+    });
+  }, []);
+  // wishlist delete
+  const deleteWishListItem = async (sub_product) => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/wishlist/delete`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          product_id: sub_product?.product_id,
+          customer_id: user?.customer_id,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        // console.log(response?.data, "product wishlist");
+        getWishListButton();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // wishlist add
+  const submitWishListButton = async (sub_product) => {
+    console.log(sub_product, "subproduct");
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/wishlist/add`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          product_id: sub_product?.product_id,
+          product_variant_id: sub_product?.product_variants
+            ? sub_product?.product_variants[0]?.product_variant_id
+              ? sub_product?.product_variants[0]?.product_variant_id
+              : null
+            : null,
+          customer_id: user?.customer_id,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        // console.log(response?.data, "product wishlist");
+        getWishListButton();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // get wishlist
+  const getWishListButton = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/wishlist`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          customer_id: user?.customer_id,
+          wishlist: false,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        // console.log(response?.data);
+        setproduct_wishlist(response?.data?.product_wishlist);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const findInWishlist = (sub_product) => {
+    for (let i = 0; i < product_wishlist?.length; i++) {
+      const element = product_wishlist[i];
+      if (element?.product_id == sub_product?.product_id) {
+        return true;
+      }
+    }
+
+    return false;
+  };
   useEffect(() => {
     getCartItemsFn();
+    getRatingDetails();
+    getAllOrderedItems();
+    getWishListButton();
+    let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+    setloggedInUser(user);
   }, []);
 
   return (
@@ -359,7 +588,22 @@ export default function Productdetail(props) {
                     <Link href="/">Home</Link>
                   </li>
                   <li className="breadcrumb-item">
-                    <Link href={`/shop_by_brand/${brandId}`}>{brandId}</Link>
+                    {dynamic_page === "cart_items" && (
+                      <Link href={`/cart_items`}>{dynamic_page}</Link>
+                    )}
+                    {dynamic_page === "wishlist" && (
+                      <Link href={`/wishlist`}>{dynamic_page}</Link>
+                    )}
+                    {dynamic_page === "checkout" && (
+                      <Link href={`/checkout`}>{dynamic_page}</Link>
+                    )}
+                    {dynamic_page !== "checkout" &&
+                      dynamic_page !== "wishlist" &&
+                      dynamic_page !== "cart_items" && (
+                        <Link href={`/shop_by_brand/${dynamic_page}`}>
+                          {dynamic_page}
+                        </Link>
+                      )}
                   </li>
 
                   <li className="breadcrumb-item active" aria-current="page">
@@ -471,7 +715,7 @@ export default function Productdetail(props) {
                   {props?.product?.mproduct?.brand?.brand_name}
                   <>
                     {props?.product?.mproduct?.product_sku ? (
-                      <>{`  (${props?.product?.mproduct?.product_sku})`}</>
+                      <>{`  (SKU: ${props?.product?.mproduct?.product_sku})`}</>
                     ) : (
                       ""
                     )}
@@ -481,13 +725,24 @@ export default function Productdetail(props) {
               <div className="d-flex">
                 <div>
                   <span className="badge text-bg-primary p-2 px-3 me-2">
-                    4.3 &#9733;
+                    {productRatingDetails?.avg_ratting} &#9733;
                   </span>
-                  <span className="fw-bold">257 Ratings & 30 Reviews </span>
+                  <span className="fw-bold">
+                    {productRatingDetails?.total_rating} Ratings &{" "}
+                    {productRatingDetails?.total_count} Reviews{" "}
+                  </span>
                 </div>
-                <a className="p-2 px-3 ms-auto fs-6" href="#">
-                  Write a review
-                </a>
+                {Object.keys(loggedInUser).length > 0 &&
+                  checkWhetherItExistsInOrders() && (
+                    <a
+                      className="p-2 px-3 ms-auto fs-6"
+                      href="#"
+                      data-bs-toggle="modal"
+                      data-bs-target="#exampleModalCenterRating"
+                    >
+                      Write a review
+                    </a>
+                  )}
               </div>
 
               <div>
@@ -663,9 +918,10 @@ export default function Productdetail(props) {
                             className="accordion-body"
                             style={{ textAlign: "justify" }}
                           >
-                            {props?.product?.product_includes
-                              .replace("<p>", "")
-                              .replace("</p>", "")}
+                            {props?.product?.product_includes?.replace(
+                              /<\/?p>/g,
+                              ""
+                            )}
                             {/* <ol>
                               <li>24mm Spectra Breast Flanges</li>
                               <li>28mm Spectra Breast Flanges</li>
@@ -704,11 +960,7 @@ export default function Productdetail(props) {
                             data-bs-parent="#accordionFlushExample"
                           >
                             <div className="accordion-body">
-                              Lorem ipsum, dolor sit amet consectetur
-                              adipisicing elit. Blanditiis eveniet harum dolorem
-                              pariatur laudantium animi numquam quos voluptate
-                              itaque, odio impedit distinctio repudiandae quas,
-                              illum ipsa consequatur explicabo adipisci natus!
+                              {props?.product?.product_feature}
                             </div>
                           </div>
                         </div>
@@ -748,34 +1000,43 @@ export default function Productdetail(props) {
                         </div>
                       )}
 
-                      <div className="accordion-item py-2">
-                        <h2 className="accordion-header" id="flush-headingFour">
-                          <button
-                            className="accordion-button collapsed"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#flush-collapseFour"
-                            aria-expanded="false"
-                            aria-controls="flush-collapseFour"
+                      {Object.keys(productRatingDetails)?.length > 0 && (
+                        <div className="accordion-item py-2">
+                          <h2
+                            className="accordion-header"
+                            id="flush-headingFour"
                           >
-                            Customer Reviews
-                          </button>
-                        </h2>
-                        <div
-                          id="flush-collapseFour"
-                          className="accordion-collapse collapse"
-                          aria-labelledby="flush-headingFour"
-                          data-bs-parent="#accordionFlushExample"
-                        >
-                          <div className="accordion-body">
-                            Lorem ipsum dolor sit amet consectetur adipisicing
-                            elit. Aspernatur odio, vitae, magnam odit sed
-                            commodi, optio sint veniam tenetur nesciunt eligendi
-                            ipsam in impedit possimus earum minus nulla mollitia
-                            deleniti?
+                            <button
+                              className="accordion-button collapsed"
+                              type="button"
+                              data-bs-toggle="collapse"
+                              data-bs-target="#flush-collapseFour"
+                              aria-expanded="false"
+                              aria-controls="flush-collapseFour"
+                            >
+                              Customer Reviews
+                            </button>
+                          </h2>
+                          <div
+                            id="flush-collapseFour"
+                            className="accordion-collapse collapse"
+                            aria-labelledby="flush-headingFour"
+                            data-bs-parent="#accordionFlushExample"
+                          >
+                            <div className="accordion-body">
+                              <div>
+                                {productRatingDetails?.review_details?.map(
+                                  (review, review_index) => (
+                                    <div key={review_index}>
+                                      {review?.product_review}
+                                    </div>
+                                  )
+                                )}
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -801,11 +1062,27 @@ export default function Productdetail(props) {
                     <div className="card" key={index}>
                       <div className="card-bodys">
                         <div className="d-flex justify-content-between">
-                          <div className="like-down-box">
-                            <svg className="icon">
-                              <use href="#icon_like-dull"></use>
-                            </svg>
-                          </div>
+                          {!findInWishlist(item) ? (
+                            <div
+                              className="like-down-box"
+                              onClick={() => {
+                                submitWishListButton(item);
+                              }}
+                            >
+                              <svg className="icon">
+                                <use href="#icon_like-dull"></use>
+                              </svg>
+                            </div>
+                          ) : (
+                            <div
+                              className="like-down-box"
+                              onClick={() => deleteWishListItem(item)}
+                            >
+                              <svg className="icon">
+                                <use href="#icon_like"></use>
+                              </svg>
+                            </div>
+                          )}
                           <div className="download-box">
                             <svg className="icon">
                               <use href="#icon_loader-dull"></use>
@@ -828,9 +1105,9 @@ export default function Productdetail(props) {
                         </div>
                         <p className="card-text">{item?.product_name}</p>
                         <span className="badge text-bg-primary p-2 px-3 me-2">
-                          4.2 &#9733;
+                          {item.avg_ratting} &#9733;
                         </span>
-                        <span>(166)</span>
+                        <span>({item?.total_ratting})</span>
                       </div>
                     </div>
                   ))}
@@ -2179,6 +2456,140 @@ export default function Productdetail(props) {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="modal fade"
+        id="exampleModalCenterRating"
+        tabIndex="-2"
+        aria-labelledby="exampleModalCenterTitle"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modal-dialog-centered modal-lg ">
+          <div className="modal-content border-0 rounded-md-4 overflow-hidden">
+            <div className="modal-body p-0">
+              <div className="bg-primary py-2 px-4 d-block text-center d-md-none position-relative">
+                <button
+                  type="button"
+                  className="position-absolute top-50 end-0 translate-middle-y ms-3 close-btn"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                  ref={closeReviewModalRef}
+                >
+                  <svg className="icon">
+                    <use href="#icon_loginclose"></use>
+                  </svg>
+                </button>
+                <h5 className="text-white">Rating & Review</h5>
+              </div>
+              <button
+                type="button"
+                className="btn-close position-absolute d-none d-md-block end-0 top-0 me-3 mt-3"
+                onClick={() => setstarRating(0)}
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+              <div className="row p-4" style={{ color: "#4D5059" }}>
+                <div className="col-12 text-center py-4 d-none d-sm-block">
+                  <h3>Rate & Review The Product</h3>
+                </div>
+                <div className="d-flex col-md-12">
+                  <div
+                    className="d-flex rounded-3 align-items-center justify-content-center shadow"
+                    style={{ width: "160px", height: "160px" }}
+                  >
+                    <Image
+                      width={140}
+                      height={140}
+                      src={`${process.env.NEXT_PUBLIC_MEDIA}${props?.product?.mproduct.product_image[0]?.image_file}`}
+                      alt="Breast Pump"
+                    />
+                  </div>
+                  <div className="d-block align-self-center ps-3 ps-sm-4">
+                    <h5 className="">
+                      {props?.product?.mproduct?.product_name.toUpperCase()}
+                    </h5>
+                    <p className="fs-18 fw-normal pt-3">Rate this product</p>
+                    {console.log(starRating, "star rating")}
+                    <div className="pb-3">
+                      {/* {[1, 2, 3, 4, 5].map((star, star_index) => (
+                        <span>
+                          {star <= starRating ? (
+                            <svg
+                              className="icon text-primary  me-3 "
+                              onClick={() => setstarRating(star)}
+                            >
+                              <use href="#icon_review"></use>
+                            </svg>
+                          ) : (
+                            <svg
+                              className="icon  me-3"
+                              onClick={() => setstarRating(star)}
+                            >
+                              <use href="#icon_review_white"></use>
+                            </svg>
+                          )}
+                        </span>
+                      ))} */}
+                      <span className="star ">
+                        <input
+                          type="range"
+                          min="1"
+                          max="5"
+                          defaultValue={starRating}
+                          onChange={(e) => setstarRating(e.target.value)}
+                        />
+                      </span>
+                    </div>
+                    {/* <p className="fs-18 fw-normal">Rate this product</p> */}
+                  </div>
+                </div>
+              </div>
+              <div className="row py-2 px-4">
+                <div className="col-lg-3 d-none d-sm-block">
+                  <span className="py-1 px-2 border border-secondary rounded-1 me-2">
+                    {productRatingDetails?.avg_ratting}
+                    <svg className="icon text-primary ms-2">
+                      <use href="#icon_review"></use>
+                    </svg>
+                  </span>
+                  <span>{productRatingDetails?.total_rating} Ratings</span>
+                </div>
+                <div className="col-lg-9 col-sm-12">
+                  <div className="w-100">
+                    <div class="input-group">
+                      <textarea
+                        class="form-control"
+                        placeholder="Enter your review"
+                        aria-label="With textarea"
+                        style={{ height: "100px" }}
+                        value={product_review}
+                        onChange={(e) => setproduct_review(e.target.value)}
+                      />
+                    </div>
+                    <div className="py-3 text-center text-md-end">
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary me-3"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                        onClick={() => setstarRating(0)}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={submitReviewButton}
+                      >
+                        Submit
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

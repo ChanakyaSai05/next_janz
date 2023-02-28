@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import Slider from "react-slick";
 import { Inter } from "@next/font/google";
@@ -19,6 +19,7 @@ import no_image from "../../../public/images/no_image.jpg";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import axios from "axios";
+import UserContext from "../../../context/UserContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,8 +28,11 @@ export default function Product(props) {
   const params = router.query;
   const { brandId } = params;
   const { brand, products } = props?.data;
+  const context = useContext(UserContext);
+  const { getCartItemsFn } = context;
   // console.log(brand);
   console.log(props, "props");
+  const [product_wishlist, setproduct_wishlist] = useState([]);
   let settings = {
     dots: true,
     infinite: true,
@@ -68,6 +72,108 @@ export default function Product(props) {
   };
 
   const [editCancel, setEditCancel] = useState(false);
+  // wishlist delete
+  const deleteWishListItem = async (sub_product) => {
+    // console.log(sub_product, "sub_product");
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/wishlist/delete`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          product_id: sub_product?.product_id,
+          customer_id: user?.customer_id,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        // console.log(response?.data, "product wishlist");
+        getWishListButton();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // wishlist add
+  const submitWishListButton = async (sub_product) => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/wishlist/add`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          product_id: sub_product?.product_id,
+          product_variant_id: sub_product?.product_variants
+            ? sub_product?.product_variants[0]?.product_variant_id
+              ? sub_product?.product_variants[0]?.product_variant_id
+              : null
+            : null,
+          customer_id: user?.customer_id,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        // console.log(response?.data, "product wishlist");
+        getWishListButton();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // get wishlist
+  const getWishListButton = async () => {
+    try {
+      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+      const response = await axios({
+        url: `${process.env.NEXT_PUBLIC_URL}customer/wishlist`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          customer_id: user?.customer_id,
+          wishlist: false,
+        },
+      });
+
+      // console.log(response, "result");
+      if (response.data.status == false) {
+        console.log("Error");
+      } else {
+        // console.log(response?.data);
+        setproduct_wishlist(response?.data?.product_wishlist);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const findInWishlist = (sub_product) => {
+    for (let i = 0; i < product_wishlist?.length; i++) {
+      const element = product_wishlist[i];
+      if (element?.product_id == sub_product?.product_id) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+  useEffect(() => {
+    getCartItemsFn();
+    getWishListButton();
+  }, []);
 
   return (
     <>
@@ -114,11 +220,27 @@ export default function Product(props) {
                   <div className="card" key={pro_index}>
                     <div className="card-bodys">
                       <div className="d-flex justify-content-between">
-                        <div className="like-down-box">
-                          <svg className="icon">
-                            <use href="#icon_like-dull"></use>
-                          </svg>
-                        </div>
+                        {!findInWishlist(pro) ? (
+                          <div
+                            className="like-down-box"
+                            onClick={() => {
+                              submitWishListButton(pro);
+                            }}
+                          >
+                            <svg className="icon">
+                              <use href="#icon_like-dull"></use>
+                            </svg>
+                          </div>
+                        ) : (
+                          <div
+                            className="like-down-box"
+                            onClick={() => deleteWishListItem(pro)}
+                          >
+                            <svg className="icon">
+                              <use href="#icon_like"></use>
+                            </svg>
+                          </div>
+                        )}
                         <div className="download-box">
                           <svg className="icon">
                             <use href="#icon_loader-dull"></use>
@@ -173,10 +295,12 @@ export default function Product(props) {
                     <p className="fw-bold fs-18 p-0 m-0 me-2">
                       {pro?.product_name}
                     </p>
-                    {editCancel ? (
+                    {!findInWishlist(pro) ? (
                       <div
                         className="like-down-box"
-                        onClick={() => setEditCancel(!editCancel)}
+                        onClick={() => {
+                          submitWishListButton(pro);
+                        }}
                       >
                         <svg className="icon">
                           <use href="#icon_like-dull"></use>
@@ -185,7 +309,7 @@ export default function Product(props) {
                     ) : (
                       <div
                         className="like-down-box"
-                        onClick={() => setEditCancel(!editCancel)}
+                        onClick={() => deleteWishListItem(pro)}
                       >
                         <svg className="icon">
                           <use href="#icon_like"></use>
@@ -261,7 +385,7 @@ export default function Product(props) {
                           onClick={() => {
                             if (pro?.product_variant) {
                               router.push(
-                                `/shop_by_brand/${brandId}/${pro?.product_variant?.variant_permlink}`
+                                `/product_detail/${brandId}/${pro?.product_variant?.variant_permlink}`
                               );
                             }
                           }}
@@ -275,74 +399,6 @@ export default function Product(props) {
               </div>
             </div>
           ))}
-
-          {/* <div className="row d-flex justify-content-center pb-5">
-            <div className="d-flex justify-content-center">
-              <div className="card-shadow rounded-2 p-4 sm-w-100 lg-w-75">
-                <div className="d-flex align-items-center justify-content-between">
-                  <p className="fw-bold fs-18 p-0 m-0 me-2">
-                    SPECTRA S1 PLUS ELECTRIC BREAST PUMP DUAL VOLTAGE
-                  </p>
-                  <div className="like-down-box">
-                    <svg className="icon">
-                      <use href="#icon_like-dull"></use>
-                    </svg>
-                  </div>
-                </div>
-                <div className="d-flex py-2">
-                  <span className="fs-6 fw-bold me-2">by</span>
-                  <span className="fs-6 fw-bold text-primary">
-                    Spectra (SKU: 12345)
-                  </span>
-                </div>
-                <div className="d-flex pb-3">
-                  <div>
-                    <span className="badge text-bg-primary p-2 px-3 me-2">
-                      4.3 &#9733;
-                    </span>
-                    <span className="fw-bold">257 Ratings & 30 Reviews </span>
-                  </div>
-                </div>
-                <p>
-                  The Spectra S1 Plus Electric Breast Pump is the perfect
-                  solution for any new .........
-                </p>
-                <div className="row">
-                  <div className="col-lg-4 col-sm-12 d-flex justify-content-center">
-                    <Image width={180} height={180} src={cardImg2} alt="..." />
-                  </div>
-                  <div className="col-lg-4 col-sm-12 d-flex align-items-center">
-                    <ul>
-                      <li>Feature list 01</li>
-                      <li>Feature list 02</li>
-                      <li>Feature list 03</li>
-                    </ul>
-                  </div>
-                  <div className="col-lg-4 col-sm-12 d-flex align-items-center ">
-                    <div className="text-center text-md-start w-100">
-                      <button type="button" className="btn btn-primary">
-                        View Details
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <div className="form-check py-2">
-                  <input
-                    className="form-check-input rounded-0"
-                    type="checkbox"
-                    value=""
-                    id="flexCheckDefault"
-                  />
-                  <label
-                    className="form-check-label text-secondary"
-                    for="flexCheckDefault"
-                  >
-                    Add to compare
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div> */}
         </div>
       </div>
       <Footer></Footer>

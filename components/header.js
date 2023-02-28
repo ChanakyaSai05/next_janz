@@ -9,6 +9,7 @@ import MyAccountDropdown from "./MyAccountDropdown";
 import axios from "axios";
 import { useContext } from "react";
 import UserContext from "../context/UserContext";
+import Greeting from "./Greeting";
 
 export default function Header() {
   // const [publicPath] = useState(process.env.NEXT_PUBLIC_URL);
@@ -16,7 +17,7 @@ export default function Header() {
   const { cartItems } = context;
   const router = useRouter();
   // const [cartItems, setcartItems] = useState([]);
-
+  const [user, setUser] = useState("");
   const handleShow = () => setShow(true);
 
   const [show, setShow] = useState(false);
@@ -51,6 +52,10 @@ export default function Header() {
   // useEffect(() => {
   //   getCartItemsFn();
   // }, []);
+  useEffect(() => {
+    let userParsed = JSON.parse(localStorage.getItem("janz_medical_user"));
+    setUser(userParsed?.customer_name);
+  }, []);
 
   return (
     <>
@@ -66,7 +71,21 @@ export default function Header() {
               </Link>
             </div>
             <div className="d-flex justify-content-center pt-4">
-              <h2>Good Evening Janz</h2>
+              <h2>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    flexWrap: "wrap",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    // fontSize: "5px",
+                  }}
+                >
+                  <Greeting />
+                  <div style={{ marginLeft: "5px" }}> {user}</div>
+                </div>
+              </h2>
             </div>
             <button
               typeof="button"
@@ -88,13 +107,24 @@ export default function Header() {
               </li>
               <hr />
               <li>
-                <Link href={"subscription"} className="nav-link">
+                <Link href={"/subscription"} className="nav-link">
                   <span>
                     <svg className="icon">
                       <use href="#icon_subscription"></use>
                     </svg>
                   </span>
                   <strong>Subscriptions</strong>
+                </Link>
+              </li>
+              <hr />
+              <li>
+                <Link href={"/wishlist"} className="nav-link">
+                  <span>
+                    <svg className="icon">
+                      <use href="#icon_subscription"></use>
+                    </svg>
+                  </span>
+                  <strong>Wishlist</strong>
                 </Link>
               </li>
               <hr />
@@ -109,12 +139,12 @@ export default function Header() {
                 </Link>
               </li>
               <li>
-                <Link href={"profile_details"} className="nav-link">
+                <Link href={"/profile_details"} className="nav-link">
                   <strong className="small">Profile Details</strong>
                 </Link>
               </li>
               <li>
-                <Link href={"insurance_details"} className="nav-link">
+                <Link href={"/insurance_details"} className="nav-link">
                   <strong className="small">Insurance Details</strong>
                 </Link>
               </li>
