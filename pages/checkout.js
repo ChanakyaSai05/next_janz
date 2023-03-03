@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
-import SignaturePad from "react-signature-pad";
+// import SignaturePad from "react-signature-pad";
 import Image from "next/image";
 import { Inter } from "@next/font/google";
 import {
@@ -2173,12 +2173,12 @@ export default function Checkout() {
                           Upload signature
                         </button>
                       </div>
-                      <div className="or-line">
+                      {/* <div className="or-line">
                         <strong>or</strong>
-                      </div>
+                      </div> */}
                       <div className="row">
                         <div className="col-md-8 col-sm-12">
-                          <div className="border rounded-2">
+                          {/* <div className="border rounded-2">
                             <div
                               className="border-bottom signature-box p-2 d-flex justify-content-center"
                               style={{
@@ -2211,7 +2211,7 @@ export default function Checkout() {
                                 use this signature
                               </button>
                             </div>
-                          </div>
+                          </div> */}
                           {Object.keys(documentsList).length != 0 && (
                             <div>
                               {documentsList?.customer_signature && (
