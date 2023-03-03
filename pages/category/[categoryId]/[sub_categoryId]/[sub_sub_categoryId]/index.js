@@ -13,15 +13,23 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import Link from "next/link";
 import UserContext from "../../../../../context/UserContext";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectUser,
+  set_data_fetched,
+} from "../../../../../features/userSlice";
+import { getWishListDetails } from "../../../../../components/FunctionCalls";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Categoryfilter(props) {
   const context = useContext(UserContext);
-  const { productsData, getCartItemsFn } = context;
+  const { productsData, getCartItemsFn, cartItems } = context;
   const router = useRouter();
   const params = router.query;
   const { categoryId, sub_categoryId, sub_sub_categoryId } = params;
+  const dispatch = useDispatch();
+  const selectedUser = useSelector(selectUser);
   console.log(props, "props");
   const [editCancel, setEditCancel] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
@@ -111,7 +119,7 @@ export default function Categoryfilter(props) {
   };
   // wishlist add
   const submitWishListButton = async (sub_product) => {
-    console.log(sub_product, "subproduct");
+    // console.log(sub_product, "subproduct");
     try {
       let user = JSON.parse(localStorage.getItem("janz_medical_user"));
       const response = await axios({
@@ -145,34 +153,20 @@ export default function Categoryfilter(props) {
   // get wishlist
   const getWishListButton = async () => {
     try {
-      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
-      const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}customer/wishlist`,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: {
-          customer_id: user?.customer_id,
-          wishlist: false,
-        },
-      });
-
-      // console.log(response, "result");
-      if (response.data.status == false) {
-        console.log("Error");
-      } else {
-        // console.log(response?.data);
-        setproduct_wishlist(response?.data?.product_wishlist);
-      }
+      let wishlistData = await getWishListDetails();
+      dispatch(
+        set_data_fetched({
+          wishlist_items_fetched: true,
+          wishlistData: wishlistData,
+        })
+      );
     } catch (error) {
       console.log(error);
     }
   };
-
   const findInWishlist = (sub_product) => {
-    for (let i = 0; i < product_wishlist?.length; i++) {
-      const element = product_wishlist[i];
+    for (let i = 0; i < selectedUser?.wishlistData?.length; i++) {
+      const element = selectedUser?.wishlistData[i];
       if (element?.product_id == sub_product?.product_id) {
         return true;
       }
@@ -182,8 +176,12 @@ export default function Categoryfilter(props) {
   };
 
   useEffect(() => {
-    getCartItemsFn();
-    getWishListButton();
+    if (!selectedUser.cart_items_fetched) {
+      getCartItemsFn();
+    }
+    if (!selectedUser.wishlist_items_fetched) {
+      getWishListButton();
+    }
   }, []);
 
   return (
@@ -319,17 +317,23 @@ export default function Categoryfilter(props) {
                         return sub_product;
                       }
                     })
-                    .filter((sub_product) => {
+                    ?.filter((sub_product) => {
                       if (checkedLocationItems.length > 0) {
-                        let location = "";
-                        if (sub_product?.location.toLowerCase() === "u") {
-                          location = "United States";
+                        if (
+                          checkedLocationItems.includes("United States") &&
+                          sub_product.location_us === "Y"
+                        ) {
+                          return true;
+                        } else if (
+                          checkedLocationItems.includes("International") &&
+                          sub_product.location_international === "Y"
+                        ) {
+                          return true;
                         } else {
-                          location = "International";
+                          return false;
                         }
-                        return checkedLocationItems.includes(location);
                       } else {
-                        return sub_product;
+                        return true;
                       }
                     })
                     ?.filter((sub_product) => {

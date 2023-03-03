@@ -27,12 +27,21 @@ import Link from "next/link";
 import axios from "axios";
 import { useContext } from "react";
 import UserContext from "../../../../../../context/UserContext";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectUser,
+  set_data_fetched,
+} from "../../../../../../features/userSlice";
+import {
+  getOrderedItems,
+  getWishListDetails,
+} from "../../../../../../components/FunctionCalls";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Productdetail(props) {
   const context = useContext(UserContext);
-  const { getCartItemsFromProductsDetail } = context;
+  const { getCartItemsFn, cartItems } = context;
   console.log(props, "props");
   const router = useRouter();
   const params = router.query;
@@ -44,6 +53,8 @@ export default function Productdetail(props) {
     loginUserAvalilable,
   } = params;
   // console.log(params);
+  const dispatch = useDispatch();
+  const selectedUser = useSelector(selectUser);
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   // quantity
@@ -62,8 +73,6 @@ export default function Productdetail(props) {
   });
   // get rating details
   const [productRatingDetails, setproductRatingDetails] = useState({});
-  // all orders details
-  const [allOrderDetails, setallOrderDetails] = useState([]);
 
   // review
   const [product_review, setproduct_review] = useState("");
@@ -205,6 +214,8 @@ export default function Productdetail(props) {
     second: false,
     third: false,
   });
+  // checked add to cart
+  const [checkedSubscriptionItem, setcheckedSubscriptionItem] = useState(false);
 
   const [editCancel, setEditCancel] = useState(false);
   const [loggedInUser, setloggedInUser] = useState({});
@@ -222,7 +233,7 @@ export default function Productdetail(props) {
     startIndex,
     endIndex
   );
-
+  console.log(checkedSubscriptionItem, "checked subscription item");
   const handlePrevPage = () => {
     setPage((prevPage) => Math.max(prevPage - 1, 1));
   };
@@ -311,27 +322,29 @@ export default function Productdetail(props) {
         // console.log("YESSSSSSSSSSSSSSSSSSSS");
       }
       // console.log(price);
+      let data = {
+        product_id: product?.product_id,
+        product_variant_id: product?.product_variant_id,
+        customer_id: user ? user.customer_id : "",
+        variant_msrp: product?.variant_msrp ? product?.variant_msrp : "",
+        variant_store_price: product?.variant_store_price
+          ? product?.variant_store_price
+          : "",
+        variant_sale_price: price,
+        variant_weight: product?.variant_weight ? product?.variant_weight : "",
+        variant_unit: product?.variant_unit ? product?.variant_unit : "",
+        qty: qty,
+      };
+      if (checkedSubscriptionItem) {
+        data["is_subscription"] = "Y";
+      }
       const response = await axios({
         url: `${process.env.NEXT_PUBLIC_URL}product/addtocart`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        data: {
-          product_id: product?.product_id,
-          product_variant_id: product?.product_variant_id,
-          customer_id: user ? user.customer_id : "",
-          variant_msrp: product?.variant_msrp ? product?.variant_msrp : "",
-          variant_store_price: product?.variant_store_price
-            ? product?.variant_store_price
-            : "",
-          variant_sale_price: price,
-          variant_weight: product?.variant_weight
-            ? product?.variant_weight
-            : "",
-          variant_unit: product?.variant_unit ? product?.variant_unit : "",
-          qty: qty,
-        },
+        data: data,
       });
 
       // console.log(response, "result");
@@ -339,7 +352,7 @@ export default function Productdetail(props) {
         console.log("Error");
       } else {
         // router.push("/cart_items");
-        getCartItemsFromProductsDetail();
+        // getCartItemsFromProductsDetail();
         getCartItemsFn();
         if (props?.accessory_products?.length > 0) {
           router.push(`/accessory_products/${sub_sub_sub_categoryId}`);
@@ -350,38 +363,16 @@ export default function Productdetail(props) {
       console.log(error);
     }
   };
-  const getCartItemsFn = async () => {
-    try {
-      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
-      const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}product/cartproducts`,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: {
-          customer_id: user ? user.customer_id : "",
-        },
-      });
 
-      // console.log(response, "result");
-      if (response.data.status == false) {
-        console.log("Error");
-      } else {
-        // console.log(response?.data);
-        let data = response?.data?.cart_products;
-        for (let i = 0; i < data?.length; i++) {
-          if (data[i].product_id == props?.product?.mproduct?.product_id) {
-            setaddToCartBtnState(true);
-            return;
-          }
-        }
-        setaddToCartBtnState(false);
-        // router.push("/cart_items");
+  // check the product exist in cart item or not
+  const checkProductInCartItem = () => {
+    let data = cartItems;
+    for (let i = 0; i < data?.length; i++) {
+      if (data[i]?.product_id == props?.product?.mproduct?.product_id) {
+        return true;
       }
-    } catch (error) {
-      console.log(error);
     }
+    return false;
   };
 
   const getFormattedDate = (item) => {
@@ -398,35 +389,11 @@ export default function Productdetail(props) {
     const formattedDate = `${day}/${month}/${year}`;
     return formattedDate;
   };
-  const getAllOrderedItems = async () => {
-    try {
-      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
-      let token = localStorage.getItem("janz_medical_login_token");
-      const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}customer/order/history`,
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      // console.log(response, "result");
-      if (response.data.status == false) {
-        console.log("Error");
-      } else {
-        // console.log(response?.data, "all ordered items");
-        setallOrderDetails(response?.data?.orders);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   // check the item exists in orders
   const checkWhetherItExistsInOrders = () => {
-    for (let i = 0; i < allOrderDetails?.length; i++) {
-      let order_product = allOrderDetails[i]?.order_product;
+    for (let i = 0; i < selectedUser?.orderedItems?.length; i++) {
+      let order_product = selectedUser?.orderedItems[i]?.order_product;
       for (let j = 0; j < order_product.length; j++) {
         let each_product = order_product[j];
         if (
@@ -501,7 +468,7 @@ export default function Productdetail(props) {
   };
   // wishlist add
   const submitWishListButton = async (sub_product) => {
-    console.log(sub_product, "subproduct");
+    // console.log(sub_product, "subproduct");
     try {
       let user = JSON.parse(localStorage.getItem("janz_medical_user"));
       const response = await axios({
@@ -535,34 +502,20 @@ export default function Productdetail(props) {
   // get wishlist
   const getWishListButton = async () => {
     try {
-      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
-      const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}customer/wishlist`,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: {
-          customer_id: user?.customer_id,
-          wishlist: false,
-        },
-      });
-
-      // console.log(response, "result");
-      if (response.data.status == false) {
-        console.log("Error");
-      } else {
-        // console.log(response?.data);
-        setproduct_wishlist(response?.data?.product_wishlist);
-      }
+      let wishlistData = await getWishListDetails();
+      dispatch(
+        set_data_fetched({
+          wishlist_items_fetched: true,
+          wishlistData: wishlistData,
+        })
+      );
     } catch (error) {
       console.log(error);
     }
   };
-
   const findInWishlist = (sub_product) => {
-    for (let i = 0; i < product_wishlist?.length; i++) {
-      const element = product_wishlist[i];
+    for (let i = 0; i < selectedUser?.wishlistData?.length; i++) {
+      const element = selectedUser?.wishlistData[i];
       if (element?.product_id == sub_product?.product_id) {
         return true;
       }
@@ -586,11 +539,32 @@ export default function Productdetail(props) {
       );
     });
   }, []);
+  const callingGetOrdersFunction = async () => {
+    const result = await getOrderedItems();
+    dispatch(
+      set_data_fetched({
+        orderedItems: result,
+        ordered_items_fetched: true,
+      })
+    );
+  };
   useEffect(() => {
-    getCartItemsFn();
+    if (!selectedUser.cart_items_fetched) {
+      getCartItemsFn();
+    }
+    if (!selectedUser.ordered_items_fetched) {
+      callingGetOrdersFunction();
+    }
+
+    if (!selectedUser.wishlist_items_fetched) {
+      getWishListButton();
+    }
+    if (cartItems.find((item) => item.is_subscription === "Y")) {
+      setcheckedSubscriptionItem(true);
+    } else {
+      setcheckedSubscriptionItem(false);
+    }
     getRatingDetails();
-    getAllOrderedItems();
-    getWishListButton();
     let user = JSON.parse(localStorage.getItem("janz_medical_user"));
     setloggedInUser(user);
   }, []);
@@ -769,7 +743,7 @@ export default function Productdetail(props) {
                       >
                         Verify Insurance
                       </button>
-                      {addToCartBtnState ? (
+                      {checkProductInCartItem() ? (
                         <button
                           type="button"
                           className="btn btn-darkred ms-auto px-4 w-100 py-3"
@@ -908,6 +882,28 @@ export default function Productdetail(props) {
                       </select>
                     </div>
                   )}
+                  <div>
+                    {props?.product?.mproduct?.subcription_item == "Y" && (
+                      <label className="form-check pb-2">
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          checked={checkedSubscriptionItem}
+                          onClick={(e) => {
+                            if (e.target.checked) {
+                              setcheckedSubscriptionItem(true);
+                            } else {
+                              setcheckedSubscriptionItem(false);
+                            }
+                          }}
+                        />
+                        <span className="form-check-label">
+                          {props?.product?.mproduct?.subscription_description}
+                        </span>
+                      </label>
+                    )}
+                  </div>
+
                   {/* <div className="d-flex align-items-center py-2">
                     <span className="me-4 fs-18 fw-bold">Color</span>
                     <label
@@ -2600,7 +2596,7 @@ export default function Productdetail(props) {
                       {props?.product?.mproduct?.product_name.toUpperCase()}
                     </h5>
                     <p className="fs-18 fw-normal pt-3">Rate this product</p>
-                    {console.log(starRating, "star rating")}
+                    {/* {console.log(starRating, "star rating")} */}
                     <div className="pb-3">
                       {/* {[1, 2, 3, 4, 5].map((star, star_index) => (
                         <span>

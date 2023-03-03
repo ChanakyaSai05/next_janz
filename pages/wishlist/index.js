@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Table, Dropdown } from "react-bootstrap";
 import Header from "../../components/header";
 import Asidebar from "../../components/asidebar";
@@ -7,10 +7,17 @@ import no_image from "../../public/images/no_image.jpg";
 import Image from "next/image";
 import axios from "axios";
 import { useRouter } from "next/router";
+import UserContext from "../../context/UserContext";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser, set_data_fetched } from "../../features/userSlice";
+import { getWishListDetails } from "../../components/FunctionCalls";
 export default function Wishlist() {
-  const [product_wishlist, setproduct_wishlist] = useState([]);
+  const context = useContext(UserContext);
+  const { getCartItemsFn, cartItems } = context;
+  const dispatch = useDispatch();
+  const selectedUser = useSelector(selectUser);
   const router = useRouter();
-  console.log(product_wishlist, "product wishlist");
+  // console.log(product_wishlist, "product wishlist");
   // wishlist add
   const submitWishListButton = async (sub_product) => {
     try {
@@ -72,33 +79,20 @@ export default function Wishlist() {
   // get wishlist
   const getWishListButton = async () => {
     try {
-      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
-      const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}customer/wishlist`,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: {
-          customer_id: user?.customer_id,
-          wishlist: true,
-        },
-      });
-
-      // console.log(response, "result");
-      if (response.data.status == false) {
-        console.log("Error");
-      } else {
-        // console.log(response?.data);
-        setproduct_wishlist(response?.data?.product_wishlist);
-      }
+      let wishlistData = await getWishListDetails();
+      dispatch(
+        set_data_fetched({
+          wishlist_items_fetched: true,
+          wishlistData: wishlistData,
+        })
+      );
     } catch (error) {
       console.log(error);
     }
   };
   const findInWishlist = (sub_product) => {
-    for (let i = 0; i < product_wishlist?.length; i++) {
-      const element = product_wishlist[i];
+    for (let i = 0; i < selectedUser?.wishlistData?.length; i++) {
+      const element = selectedUser?.wishlistData[i];
       if (element?.product_id == sub_product?.product_id) {
         return true;
       }
@@ -107,7 +101,12 @@ export default function Wishlist() {
     return false;
   };
   useEffect(() => {
-    getWishListButton();
+    if (!selectedUser.cart_items_fetched) {
+      getCartItemsFn();
+    }
+    if (!selectedUser.wishlist_items_fetched) {
+      getWishListButton();
+    }
   }, []);
   return (
     <>
@@ -124,7 +123,7 @@ export default function Wishlist() {
           <div className="container">
             <div className="">
               <div className="container">
-                {product_wishlist?.map((item, index) => (
+                {selectedUser?.wishlistData?.map((item, index) => (
                   <div
                     className=" d-flex justify-content-center pb-5 "
                     key={index}

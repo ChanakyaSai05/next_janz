@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import Slider from "react-slick";
 import { Inter } from "@next/font/google";
@@ -18,15 +18,21 @@ import "slick-carousel/slick/slick-theme.css";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import axios from "axios";
+import UserContext from "../../context/UserContext";
+import { useSelector } from "react-redux";
+import { selectUser } from "../../features/userSlice";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Product(props) {
+  const context = useContext(UserContext);
+  const { getCartItemsFn } = context;
+  const selectedUser = useSelector(selectUser);
   const router = useRouter();
   const params = router.query;
   const { insuranceId } = params;
   const { insurance } = props.data;
-  console.log(insurance);
+  // console.log(insurance);
 
   const [editCancel, setEditCancel] = useState(false);
   let array = [
@@ -67,7 +73,11 @@ export default function Product(props) {
       faq_status: "1",
     },
   ];
-
+  useEffect(() => {
+    if (!selectedUser.cart_items_fetched) {
+      getCartItemsFn();
+    }
+  }, []);
   return (
     <>
       <Headerlanding></Headerlanding>

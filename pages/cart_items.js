@@ -25,6 +25,8 @@ import no_image from "../public/images/no_image.jpg";
 import { useRouter } from "next/router";
 import axios from "axios";
 import UserContext from "../context/UserContext";
+import { useSelector } from "react-redux";
+import { selectUser } from "../features/userSlice";
 
 export default function Cart() {
   const context = useContext(UserContext);
@@ -37,6 +39,7 @@ export default function Cart() {
     setcartItems,
     closeRefRegisterModalandOpenLogin,
   } = context;
+  const selectedUser = useSelector(selectUser);
   const [num, setNum] = useState(1);
   // rx file
   const [rawFile, setrawFile] = useState(null);
@@ -223,11 +226,7 @@ export default function Cart() {
   //   }
   //   settotalPrice(price);
   // };
-  useEffect(() => {
-    let user = JSON.parse(localStorage.getItem("janz_medical_user"));
-    setloggedInUser(user);
-    getCartItemsFn();
-  }, []);
+
   // console.log(cartItems, "cart items");
 
   // proceed to checkout button
@@ -247,7 +246,7 @@ export default function Cart() {
       closeRefRegisterModalandOpenLogin.current.click();
     } else {
       // router.push("/checkout");
-      console.log("yes starting uploading process");
+      // console.log("yes starting uploading process");
       // uploadRfRef.current.click();
       const modal = uploadRfRef.current;
       modal.setAttribute("aria-hidden", "false");
@@ -257,7 +256,7 @@ export default function Cart() {
     }
   };
   const uploadRxButtonToApi = async () => {
-    console.log(rxSeclectedItem);
+    // console.log(rxSeclectedItem);
     if (!rawFile) {
       return;
     }
@@ -299,9 +298,19 @@ export default function Cart() {
     }
   };
 
+  const checkSubscription = (item) => {
+    return item?.is_subscription === "Y" ? true : false;
+  };
+  useEffect(() => {
+    let user = JSON.parse(localStorage.getItem("janz_medical_user"));
+    setloggedInUser(user);
+    if (!selectedUser.cart_items_fetched) {
+      getCartItemsFn();
+    }
+  }, []);
   //
-  console.log(rawFile, "raw");
-  console.log(previewUrl, "prev");
+  // console.log(rawFile, "raw");
+  // console.log(previewUrl, "prev");
   return (
     <>
       <Headerlanding></Headerlanding>
@@ -370,6 +379,21 @@ export default function Cart() {
                                       {item?.mproduct?.product_name}
                                     </h5>
                                     <p>{item?.mproduct?.brand?.brand_name}</p>
+                                    <p>
+                                      <label className="form-check pb-2">
+                                        <input
+                                          className="form-check-input"
+                                          type="checkbox"
+                                          checked={checkSubscription(item)}
+                                        />
+                                        <span className="form-check-label">
+                                          {
+                                            item?.mproduct
+                                              ?.subscription_description
+                                          }
+                                        </span>
+                                      </label>
+                                    </p>
                                     {/* <p>Color: White</p> */}
                                   </div>
                                 </div>

@@ -21,6 +21,9 @@ import UserContext from "../context/UserContext";
 // import csc from "country-state-city";
 import { Country, State, City } from "country-state-city";
 import axios from "axios";
+import { useSelector } from "react-redux";
+import { selectUser } from "../features/userSlice";
+import Link from "next/link";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Checkout() {
@@ -33,7 +36,7 @@ export default function Checkout() {
     totalPrice,
     settotalPrice,
   } = context;
-
+  const selectedUser = useSelector(selectUser);
   // us states
   const [usStates, setusStates] = useState([]);
 
@@ -54,7 +57,7 @@ export default function Checkout() {
   };
   const save = () => {
     data = sigPad.current.toDataURL();
-    console.log(data);
+    // console.log(data);
     // const link = document.createElement("a");
     // link.download = "signature.png";
     // link.href = data;
@@ -106,8 +109,12 @@ export default function Checkout() {
     address_id: "0",
     primary: "",
   });
+  // shipping address
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [addButtonShippedClicked, setaddButtonShippedClicked] = useState(false);
+  // billing address
   const [selectedAddressBilling, setSelectedAddressBilling] = useState(null);
+  const [addButtonBillingClicked, setaddButtonBillingClicked] = useState(false);
   const [selectedInsurance, setselectedInsurance] = useState(null);
   const formRef = useRef(null);
 
@@ -260,7 +267,7 @@ export default function Checkout() {
       // alert("Error");
     }
   };
-  console.log(profileDetails, "PROFILE DETAILS type address no");
+  // console.log(profileDetails, "PROFILE DETAILS type address no");
 
   const incNum = () => {
     if (num < 10) {
@@ -445,7 +452,7 @@ export default function Checkout() {
       if (response.data.status == false) {
         console.log("Error");
       } else {
-        console.log(response, "order details");
+        // console.log(response, "order details");
         alert("Order successful");
         getCartItemsFn();
         router.push("/");
@@ -595,9 +602,9 @@ export default function Checkout() {
     setEditUserprofile(false);
   };
   // console.log(addressList, "address list");
-  console.log(selectedAddress, "selected address");
+  // console.log(selectedAddress, "selected address");
   // console.log(insuranceDetails, "insurance list");
-  console.log(selectedInsurance, "selected insurance");
+  // console.log(selectedInsurance, "selected insurance");
   // add insurance detials
   const addInsuranceDetails = async () => {
     try {
@@ -874,7 +881,7 @@ export default function Checkout() {
       if (response.data.status == false) {
         console.log("Error");
       } else {
-        console.log(response, "documents list");
+        // console.log(response, "documents list");
         setdocumentsList(response?.data?.document);
       }
     } catch (error) {
@@ -1056,9 +1063,8 @@ export default function Checkout() {
         let item = cartItems[i];
         let obj = {};
         obj["number"] = i + 1;
-        obj["quantity"] = item?.qty;
-        obj["amount"] =
-          parseInt(item?.qty) * parseInt(item?.variant_sale_price);
+        obj["quantity"] = 1;
+        obj["amount"] = parseInt(item?.variant_sale_price);
         obj["taxCode"] = "PS081282";
         obj["itemCode"] = item?.product_variant_id;
         obj["description"] = item?.mproduct?.product_name;
@@ -1115,7 +1121,7 @@ export default function Checkout() {
       if (response.data.status == false) {
         console.log("Error");
       } else {
-        console.log(response, "tax response");
+        // console.log(response, "tax response");
         settaxDetails(response?.data?.tax_details);
       }
     } catch (error) {
@@ -1136,7 +1142,9 @@ export default function Checkout() {
     setloginUser(user);
     getAddressList();
     getInsuranceList();
-    getCartItemsFn();
+    if (!selectedUser.cart_items_fetched) {
+      getCartItemsFn();
+    }
     getDocumentsList();
   }, []);
   useEffect(() => {
@@ -1247,6 +1255,7 @@ export default function Checkout() {
                           address_id: "0",
                           primary: "",
                         });
+                        setaddButtonShippedClicked(true);
                         setEditCancel(true);
                       }}
                     >
@@ -1257,7 +1266,9 @@ export default function Checkout() {
                     <div className="">
                       {editCancel ? (
                         <div className="edit-form-box">
-                          <h6>Edit address</h6>
+                          <h6>
+                            {addButtonShippedClicked ? "Add" : "Edit"} address
+                          </h6>
                           <div className="row">
                             <div className="col">
                               <Form ref={formRef} onSubmit={handleSubmit}>
@@ -1630,6 +1641,7 @@ export default function Checkout() {
                                         <button
                                           className="border-btn text-primary"
                                           onClick={() => {
+                                            setaddButtonShippedClicked(false);
                                             editButtonClickedFn(
                                               item,
                                               "normalAddress"
@@ -2511,21 +2523,45 @@ export default function Checkout() {
                                       </div>
                                       <div className="ms-3">
                                         <div className="">
+                                          {/* <Link
+                                            href={`/product_detail/checkout/${item?.product_variant?.variant_permlink}`}
+                                            target="_blank"
+                                          > */}
                                           <h5
                                             className="card-title"
                                             style={{ cursor: "pointer" }}
                                             onClick={() => {
                                               if (item?.product_variant) {
-                                                router.push(
-                                                  `/product_detail/checkout/${item?.product_variant?.variant_permlink}`
+                                                window.open(
+                                                  `/product_detail/checkout/${item?.product_variant?.variant_permlink}`,
+                                                  "_blank" // This tells the browser to open the link in a new tab
                                                 );
                                               }
                                             }}
                                           >
                                             {item?.mproduct?.product_name}
                                           </h5>
+                                          {/* </Link> */}
+
                                           <p>
                                             {item?.mproduct?.brand?.brand_name}
+                                          </p>
+                                          <p>
+                                            <label className="form-check pb-2">
+                                              <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                checked={
+                                                  item?.is_subscription === "Y"
+                                                }
+                                              />
+                                              <span className="form-check-label">
+                                                {
+                                                  item?.mproduct
+                                                    ?.subscription_description
+                                                }
+                                              </span>
+                                            </label>
                                           </p>
                                           {/* <p>Color: White</p> */}
                                         </div>
@@ -3191,7 +3227,9 @@ export default function Checkout() {
             </div>
             <div className="modal-body">
               <div className="row">
-                <h5 className="pb-3">Add Billing Address</h5>
+                <h5 className="pb-3">
+                  {addButtonBillingClicked ? "Add" : "Edit"} Billing Address
+                </h5>
                 <div className="col-md-12">
                   <div class="form-check mb-2">
                     <input
@@ -3450,6 +3488,7 @@ export default function Checkout() {
                           address_id: "0",
                           primary: "",
                         });
+
                         setSelectedAddressBilling(null);
                       }}
                       data-bs-dismiss="modal"
@@ -3527,6 +3566,7 @@ export default function Checkout() {
                           address_id: "0",
                           primary: "",
                         });
+                        setaddButtonBillingClicked(true);
                         setSelectedAddressBilling(null);
                       }}
                     >
@@ -3598,6 +3638,7 @@ export default function Checkout() {
                                 data-bs-target="#exampleModalToggleAddBillingAddress"
                                 data-bs-toggle="modal"
                                 onClick={() => {
+                                  setaddButtonBillingClicked(false);
                                   editButtonClickedFn(item, "billingAddress");
                                 }}
                               >

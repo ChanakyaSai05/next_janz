@@ -20,6 +20,9 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import axios from "axios";
 import UserContext from "../../../context/UserContext";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser, set_data_fetched } from "../../../features/userSlice";
+import { getWishListDetails } from "../../../components/FunctionCalls";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,7 +32,9 @@ export default function Product(props) {
   const { brandId } = params;
   const { brand, products } = props?.data;
   const context = useContext(UserContext);
-  const { getCartItemsFn } = context;
+  const { getCartItemsFn, cartItems } = context;
+  const dispatch = useDispatch();
+  const selectedUser = useSelector(selectUser);
   // console.log(brand);
   console.log(props, "props");
   const [product_wishlist, setproduct_wishlist] = useState([]);
@@ -135,34 +140,20 @@ export default function Product(props) {
   // get wishlist
   const getWishListButton = async () => {
     try {
-      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
-      const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}customer/wishlist`,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: {
-          customer_id: user?.customer_id,
-          wishlist: false,
-        },
-      });
-
-      // console.log(response, "result");
-      if (response.data.status == false) {
-        console.log("Error");
-      } else {
-        // console.log(response?.data);
-        setproduct_wishlist(response?.data?.product_wishlist);
-      }
+      let wishlistData = await getWishListDetails();
+      dispatch(
+        set_data_fetched({
+          wishlist_items_fetched: true,
+          wishlistData: wishlistData,
+        })
+      );
     } catch (error) {
       console.log(error);
     }
   };
-
   const findInWishlist = (sub_product) => {
-    for (let i = 0; i < product_wishlist?.length; i++) {
-      const element = product_wishlist[i];
+    for (let i = 0; i < selectedUser?.wishlistData?.length; i++) {
+      const element = selectedUser?.wishlistData[i];
       if (element?.product_id == sub_product?.product_id) {
         return true;
       }
@@ -171,8 +162,12 @@ export default function Product(props) {
     return false;
   };
   useEffect(() => {
-    getCartItemsFn();
-    getWishListButton();
+    if (!selectedUser.cart_items_fetched) {
+      getCartItemsFn();
+    }
+    if (!selectedUser.wishlist_items_fetched) {
+      getWishListButton();
+    }
   }, []);
 
   return (
@@ -263,9 +258,9 @@ export default function Product(props) {
                       </div>
                       <p className="card-text">{pro?.product_name}</p>
                       <span className="badge text-bg-primary p-2 px-3 me-2">
-                        4.2 &#9733;
+                        {pro?.avg_ratting} &#9733;
                       </span>
-                      <span>(166)</span>
+                      <span>({pro?.total_ratting})</span>
                     </div>
                   </div>
                 ))}
@@ -332,9 +327,12 @@ export default function Product(props) {
                   <div className="d-flex pb-3">
                     <div>
                       <span className="badge text-bg-primary p-2 px-3 me-2">
-                        4.3 &#9733;
+                        {pro?.avg_ratting} &#9733;
                       </span>
-                      <span className="fw-bold">257 Ratings & 30 Reviews </span>
+                      <span className="fw-bold">
+                        {pro?.total_ratting} Ratings & {pro?.total_review}{" "}
+                        Reviews{" "}
+                      </span>
                     </div>
                   </div>
                   <p>

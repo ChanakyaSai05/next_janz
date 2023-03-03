@@ -12,7 +12,6 @@ import UserContext from "../context/UserContext";
 import Greeting from "./Greeting";
 
 export default function Header() {
-  // const [publicPath] = useState(process.env.NEXT_PUBLIC_URL);
   const context = useContext(UserContext);
   const { cartItems } = context;
   const router = useRouter();
@@ -23,35 +22,7 @@ export default function Header() {
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
-  // const getCartItemsFn = async () => {
-  //   try {
-  //     let user = JSON.parse(localStorage.getItem("janz_medical_user"));
-  //     const response = await axios({
-  //       url: `${process.env.NEXT_PUBLIC_URL}product/cartproducts`,
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       data: {
-  //         customer_id: user ? user.customer_id : "",
-  //       },
-  //     });
 
-  //     // console.log(response, "result");
-  //     if (response.data.status == false) {
-  //       console.log("Error");
-  //     } else {
-  //       console.log(response?.data);
-  //       setcartItems(response?.data?.cart_products);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-  // console.log(cartItems, "cart_items");
-  // useEffect(() => {
-  //   getCartItemsFn();
-  // }, []);
   useEffect(() => {
     let userParsed = JSON.parse(localStorage.getItem("janz_medical_user"));
     setUser(userParsed?.customer_name);
@@ -67,7 +38,13 @@ export default function Header() {
           <aside className="left-aside menu-box">
             <div className="col-auto logo-box">
               <Link className="logo" href={" "}>
-                <Image width={150} height={60} src={logo} alt="logo" />
+                <Image
+                  width={150}
+                  height={60}
+                  src={logo}
+                  alt="logo"
+                  onClick={() => router.push("/")}
+                />
               </Link>
             </div>
             <div className="d-flex justify-content-center pt-4">

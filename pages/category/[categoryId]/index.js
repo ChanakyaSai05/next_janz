@@ -27,6 +27,9 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import UserContext from "../../../context/UserContext";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser, set_data_fetched } from "../../../features/userSlice";
+import { getWishListDetails } from "../../../components/FunctionCalls";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -35,9 +38,10 @@ export default function Category(props) {
   const params = router.query;
   const { categoryId } = params;
   const context = useContext(UserContext);
-  const { getCartItemsFn } = context;
-  const [product_wishlist, setproduct_wishlist] = useState([]);
-  console.log(props, "props");
+  const { getCartItemsFn, cartItems } = context;
+  const dispatch = useDispatch();
+  const selectedUser = useSelector(selectUser);
+  // console.log(props, "props");
   const hero = {
     dots: true,
     infinite: true,
@@ -117,26 +121,13 @@ export default function Category(props) {
   // get wishlist
   const getWishListButton = async () => {
     try {
-      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
-      const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}customer/wishlist`,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: {
-          customer_id: user?.customer_id,
-          wishlist: false,
-        },
-      });
-
-      // console.log(response, "result");
-      if (response.data.status == false) {
-        console.log("Error");
-      } else {
-        // console.log(response?.data);
-        setproduct_wishlist(response?.data?.product_wishlist);
-      }
+      let wishlistData = await getWishListDetails();
+      dispatch(
+        set_data_fetched({
+          wishlist_items_fetched: true,
+          wishlistData: wishlistData,
+        })
+      );
     } catch (error) {
       console.log(error);
     }
@@ -170,8 +161,8 @@ export default function Category(props) {
     }
   };
   const findInWishlist = (sub_product) => {
-    for (let i = 0; i < product_wishlist?.length; i++) {
-      const element = product_wishlist[i];
+    for (let i = 0; i < selectedUser?.wishlistData?.length; i++) {
+      const element = selectedUser?.wishlistData[i];
       if (element?.product_id == sub_product?.product_id) {
         return true;
       }
@@ -180,8 +171,12 @@ export default function Category(props) {
     return false;
   };
   useEffect(() => {
-    getCartItemsFn();
-    getWishListButton();
+    if (!selectedUser.cart_items_fetched) {
+      getCartItemsFn();
+    }
+    if (!selectedUser.wishlist_items_fetched) {
+      getWishListButton();
+    }
   }, []);
   // add to cart button
   const cartIconBtn = () => {

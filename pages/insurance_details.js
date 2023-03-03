@@ -1,17 +1,24 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Table, Dropdown } from "react-bootstrap";
 import Header from "../components/header";
 import Asidebar from "../components/asidebar";
 import Form from "react-bootstrap/Form";
 import { useEffect } from "react";
 import axios from "axios";
+import UserContext from "../context/UserContext";
+import { useSelector } from "react-redux";
+import { selectUser } from "../features/userSlice";
 
 export default function Insurancedetails() {
+  const context = useContext(UserContext);
+  const { getCartItemsFn, cartItems } = context;
+  const selectedUser = useSelector(selectUser);
   const [editCancel, setEditCancel] = useState(false);
   const [numbereditCancel, setNumberEditCancel] = useState(false);
   const [formedit, setFormEdit] = useState(false);
   const [editform, setEditForm] = useState(false);
   const [addEditMode, setaddEditMode] = useState(false);
+  const [addButtonClicked, setaddButtonClicked] = useState(false);
   // edit mode the above one true
   //insurance details
   const [insuranceDetails, setinsuranceDetails] = useState({
@@ -269,6 +276,9 @@ export default function Insurancedetails() {
     }
   };
   useEffect(() => {
+    if (!selectedUser.cart_items_fetched) {
+      getCartItemsFn();
+    }
     getInsuranceList();
   }, []);
 
@@ -287,6 +297,21 @@ export default function Insurancedetails() {
             typeof="button"
             className="button button-blue w-100 p-3 fs-20"
             onClick={() => {
+              setinsuranceDetails({
+                customer_insruance_id: "0",
+                insurance_default: "",
+                insurnace_id: "",
+                birth_date: "",
+                subscriber_id: "",
+                policy_number: "",
+                group_number: "",
+                sponsor_first_name: "",
+                sponsor_last_name: "",
+                sponsor_ssn: "",
+                sponsor_dbn: "",
+                insurance_name: "",
+              });
+              setaddButtonClicked(true);
               setEditForm(true);
             }}
           >
@@ -301,7 +326,9 @@ export default function Insurancedetails() {
 
         {editform && (
           <div className="edit-form-box">
-            <h6 className="mb-3">Edit Insurance</h6>
+            <h6 className="mb-3">
+              {addButtonClicked ? "Add" : "Edit"} Insurance
+            </h6>
             <div className="row">
               <div className="col-md-6">
                 <Form>
@@ -523,7 +550,10 @@ export default function Insurancedetails() {
                                 <Dropdown.Item
                                   as="button"
                                   className="border-bottom"
-                                  onClick={() => editForm(item)}
+                                  onClick={() => {
+                                    setaddButtonClicked(false);
+                                    editForm(item);
+                                  }}
                                 >
                                   Edit
                                 </Dropdown.Item>

@@ -1,21 +1,32 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Header from "../components/header";
 import Asidebar from "../components/asidebar";
 import Image from "next/image";
 import breastPump from "../public/images/breast-pump.svg";
+import no_image from "../public/images/no_image.jpg";
 import breastPumpMeter from "../public/images/breast-pump-meter.svg";
+import UserContext from "../context/UserContext";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser, set_data_fetched } from "../features/userSlice";
+import axios from "axios";
+import { getOrderedItems } from "../components/FunctionCalls";
 
 export default function Myorder() {
   // const [publicPath] = useState(process.env.NEXT_PUBLIC_URL);
-
+  const context = useContext(UserContext);
+  const { getCartItemsFn, cartItems } = context;
+  const selectedUser = useSelector(selectUser);
   const [editCancel, setEditCancel] = useState(false);
   const [numbereditCancel, setNumberEditCancel] = useState(false);
   const [formedit, setFormEdit] = useState(false);
   const [editform, setEditForm] = useState(false);
-
+  const [allOrderedItems, setallOrderedItems] = useState([]);
   const editForm = (item) => {
     setEditForm(!editform);
   };
+  const selectedItems = useSelector(selectUser);
+  console.log(selectedItems, "slectedItem");
+  const dispatch = useDispatch();
 
   const [table, setTable] = useState([
     { id: 1, isShown: false },
@@ -40,32 +51,42 @@ export default function Myorder() {
     setFormShow((formShow) => !btnState);
   }
   let toggleClassForm = btnState ? " show-form" : "";
-  const getAllOrderedItems = async () => {
-    try {
-      let user = JSON.parse(localStorage.getItem("janz_medical_user"));
-      let token = localStorage.getItem("janz_medical_login_token");
-      const response = await axios({
-        url: `${process.env.NEXT_PUBLIC_URL}product/cartproduct/delete`,
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
 
-      // console.log(response, "result");
-      if (response.data.status == false) {
-        console.log("Error");
-      } else {
-        console.log(response?.data, "all ordered items");
-      }
-    } catch (error) {
-      console.log(error);
+  // console.log(allOrderedItems, "allorders");
+  // get orders
+  const getOrderedDate = (ordered_date) => {
+    if (ordered_date) {
+      const dateString = ordered_date;
+
+      const date = new Date(dateString);
+
+      const formattedDate = date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+      return formattedDate;
     }
+
+    return "";
   };
 
+  const callingGetOrdersFunction = async () => {
+    const result = await getOrderedItems();
+    dispatch(
+      set_data_fetched({
+        orderedItems: result,
+        ordered_items_fetched: true,
+      })
+    );
+  };
   useEffect(() => {
-    getAllOrderedItems();
+    if (!selectedUser.cart_items_fetched) {
+      getCartItemsFn();
+    }
+    if (!selectedUser.ordered_items_fetched) {
+      callingGetOrdersFunction();
+    }
   }, []);
 
   return (
@@ -78,7 +99,102 @@ export default function Myorder() {
             <h2>Order History</h2>
           </div>
         </div>
-        <div className="row mb-4 ">
+        {selectedUser?.orderedItems?.map((order, order_index) => (
+          <div className="row mb-4 " key={order_index}>
+            <div className="col-12">
+              <div className="card border-0">
+                <div className="card-body">
+                  <div className="row">
+                    <div className="col">
+                      <div className="d-sm-flex align-items-end align-items-center">
+                        <h5 className="pe-3">Order#{order?.order_number}</h5>
+                        <small className="opacity-75">
+                          {getOrderedDate(order?.created_at)}
+                        </small>
+                      </div>
+                    </div>
+                    <div className="col-auto">
+                      <h5>Total: ${order?.total_amount}</h5>
+                    </div>
+                    <div className="col-12">
+                      <hr className="mt-2" />
+                    </div>
+                  </div>
+                  {order?.order_product?.map(
+                    (order_product, order_product_index) => (
+                      <>
+                        <div className="row" key={order_product_index}>
+                          <div className="col-lg-5 col-sm-12">
+                            <div className="d-flex">
+                              <div className="order-imgbox">
+                                <Image
+                                  width={200}
+                                  height={200}
+                                  src={
+                                    order_product?.product?.product_image[0]
+                                      ?.image_file
+                                      ? `${process.env.NEXT_PUBLIC_MEDIA}${order_product?.product?.product_image[0]?.image_file}`
+                                      : no_image
+                                  }
+                                  alt="Breast Pump"
+                                />
+                              </div>
+                              <div className="d-block align-self-center ps-3 ps-sm-4">
+                                <h6>{order_product?.product?.product_name}</h6>
+                                <ul className="list-inline mb-0 mt-3">
+                                  <li className="list-inline-item pe-3">
+                                    <strong className="me-2">SKU:</strong>
+                                    <span>
+                                      {order_product?.product?.product_sku}
+                                    </span>
+                                  </li>
+                                  <li className="list-inline-item">
+                                    <strong className="me-2">Qty:</strong>
+                                    <span>{order_product?.qty}</span>
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="col-lg col-sm-12 ">
+                            <h6 className="mt-20px">
+                              {order?.orderstatus?.status_name}
+                            </h6>
+                          </div>
+                          <div className="col-lg-auto col-sm-12">
+                            <div className="d-flex mt-20px mb-2">
+                              <a className="text-primary fw-bold text-decoration-none">
+                                <svg className="icon me-2">
+                                  <use href="#icon_files"></use>
+                                </svg>
+                                <span className="text-decoration-underline">
+                                  Upload Authorization\RX
+                                </span>
+                              </a>
+                            </div>
+                            <div className="d-flex">
+                              <a className="text-danger fw-bold text-decoration-none">
+                                <svg className="icon me-2">
+                                  <use href="#icon_cancel"></use>
+                                </svg>
+                                <span className="text-decoration-underline">
+                                  Cancel Order
+                                </span>
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                        <br />
+                      </>
+                    )
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+        {/* Examples */}
+        {/* <div className="row mb-4 ">
           <div className="col-12">
             <div className="card border-0">
               <div className="card-body">
@@ -429,7 +545,7 @@ export default function Myorder() {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className={`modal ${toggleClassCheck}`}>
           <div className="popup-body">

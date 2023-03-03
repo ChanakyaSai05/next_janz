@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import React, { Component } from "react";
 import Image from "next/image";
 import Headerlanding from "../components/headerlanding";
@@ -6,10 +6,20 @@ import Footer from "../components/footer";
 import storeBanner from "../public/images/store-banner.svg";
 import storeUser from "../public/images/store-user.svg";
 import map from "../public/images/map.svg";
+import UserContext from "../context/UserContext";
+import { useSelector } from "react-redux";
+import { selectUser } from "../features/userSlice";
 
 export default function Store() {
   // const [publicPath] = useState(process.env.NEXT_PUBLIC_URL);
-
+  const context = useContext(UserContext);
+  const { getCartItemsFn, cartItems } = context;
+  const selectedUser = useSelector(selectUser);
+  useEffect(() => {
+    if (!selectedUser.cart_items_fetched) {
+      getCartItemsFn();
+    }
+  }, []);
   return (
     <>
       <Headerlanding></Headerlanding>

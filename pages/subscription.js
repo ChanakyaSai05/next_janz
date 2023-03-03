@@ -1,14 +1,19 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Table, Dropdown } from "react-bootstrap";
 import Header from "../components/header";
 import Asidebar from "../components/asidebar";
+import UserContext from "../context/UserContext";
+import { useSelector } from "react-redux";
+import { selectUser } from "../features/userSlice";
 
 export default function Subscription() {
+  const context = useContext(UserContext);
+  const { getCartItemsFn, cartItems } = context;
   const [editCancel, setEditCancel] = useState(false);
   const [numbereditCancel, setNumberEditCancel] = useState(false);
   const [formedit, setFormEdit] = useState(false);
   const [editform, setEditForm] = useState(false);
-
+  const selectedUser = useSelector(selectUser);
   const editForm = (item) => {
     setEditForm(!editform);
   };
@@ -58,6 +63,11 @@ export default function Subscription() {
       })
     );
   };
+  useEffect(() => {
+    if (!selectedUser.cart_items_fetched) {
+      getCartItemsFn();
+    }
+  }, []);
 
   return (
     <>

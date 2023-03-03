@@ -44,22 +44,30 @@ import brand4 from "../public/images/brand/brand4.svg";
 import brand5 from "../public/images/brand/brand5.svg";
 import brand10 from "../public/images/brand/brand10.svg";
 import customerImg2 from "../public/images/customer-img2.svg";
+import no_image from "../public/images/no_image.jpg";
+
 import axios from "axios";
 import { useRouter } from "next/router";
 import { useContext } from "react";
 import UserContext from "../context/UserContext";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser, set_data_fetched } from "../features/userSlice";
+import { getWishListDetails } from "../components/FunctionCalls";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home(props) {
   const context = useContext(UserContext);
-  const { productsData, setProductsData, getCartItemsFn } = context;
+  const { productsData, setProductsData, getCartItemsFn, cartItems } = context;
   const router = useRouter();
   const { diabaticCare, maternityCare, respiratoryCare, mobility } =
     props?.images;
   const [productsBrandsUpdatedImages, setproductsBrandsUpdatedImages] =
     useState([]);
   // console.log(props, "props");
+  const selectedUser = useSelector(selectUser);
+  const dispatch = useDispatch();
+  // console.log(selectedUser, "select user");
   console.log(productsData);
 
   let settings = {
@@ -199,8 +207,28 @@ export default function Home(props) {
     // console.log(productsDataBrandsUpdated, "updated");
   }, [productsData?.brands?.length]);
   //
+
+  // get wishlist
+  const getWishListButton = async () => {
+    try {
+      let wishlistData = await getWishListDetails();
+      dispatch(
+        set_data_fetched({
+          wishlist_items_fetched: true,
+          wishlistData: wishlistData,
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
   useEffect(() => {
-    getCartItemsFn();
+    if (!selectedUser.cart_items_fetched) {
+      getCartItemsFn();
+    }
+    if (!selectedUser.wishlist_items_fetched) {
+      getWishListButton();
+    }
   }, []);
 
   return (
@@ -364,7 +392,11 @@ export default function Home(props) {
               </button>
             </div>
             <div className="col d-flex justify-content-center py-2">
-              <button type="button" className="w-100">
+              <button
+                type="button"
+                className="w-100"
+                onClick={() => router.push("/insurance_accepted/tricare")}
+              >
                 <svg className="icon">
                   <use href="#icon_refill"></use>
                 </svg>
@@ -393,7 +425,11 @@ export default function Home(props) {
                   <Image
                     width={296}
                     height={300}
-                    src={`${process.env.NEXT_PUBLIC_MEDIA}${item?.category_image}`}
+                    src={
+                      item?.category_image
+                        ? `${process.env.NEXT_PUBLIC_MEDIA}${item?.category_image}`
+                        : no_image
+                    }
                     alt="..."
                   />
                   <h5>{item?.category_name}</h5>
@@ -408,7 +444,14 @@ export default function Home(props) {
                       </li>
                     ))}
                   </ul>
-                  <button type="button">Show more</button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      router.push(`/category/${item?.category_slug}`)
+                    }
+                  >
+                    Show more
+                  </button>
                 </div>
               </div>
             ))}
@@ -619,169 +662,54 @@ export default function Home(props) {
         <div className="row">
           <div className="12">
             <Slider {...settings}>
-              <div className="card">
-                <div className="card-bodys">
-                  <div className="d-flex justify-content-between">
-                    <div className="like-down-box">
-                      <svg className="icon">
-                        <use href="#icon_like-dull"></use>
-                      </svg>
-                    </div>
-                    <div className="download-box">
-                      <svg className="icon">
-                        <use href="#icon_loader-dull"></use>
-                      </svg>
-                    </div>
+              {productsData?.suggested_products?.map(
+                (product, product_index) => (
+                  <div key={product_index}>
+                    {product?.products &&
+                      product?.products?.map(
+                        (sub_product, sub_product_index) => (
+                          <div className="card" key={sub_product_index}>
+                            <div className="card-bodys">
+                              <div className="d-flex justify-content-between">
+                                <div className="like-down-box">
+                                  <svg className="icon">
+                                    <use href="#icon_like-dull"></use>
+                                  </svg>
+                                </div>
+                                <div className="download-box">
+                                  <svg className="icon">
+                                    <use href="#icon_loader-dull"></use>
+                                  </svg>
+                                </div>
+                              </div>
+                              <div className="d-flex my-2 py-2 justify-content-center">
+                                <div className="card-img">
+                                  <Image
+                                    width={180}
+                                    height={180}
+                                    src={
+                                      sub_product?.product_image[0]?.image_file
+                                        ? `${process.env.NEXT_PUBLIC_MEDIA}${sub_product?.product_image[0]?.image_file}`
+                                        : no_image
+                                    }
+                                    alt="..."
+                                  />
+                                </div>
+                              </div>
+                              <p className="card-text">
+                                {sub_product?.product_name}
+                              </p>
+                              <span className="badge text-bg-primary p-2 px-3 me-2">
+                                {sub_product?.avg_ratting} &#9733;
+                              </span>
+                              <span>({sub_product?.total_ratting})</span>
+                            </div>
+                          </div>
+                        )
+                      )}
                   </div>
-                  <div className="d-flex my-2 py-2 justify-content-center">
-                    <div className="card-img">
-                      <Image
-                        width={180}
-                        height={180}
-                        src={cardImg1}
-                        alt="..."
-                      />
-                    </div>
-                  </div>
-                  <p className="card-text">5 OZ Breast Milk Bottle Set</p>
-                  <span className="badge text-bg-primary p-2 px-3 me-2">
-                    4.2 &#9733;
-                  </span>
-                  <span>(166)</span>
-                </div>
-              </div>
-              <div className="card">
-                <div className="card-bodys">
-                  <div className="d-flex justify-content-between">
-                    <div className="like-down-box">
-                      <svg className="icon">
-                        <use href="#icon_like"></use>
-                      </svg>
-                    </div>
-                    <div className="download-box">
-                      <svg className="icon">
-                        <use href="#icon_loader"></use>
-                      </svg>
-                      <span>1</span>
-                    </div>
-                  </div>
-                  <div className="d-flex my-2 py-2 justify-content-center">
-                    <div className="card-img">
-                      <Image
-                        width={159}
-                        height={160}
-                        src={cardImg2}
-                        alt="..."
-                      />
-                    </div>
-                  </div>
-                  <p className="card-text">
-                    Spectra S1 Plus Electric Breast Pump Dual Voltage
-                  </p>
-                  <span className="badge text-bg-primary p-2 px-3 me-2">
-                    4.1 &#9733;
-                  </span>
-                  <span>(176)</span>
-                </div>
-              </div>
-              <div className="card">
-                <div className="card-bodys">
-                  <div className="d-flex justify-content-between">
-                    <div className="like-down-box">
-                      <svg className="icon">
-                        <use href="#icon_like-dull"></use>
-                      </svg>
-                    </div>
-                    <div className="download-box">
-                      <svg className="icon">
-                        <use href="#icon_loader-dull"></use>
-                      </svg>
-                      {/* <span>1</span> */}
-                    </div>
-                  </div>
-                  <div className="d-flex my-2 py-2 justify-content-center">
-                    <div className="card-img">
-                      <Image
-                        width={180}
-                        height={180}
-                        src={cardImg3}
-                        alt="..."
-                      />
-                    </div>
-                  </div>
-                  <p className="card-text">Lansinoh Resupply Kit</p>
-                  <span className="badge text-bg-primary p-2 px-3 me-2">
-                    4.4 &#9733;
-                  </span>
-                  <span>(200)</span>
-                </div>
-              </div>
-              <div className="card">
-                <div className="card-bodys">
-                  <div className="d-flex justify-content-between">
-                    <div className="like-down-box">
-                      <svg className="icon">
-                        <use href="#icon_like-dull"></use>
-                      </svg>
-                    </div>
-                    <div className="download-box">
-                      <svg className="icon">
-                        <use href="#icon_loader-dull"></use>
-                      </svg>
-                      {/* <span>1</span> */}
-                    </div>
-                  </div>
-                  <div className="d-flex my-2 py-2 justify-content-center">
-                    <div className="card-img">
-                      <Image
-                        width={125}
-                        height={160}
-                        src={cardImg4}
-                        alt="..."
-                      />
-                    </div>
-                  </div>
-                  <p className="card-text">Bambo Nature Love Balm</p>
-                  <span className="badge text-bg-primary p-2 px-3 me-2">
-                    4.0 &#9733;
-                  </span>
-                  <span>(123)</span>
-                </div>
-              </div>
-              <div className="card">
-                <div className="card-bodys">
-                  <div className="d-flex justify-content-between">
-                    <div className="like-down-box">
-                      <svg className="icon">
-                        <use href="#icon_like"></use>
-                      </svg>
-                    </div>
-                    <div className="download-box">
-                      <svg className="icon">
-                        <use href="#icon_loader"></use>
-                      </svg>
-                      <span>1</span>
-                    </div>
-                  </div>
-                  <div className="d-flex my-2 py-2 justify-content-center">
-                    <div className="card-img">
-                      <Image
-                        width={159}
-                        height={160}
-                        src={cardImg2}
-                        alt="..."
-                      />
-                    </div>
-                  </div>
-                  <p className="card-text">
-                    Spectra S1 Plus Electric Breast Pump Dual Voltage
-                  </p>
-                  <span className="badge text-bg-primary p-2 px-3 me-2">
-                    4.1 &#9733;
-                  </span>
-                  <span>(176)</span>
-                </div>
-              </div>
+                )
+              )}
             </Slider>
           </div>
         </div>
@@ -957,7 +885,11 @@ export default function Home(props) {
                       <Image
                         width={120}
                         height={60}
-                        src={`${process.env.NEXT_PUBLIC_MEDIA}${item.insurance_image}`}
+                        src={
+                          item.insurance_image
+                            ? `${process.env.NEXT_PUBLIC_MEDIA}${item.insurance_image}`
+                            : no_image
+                        }
                         alt="..."
                       />
                     </div>
@@ -999,7 +931,11 @@ export default function Home(props) {
                           <Image
                             width={199}
                             height={157}
-                            src={`${process.env.NEXT_PUBLIC_MEDIA}${item["first"]?.brand_image}`}
+                            src={
+                              item["first"]?.brand_image
+                                ? `${process.env.NEXT_PUBLIC_MEDIA}${item["first"]?.brand_image}`
+                                : no_image
+                            }
                             alt="..."
                           />
                         )}
@@ -1018,7 +954,11 @@ export default function Home(props) {
                             <Image
                               width={199}
                               height={157}
-                              src={`${process.env.NEXT_PUBLIC_MEDIA}${item["second"]?.brand_image}`}
+                              src={
+                                item["second"]?.brand_image
+                                  ? `${process.env.NEXT_PUBLIC_MEDIA}${item["second"]?.brand_image}`
+                                  : no_image
+                              }
                               alt="..."
                             />
                           )}

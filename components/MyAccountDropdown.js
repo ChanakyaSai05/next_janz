@@ -6,7 +6,7 @@ import UserContext from "../context/UserContext";
 
 function MyAccountDropdown({ headerlanding }) {
   const context = useContext(UserContext);
-  const { loginUserAvalilable, setloginUserAvalilable, logoutBtn } = context;
+  const { logoutBtn } = context;
   const router = useRouter();
   const params = router.query;
   // console.log(headerlanding, "header landing");

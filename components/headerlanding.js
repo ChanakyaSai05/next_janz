@@ -14,22 +14,12 @@ import { useRouter } from "next/router";
 import UserState from "../context/UserState";
 import UserContext from "../context/UserContext";
 import MyAccountDropdown from "./MyAccountDropdown";
-
-export async function getServerSideProps({ params }) {
-  // console.log("before axios call");
-  const res = await axios.get(`${process.env.NEXT_PUBLIC_URL}menu/content`);
-  // console.log("after axios call");
-  const data = res.data;
-
-  return {
-    props: {
-      data,
-    },
-  };
-}
+import { useSelector } from "react-redux";
+import { selectUser } from "../features/userSlice";
 
 export default function Headerlanding() {
   const context = useContext(UserContext);
+
   const {
     closeRefRegisterModalandOpenLogin,
     productsData,
@@ -37,13 +27,15 @@ export default function Headerlanding() {
     checkLoginUser,
     loginUserAvalilable,
     setloginUserAvalilable,
+    getCartItemsFn,
     cartItems,
     fetchData,
   } = context;
   // console.log(closeRefRegisterModalandOpenLogin, "LOGIN TOGGLE");
   // const [productsData, setProductsData] = useState(null);
   // console.log(props, "PROPS");
-  console.log(productsData, "pdata");
+  const selectedUser = useSelector(selectUser);
+  // console.log(productsData, "pdata");
   const [preset, setPreset] = useState({
     one: true,
     two: false,
@@ -502,9 +494,13 @@ export default function Headerlanding() {
   //   }
   // };
   useEffect(() => {
-    // getCartItemsFn();
+    if (!selectedUser.cart_items_fetched) {
+      getCartItemsFn();
+    }
+    if (!selectedUser.menu_content_fetched) {
+      fetchData();
+    }
     checkLoginUser();
-    fetchData();
   }, []);
   return (
     <>
@@ -822,12 +818,12 @@ export default function Headerlanding() {
                   </Dropdown.Menu>
                 </Dropdown>
                 <Dropdown
-                  className="about-btn-box pntr-none"
+                  className="about-btn-box pntr-none career-btn"
                   onMouseLeave={() => handleDropdownClose("toggle-6")}
                 >
                   <Dropdown.Toggle
                     id="toggle-6"
-                    className="text-white m-0 dropdown-btn pnt-none"
+                    className="text-white m-0 dropdown-btn pnt-none  "
                     onMouseEnter={() => handleDropdownOpen("toggle-6")}
                   >
                     About Us

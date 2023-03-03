@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Table, Dropdown } from "react-bootstrap";
 import Header from "../components/header";
 import Asidebar from "../components/asidebar";
@@ -6,14 +6,21 @@ import Form from "react-bootstrap/Form";
 import axios from "axios";
 import CryptoJS from "crypto-js";
 import { Country, State, City } from "country-state-city";
+import UserContext from "../context/UserContext";
+import { useSelector } from "react-redux";
+import { selectUser } from "../features/userSlice";
 
 export default function Profiledetails() {
+  const context = useContext(UserContext);
+  const { getCartItemsFn, cartItems } = context;
+  const selectedUser = useSelector(selectUser);
   const [loginDetails, setloginDetails] = useState({
     current_password: "",
     new_password: "",
     new_password_confirm: "",
     verification_code: "",
   });
+  const [validzip, setvalidzip] = useState({ error: false, message: "" });
   // Password validation
   const [passwordValidation, setpasswordValidation] = useState({
     length: false,
@@ -59,12 +66,21 @@ export default function Profiledetails() {
     address_id: "0",
     primary: "",
   });
+  // set profile add and edit address
+  // add new address=true and edit new address=false
+  const [addButtonClicked, setaddButtonClicked] = useState(false);
   // Address list
   const [addressList, setaddressList] = useState([]);
   // selected delete item
   const [selectedDeleteAddress, setselectedDeleteAddress] = useState({});
 
   const handleProfileDetails = (e) => {
+    if (e.target.id === "zipCode") {
+      // console.log("target");
+      if (e.target.value.length > 5) {
+        return;
+      }
+    }
     setprofileDetails({ ...profileDetails, [e.target.id]: e.target.value });
   };
   // console.log(profileDetails, "PROFILE DETAILS type address no");
@@ -105,7 +121,7 @@ export default function Profiledetails() {
       setTableDelete(true);
     }, 100);
   }
-  console.log(selectedDeleteAddress, "selected delte address");
+  // console.log(selectedDeleteAddress, "selected delte address");
   let toggleClassOpen = tableDelete ? " show" : "";
 
   const [btnState, setBtnState] = useState(false);
@@ -514,7 +530,50 @@ export default function Profiledetails() {
         : "off",
     });
   }, []);
+  useEffect(() => {
+    let { state, zipCode } = profileDetails;
+    if (zipCode.length == 0) {
+      setvalidzip({ ...validzip, error: false });
+      return;
+    }
+    let zipArr = zipCode.split("");
+    if (state === "AE") {
+      // setprofileDetails({ ...profileDetails, zipCode: "09" });
+      if (zipArr[0] != "0" || zipArr[1] != "9" || zipArr.length > 5) {
+        setvalidzip({ error: true, message: "Please Enter valid zip code" });
+      } else {
+        setvalidzip({ error: false, message: "" });
+      }
+    }
+    if (state === "AP") {
+      // setprofileDetails({ ...profileDetails, zipCode: "962" });
+      zipArr[0] != "9" ||
+      zipArr[1] != "6" ||
+      zipArr[2] != "2" ||
+      zipArr.length > 6
+        ? setvalidzip({ error: true, message: "Please Enter valid zip code" })
+        : setvalidzip({ error: false, message: "" });
+    }
+    if (state === "AA") {
+      // setprofileDetails({ ...profileDetails, zipCode: "340" });
+      if (
+        zipArr[0] != "3" ||
+        zipArr[1] != "4" ||
+        zipArr[2] != "0" ||
+        zipArr.length > 6
+      ) {
+        setvalidzip({ error: true, message: "Please Enter valid zip code" });
+      } else {
+        setvalidzip({ error: false, message: "" });
+      }
+    }
+  }, [profileDetails.state, profileDetails.zipCode]);
 
+  useEffect(() => {
+    if (!selectedUser.cart_items_fetched) {
+      getCartItemsFn();
+    }
+  }, []);
   return (
     <>
       <Header></Header>
@@ -666,7 +725,7 @@ export default function Profiledetails() {
         <h5 className="small-heading py-3">My addresses</h5>
         {editform && (
           <div className="edit-form-box">
-            <h6>Edit address</h6>
+            <h6>{addButtonClicked ? "Add" : "Edit"} address</h6>
             <div className="row">
               <div className="col-md-6">
                 <Form>
@@ -860,13 +919,23 @@ export default function Profiledetails() {
                           ZIP Code
                         </label>
                         <input
-                          type="text"
+                          type="number"
                           value={profileDetails.zipCode}
                           className="form-control"
                           id="zipCode"
+                          maxLength="5"
+                          // pattern="\d{5}"
                           onChange={handleProfileDetails}
                         />
                       </div>
+                      {validzip.error && (
+                        <p
+                          className="pb-1 text-danger"
+                          style={{ paddingLeft: "10px" }}
+                        >
+                          {validzip.message}
+                        </p>
+                      )}
                     </div>
                   ) : (
                     <div className="no-btn-show">
@@ -927,6 +996,7 @@ export default function Profiledetails() {
                           value={profileDetails.zipCode}
                           className="form-control"
                           id="zipCode"
+                          maxLength="5"
                           onChange={handleProfileDetails}
                         />
                       </div>
@@ -1020,7 +1090,10 @@ export default function Profiledetails() {
                                 <Dropdown.Item
                                   as="button"
                                   className="border-bottom"
-                                  onClick={() => editForm(item)}
+                                  onClick={() => {
+                                    editForm(item);
+                                    setaddButtonClicked(false);
+                                  }}
                                 >
                                   Edit
                                 </Dropdown.Item>
@@ -1046,7 +1119,25 @@ export default function Profiledetails() {
           <button
             typeof="button"
             className="button button-blue w-100 p-3 fs-20"
-            onClick={() => setEditForm(true)}
+            onClick={() => {
+              setprofileDetails({
+                name: "",
+                address1: "",
+                address2: "",
+                apoFpo: "yes",
+                addressType: "",
+                city: "",
+                state: "",
+                country: "",
+                zipCode: "",
+                unitBox: "",
+                us_states: "",
+                address_id: "0",
+                primary: "",
+              });
+              setaddButtonClicked(true);
+              setEditForm(true);
+            }}
           >
             <span className="plus-icon">
               <svg className="icon">

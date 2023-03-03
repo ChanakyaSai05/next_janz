@@ -21,13 +21,16 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import UserContext from "../../context/UserContext";
 import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { selectUser } from "../../features/userSlice";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Product(props) {
-  console.log(props, "props accessory products");
+  // console.log(props, "props accessory products");
   const context = useContext(UserContext);
   const { getCartItemsFn, cartItems, setcartItems } = context;
+  const selectedUser = useSelector(selectUser);
   const router = useRouter();
   let settings = {
     dots: true,
@@ -69,7 +72,7 @@ export default function Product(props) {
 
   // add to cart button
   const addToCartButton = async (item) => {
-    console.log(item, "item");
+    // console.log(item, "item");
     try {
       let user = JSON.parse(localStorage.getItem("janz_medical_user"));
       let product = item?.product_variants[0];
@@ -108,9 +111,11 @@ export default function Product(props) {
       console.log(error);
     }
   };
-  console.log(cartItems, "cart_items");
+  // console.log(cartItems, "cart_items");
   useEffect(() => {
-    getCartItemsFn();
+    if (!selectedUser.cart_items_fetched) {
+      getCartItemsFn();
+    }
   }, []);
 
   return (

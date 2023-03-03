@@ -2,16 +2,21 @@ import UserContext from "./UserContext";
 import { useRef, useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { set_data_fetched } from "../features/userSlice";
 
 const UserState = (props) => {
   const router = useRouter();
   const closeRefRegisterModalandOpenLogin = useRef();
   const [productsData, setProductsData] = useState({});
   const [loginUserAvalilable, setloginUserAvalilable] = useState(false);
+  const dispatch = useDispatch();
+
   // cart items
   const [cartItems, setcartItems] = useState([]);
   // total cart price
   const [totalPrice, settotalPrice] = useState(0);
+
   // check loginuser available or not function
   const checkLoginUser = () => {
     const user = JSON.parse(localStorage.getItem("janz_medical_user"));
@@ -51,6 +56,11 @@ const UserState = (props) => {
         console.log(response?.data, "cart items");
         calculateTotalCartPrice(response?.data?.cart_products);
         setcartItems(response?.data?.cart_products);
+        dispatch(
+          set_data_fetched({
+            cart_items_fetched: true,
+          })
+        );
       }
     } catch (error) {
       console.log(error);
@@ -78,6 +88,11 @@ const UserState = (props) => {
       );
       if (res.data.status !== false) {
         setProductsData(res.data);
+        dispatch(
+          set_data_fetched({
+            menu_content_fetched: true,
+          })
+        );
       }
     } catch (error) {
       console.error(error);
@@ -89,29 +104,22 @@ const UserState = (props) => {
       // handle other types of errors
     }
   }
+  // console.log(fetchedDataStatus, "fetched_data_status");
 
-  // get cart from product detail
-  const getCartItemsFromProductsDetail = () => {
-    getCartItemsFn();
-  };
   return (
     <UserContext.Provider
       value={{
-        getCartItemsFromProductsDetail,
         fetchData,
         closeRefRegisterModalandOpenLogin,
         productsData,
-        setProductsData,
         loginUserAvalilable,
-        setloginUserAvalilable,
         logoutBtn,
         checkLoginUser,
         getCartItemsFn,
         calculateTotalCartPrice,
         cartItems,
-        totalPrice,
-        settotalPrice,
         setcartItems,
+        totalPrice,
       }}
     >
       {props.children}
