@@ -434,7 +434,7 @@ export default function Home(props) {
                   />
                   <h5>{item?.category_name}</h5>
                   <ul>
-                    {item.children?.map((child, child_index) => (
+                    {item.children?.slice(0, 6)?.map((child, child_index) => (
                       <li key={child_index}>
                         <Link
                           href={`/category/${item?.category_slug}/${child?.category_slug}`}
